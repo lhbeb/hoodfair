@@ -352,37 +352,37 @@ const Header = () => {
             <nav className="flex items-center gap-3 px-4 py-3 min-w-max">
               <Link
                 href="/#products"
-                className="flex-shrink-0 px-4 py-2 border border-[#262626]/30 rounded-full text-sm font-medium text-[#262626] hover:border-[#262626] hover:bg-[#262626]/5 transition-colors duration-300 whitespace-nowrap"
+                className="flex-shrink-0 px-4 py-2 border border-[#2356A5]/30 rounded-full text-sm font-medium text-[#2356A5] hover:border-[#2356A5] hover:bg-[#2356A5]/5 transition-colors duration-300 whitespace-nowrap"
               >
                 All
               </Link>
               <Link
                 href="/electronics"
-                className="flex-shrink-0 px-4 py-2 border border-[#262626]/30 rounded-full text-sm font-medium text-[#262626] hover:border-[#262626] hover:bg-[#262626]/5 transition-colors duration-300 whitespace-nowrap"
+                className="flex-shrink-0 px-4 py-2 border border-[#2356A5]/30 rounded-full text-sm font-medium text-[#2356A5] hover:border-[#2356A5] hover:bg-[#2356A5]/5 transition-colors duration-300 whitespace-nowrap"
               >
                 Electronics
               </Link>
               <Link
                 href="/fashion"
-                className="flex-shrink-0 px-4 py-2 border border-[#262626]/30 rounded-full text-sm font-medium text-[#262626] hover:border-[#262626] hover:bg-[#262626]/5 transition-colors duration-300 whitespace-nowrap"
+                className="flex-shrink-0 px-4 py-2 border border-[#2356A5]/30 rounded-full text-sm font-medium text-[#2356A5] hover:border-[#2356A5] hover:bg-[#2356A5]/5 transition-colors duration-300 whitespace-nowrap"
               >
                 Fashion
               </Link>
               <Link
                 href="/entertainment"
-                className="flex-shrink-0 px-4 py-2 border border-[#262626]/30 rounded-full text-sm font-medium text-[#262626] hover:border-[#262626] hover:bg-[#262626]/5 transition-colors duration-300 whitespace-nowrap"
+                className="flex-shrink-0 px-4 py-2 border border-[#2356A5]/30 rounded-full text-sm font-medium text-[#2356A5] hover:border-[#2356A5] hover:bg-[#2356A5]/5 transition-colors duration-300 whitespace-nowrap"
               >
                 Entertainment
               </Link>
               <Link
                 href="/hobbies-collectibles"
-                className="flex-shrink-0 px-4 py-2 border border-[#262626]/30 rounded-full text-sm font-medium text-[#262626] hover:border-[#262626] hover:bg-[#262626]/5 transition-colors duration-300 whitespace-nowrap"
+                className="flex-shrink-0 px-4 py-2 border border-[#2356A5]/30 rounded-full text-sm font-medium text-[#2356A5] hover:border-[#2356A5] hover:bg-[#2356A5]/5 transition-colors duration-300 whitespace-nowrap"
               >
                 Hobbies & Collectibles
               </Link>
               <Link
                 href="/#featured"
-                className="flex-shrink-0 px-4 py-2 border border-[#262626]/30 rounded-full text-sm font-medium text-[#262626] hover:border-[#262626] hover:bg-[#262626]/5 transition-colors duration-300 whitespace-nowrap"
+                className="flex-shrink-0 px-4 py-2 border border-[#2356A5]/30 rounded-full text-sm font-medium text-[#2356A5] hover:border-[#2356A5] hover:bg-[#2356A5]/5 transition-colors duration-300 whitespace-nowrap"
               >
                 Featured
               </Link>
