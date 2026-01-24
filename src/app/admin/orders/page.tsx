@@ -391,7 +391,7 @@ export default function AdminOrdersPage() {
         <div className="mb-4 flex justify-end">
           <button
             onClick={() => setShowExportDialog(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#015256] text-white rounded-lg hover:bg-[#4a0a27] transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#015256] text-white rounded-lg hover:bg-[#1a3d70] transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" /></svg>
             Export Orders (CSV)
@@ -770,7 +770,7 @@ export default function AdminOrdersPage() {
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-[#015256] hover:text-[#4a0a27] hover:bg-[#015256]/5 rounded-lg transition-colors"
+                              className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-[#015256] hover:text-[#1a3d70] hover:bg-[#015256]/5 rounded-lg transition-colors"
                               title="View product"
                             >
                               <Eye className="h-3 w-3" />

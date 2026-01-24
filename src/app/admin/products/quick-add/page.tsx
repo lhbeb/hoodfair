@@ -226,9 +226,9 @@ export default function QuickAddProductPage() {
               </div>
 
               <div className="bg-[#015256]/5 border border-[#015256]/20 rounded-lg p-4">
-                <div className="text-sm text-[#4a0a27]">
+                <div className="text-sm text-[#1a3d70]">
                   <div className="font-semibold mb-2">Required Fields:</div>
-                  <ul className="list-disc list-inside space-y-1 text-[#4a0a27]">
+                  <ul className="list-disc list-inside space-y-1 text-[#1a3d70]">
                     <li>slug, title, description, price</li>
                     <li>brand, category, condition</li>
                     <li>checkoutLink (or checkout_link)</li>

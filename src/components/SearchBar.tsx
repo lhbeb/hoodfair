@@ -81,7 +81,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ open, onClose }) => {
             aria-label="Search for products"
           />
           {query.length > 0 && (
-            <ArrowRight className="h-5 w-5 text-[#6d0f3a] animate-bounce-x ml-1" aria-label="Press Enter to search" />
+            <ArrowRight className="h-5 w-5 text-[#2658A6] animate-bounce-x ml-1" aria-label="Press Enter to search" />
           )}
           <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600" aria-label="Close search">
             <X className="h-5 w-5" />
@@ -106,7 +106,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ open, onClose }) => {
             aria-label="Search for products"
           />
           {query.length > 0 && (
-            <ArrowRight className="h-5 w-5 text-[#6d0f3a] animate-bounce-x ml-1" aria-label="Press Enter to search" />
+            <ArrowRight className="h-5 w-5 text-[#2658A6] animate-bounce-x ml-1" aria-label="Press Enter to search" />
           )}
           <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600" aria-label="Close search">
             <X className="h-5 w-5" />

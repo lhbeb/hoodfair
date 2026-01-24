@@ -37,8 +37,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, cardBackground = 'bg
           />
           {isSoldOut && (
             <div className="absolute inset-0 bg-[rgba(0,0,0,0.65)] flex items-center justify-center rounded-t-md">
-              <div className="bg-[#015256] rounded-lg px-5 py-2">
-                <span className="sold-out-badge text-white text-sm uppercase tracking-wider whitespace-nowrap">
+              <div className="bg-[#F4C446] rounded-lg px-5 py-2">
+                <span className="sold-out-badge text-black text-sm uppercase tracking-wider whitespace-nowrap font-bold">
                   Sold Out
                 </span>
               </div>
@@ -52,7 +52,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, cardBackground = 'bg
         </h3>
         <div className="mt-auto pt-2 flex flex-col gap-2">
           <span className="text-xl font-bold text-[#262626]">${new Intl.NumberFormat('en-US').format(price)}</span>
-          <Link href={`/products/${slug}`} className="flex items-center text-sm text-[#262626] hover:text-[#6d0f3a] transition-colors">
+          <Link href={`/products/${slug}`} className="flex items-center text-sm text-[#262626] hover:text-[#2658A6] transition-colors">
             <Eye className="h-4 w-4 mr-1" />
             <span>View Details</span>
           </Link>

@@ -149,7 +149,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                     {[...Array(5)].map((_, i) => (
                       <Star 
                         key={i}
-                        className={`h-5 w-5 ${i < Math.floor(averageRating) ? 'text-[#6d0f3a] fill-[#6d0f3a]' : 'text-gray-300'}`}
+                        className={`h-5 w-5 ${i < Math.floor(averageRating) ? 'text-[#2658A6] fill-[#2658A6]' : 'text-gray-300'}`}
                       />
                     ))}
                   </div>
@@ -165,7 +165,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                   <span className="text-sm text-gray-600 w-8">{rating}★</span>
                   <div className="flex-grow bg-gray-200 rounded-full h-2">
                     <div 
-                      className="bg-[#6d0f3a] rounded-full h-2" 
+                      className="bg-[#2658A6] rounded-full h-2" 
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
@@ -186,7 +186,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#6d0f3a] focus:border-transparent"
+                className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-transparent"
               >
                 <option value="recent">Most Recent</option>
                 <option value="helpful">Most Helpful</option>
@@ -216,7 +216,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                       <h3 className="font-medium text-[#262626] flex items-center gap-2 flex-wrap sm:flex-nowrap">
                         {review.author}
                         {review.verified && (
-                          <span className="flex items-center text-[#6d0f3a] text-sm">
+                          <span className="flex items-center text-[#2658A6] text-sm">
                             <CheckCircle2 className="h-4 w-4 mr-1" />
                             Verified Purchase
                           </span>
@@ -234,7 +234,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                     {[...Array(5)].map((_, i) => (
                       <Star 
                         key={i}
-                        className={`h-4 w-4 ${i < review.rating ? 'text-[#6d0f3a] fill-[#6d0f3a]' : 'text-gray-300'}`}
+                        className={`h-4 w-4 ${i < review.rating ? 'text-[#2658A6] fill-[#2658A6]' : 'text-gray-300'}`}
                       />
                     ))}
                   </div>
@@ -250,7 +250,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                           <button
                             key={index}
                             onClick={() => openImageModal(image)}
-                            className="relative group overflow-hidden rounded-lg border border-gray-200 hover:border-[#6d0f3a] transition-colors duration-200"
+                            className="relative group overflow-hidden rounded-lg border border-gray-200 hover:border-[#2658A6] transition-colors duration-200"
                           >
                             <Image
                               src={image}
@@ -277,7 +277,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                         onClick={() => handleHelpfulClick(review.id)}
                         className={`flex items-center text-sm px-3 py-1.5 rounded-md transition-colors duration-200 ${
                           helpfulClicks[review.id] 
-                            ? 'bg-[#6d0f3a] text-white' 
+                            ? 'bg-[#2658A6] text-white' 
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                       >

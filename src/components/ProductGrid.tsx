@@ -307,7 +307,7 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                             setPriceRange((previous) => ({ ...previous, min: event.target.value }))
                           }
                           placeholder="0"
-                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6d0f3a]"
+                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2658A6]"
                         />
                       </div>
                       <div className="w-full">
@@ -321,7 +321,7 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                             setPriceRange((previous) => ({ ...previous, max: event.target.value }))
                           }
                           placeholder="150"
-                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6d0f3a]"
+                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2658A6]"
                         />
                       </div>
                     </div>
@@ -337,7 +337,7 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                     <span>
                       Brands
                       {selectedBrands.length > 0 ? (
-                        <span className="ml-1 text-[#6d0f3a]">({selectedBrands.length})</span>
+                        <span className="ml-1 text-[#2658A6]">({selectedBrands.length})</span>
                       ) : null}
                     </span>
                     {expandedSections.brands ? (
@@ -365,7 +365,7 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                                 return previous.filter((value) => value !== brand);
                               });
                             }}
-                            className="h-4 w-4 rounded border-gray-300 text-[#6d0f3a] focus:ring-[#6d0f3a]"
+                            className="h-4 w-4 rounded border-gray-300 text-[#2658A6] focus:ring-[#2658A6]"
                           />
                           {brand}
                         </label>
@@ -374,7 +374,7 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                       {brandOptions.length > 8 ? (
                         <button
                           type="button"
-                          className="mt-2 text-xs font-semibold uppercase tracking-wide text-[#6d0f3a] hover:underline"
+                          className="mt-2 text-xs font-semibold uppercase tracking-wide text-[#2658A6] hover:underline"
                           onClick={() => setShowAllBrands((previous) => !previous)}
                         >
                           {showAllBrands ? "Show fewer brands" : `Show all ${brandOptions.length}`}
@@ -393,7 +393,7 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                     <span>
                       Condition
                       {selectedConditions.length > 0 ? (
-                        <span className="ml-1 text-[#6d0f3a]">({selectedConditions.length})</span>
+                        <span className="ml-1 text-[#2658A6]">({selectedConditions.length})</span>
                       ) : null}
                     </span>
                     {expandedSections.conditions ? (
@@ -421,7 +421,7 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                                 return previous.filter((value) => value !== condition);
                               });
                             }}
-                            className="h-4 w-4 rounded border-gray-300 text-[#6d0f3a] focus:ring-[#6d0f3a]"
+                            className="h-4 w-4 rounded border-gray-300 text-[#2658A6] focus:ring-[#2658A6]"
                           />
                           {condition}
                         </label>
@@ -430,7 +430,7 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                       {conditionOptions.length > 8 ? (
                         <button
                           type="button"
-                          className="mt-2 text-xs font-semibold uppercase tracking-wide text-[#6d0f3a] hover:underline"
+                          className="mt-2 text-xs font-semibold uppercase tracking-wide text-[#2658A6] hover:underline"
                           onClick={() => setShowAllConditions((previous) => !previous)}
                         >
                           {showAllConditions ? "Show fewer conditions" : `Show all ${conditionOptions.length}`}
@@ -444,7 +444,7 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                   <div className="md:col-[1/-1]">
                     <button
                       type="button"
-                      className="w-full rounded-xl border border-[#6d0f3a] bg-[#6d0f3a]/5 px-4 py-3 text-sm font-semibold text-[#6d0f3a] transition-colors duration-200 hover:bg-[#6d0f3a]/10"
+                      className="w-full rounded-xl border border-[#2658A6] bg-[#2658A6]/5 px-4 py-3 text-sm font-semibold text-[#2658A6] transition-colors duration-200 hover:bg-[#2658A6]/10"
                       onClick={handleClearFilters}
                     >
                       Clear all filters
@@ -469,7 +469,7 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                     <SlidersHorizontal className="h-4 w-4" />
                     <span>Filters</span>
                     {activeFilters > 0 ? (
-                      <span className="rounded-full bg-[#6d0f3a] px-2 py-0.5 text-xs font-semibold text-white">
+                      <span className="rounded-full bg-[#2658A6] px-2 py-0.5 text-xs font-semibold text-white">
                         {activeFilters}
                       </span>
                     ) : null}
@@ -479,7 +479,7 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                     <select
                       value={sortBy}
                       onChange={(event) => setSortBy(event.target.value as SortOption)}
-                      className="appearance-none rounded-lg border border-gray-300 bg-white px-4 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-[#6d0f3a]"
+                      className="appearance-none rounded-lg border border-gray-300 bg-white px-4 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-[#2658A6]"
                     >
                       <option value="featured">Default</option>
                       <option value="price-high">Price: High to Low</option>
@@ -495,11 +495,11 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
             {activeFilters > 0 ? (
               <div className="mb-6 flex flex-wrap items-center gap-2">
                 {priceRange.min !== "" ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[#6d0f3a]/10 px-3 py-1.5 text-sm font-medium text-[#6d0f3a]">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[#2658A6]/10 px-3 py-1.5 text-sm font-medium text-[#2658A6]">
                     Min: ${priceRange.min}
                     <button
                       type="button"
-                      className="rounded-full p-0.5 hover:bg-[#6d0f3a]/20"
+                      className="rounded-full p-0.5 hover:bg-[#2658A6]/20"
                       onClick={() => setPriceRange((previous) => ({ ...previous, min: "" }))}
                     >
                       <X className="h-3 w-3" />
@@ -508,11 +508,11 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                 ) : null}
 
                 {priceRange.max !== "" ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[#6d0f3a]/10 px-3 py-1.5 text-sm font-medium text-[#6d0f3a]">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[#2658A6]/10 px-3 py-1.5 text-sm font-medium text-[#2658A6]">
                     Max: ${priceRange.max}
                     <button
                       type="button"
-                      className="rounded-full p-0.5 hover:bg-[#6d0f3a]/20"
+                      className="rounded-full p-0.5 hover:bg-[#2658A6]/20"
                       onClick={() => setPriceRange((previous) => ({ ...previous, max: "" }))}
                     >
                       <X className="h-3 w-3" />
@@ -523,12 +523,12 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                 {selectedBrands.map((brand) => (
                   <span
                     key={brand}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-[#6d0f3a]/10 px-3 py-1.5 text-sm font-medium text-[#6d0f3a]"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-[#2658A6]/10 px-3 py-1.5 text-sm font-medium text-[#2658A6]"
                   >
                     {brand}
                     <button
                       type="button"
-                      className="rounded-full p-0.5 hover:bg-[#6d0f3a]/20"
+                      className="rounded-full p-0.5 hover:bg-[#2658A6]/20"
                       onClick={() => handleRemoveBrand(brand)}
                     >
                       <X className="h-3 w-3" />
@@ -539,12 +539,12 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                 {selectedConditions.map((condition) => (
                   <span
                     key={condition}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-[#6d0f3a]/10 px-3 py-1.5 text-sm font-medium text-[#6d0f3a]"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-[#2658A6]/10 px-3 py-1.5 text-sm font-medium text-[#2658A6]"
                   >
                     {condition}
                     <button
                       type="button"
-                      className="rounded-full p-0.5 hover:bg-[#6d0f3a]/20"
+                      className="rounded-full p-0.5 hover:bg-[#2658A6]/20"
                       onClick={() => handleRemoveCondition(condition)}
                     >
                       <X className="h-3 w-3" />
@@ -577,7 +577,7 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                         className={`px-3 py-2 rounded-lg transition-colors duration-300 flex items-center gap-1 ${
                           currentPage === 1
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                            : "bg-white text-gray-700 border border-gray-300 hover:bg-[#6d0f3a]/10 hover:text-[#6d0f3a]"
+                            : "bg-white text-gray-700 border border-gray-300 hover:bg-[#2658A6]/10 hover:text-[#2658A6]"
                         }`}
                         aria-label="Previous page"
                       >
@@ -593,7 +593,7 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                             <button
                               type="button"
                               onClick={() => handlePageChange(1)}
-                              className="px-3 sm:px-4 py-2 rounded-lg transition-colors duration-300 bg-white text-gray-700 border border-gray-300 hover:bg-[#6d0f3a]/10 hover:text-[#6d0f3a]"
+                              className="px-3 sm:px-4 py-2 rounded-lg transition-colors duration-300 bg-white text-gray-700 border border-gray-300 hover:bg-[#2658A6]/10 hover:text-[#2658A6]"
                             >
                               1
                             </button>
@@ -620,8 +620,8 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                                 onClick={() => handlePageChange(i)}
                                 className={`px-3 sm:px-4 py-2 rounded-lg transition-colors duration-300 ${
                                   currentPage === i
-                                    ? "bg-[#6d0f3a] text-white font-semibold"
-                                    : "bg-white text-gray-700 border border-gray-300 hover:bg-[#6d0f3a]/10 hover:text-[#6d0f3a]"
+                                    ? "bg-[#2658A6] text-white font-semibold"
+                                    : "bg-white text-gray-700 border border-gray-300 hover:bg-[#2658A6]/10 hover:text-[#2658A6]"
                                 }`}
                               >
                                 {i}
@@ -640,7 +640,7 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                             <button
                               type="button"
                               onClick={() => handlePageChange(totalPages)}
-                              className="px-3 sm:px-4 py-2 rounded-lg transition-colors duration-300 bg-white text-gray-700 border border-gray-300 hover:bg-[#6d0f3a]/10 hover:text-[#6d0f3a]"
+                              className="px-3 sm:px-4 py-2 rounded-lg transition-colors duration-300 bg-white text-gray-700 border border-gray-300 hover:bg-[#2658A6]/10 hover:text-[#2658A6]"
                             >
                               {totalPages}
                             </button>
@@ -656,7 +656,7 @@ const ProductGrid = ({ products, showHeader = true }: ProductGridProps) => {
                         className={`px-3 py-2 rounded-lg transition-colors duration-300 flex items-center gap-1 ${
                           currentPage === totalPages
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                            : "bg-white text-gray-700 border border-gray-300 hover:bg-[#6d0f3a]/10 hover:text-[#6d0f3a]"
+                            : "bg-white text-gray-700 border border-gray-300 hover:bg-[#2658A6]/10 hover:text-[#2658A6]"
                         }`}
                         aria-label="Next page"
                       >

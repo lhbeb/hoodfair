@@ -428,7 +428,7 @@ export default function NewProductPage() {
             <button
               onClick={(e) => handleSubmit(e, false)}
               disabled={loading || formData.collections.length === 0}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#015256] text-white text-sm font-medium rounded-xl hover:bg-[#4a0a27] disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#015256] text-white text-sm font-medium rounded-xl hover:bg-[#1a3d70] disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               title={formData.collections.length === 0 ? 'Please select at least one collection' : ''}
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
@@ -936,7 +936,7 @@ export default function NewProductPage() {
               <button type="button" onClick={() => setShowReviewModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
                 Cancel
               </button>
-              <button type="button" onClick={saveReview} className="px-4 py-2 bg-[#015256] text-white rounded-lg hover:bg-[#4a0a27]">
+              <button type="button" onClick={saveReview} className="px-4 py-2 bg-[#015256] text-white rounded-lg hover:bg-[#1a3d70]">
                 Save
               </button>
             </div>

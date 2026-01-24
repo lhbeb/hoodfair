@@ -22,7 +22,7 @@ const FeaturedProduct: React.FC<FeaturedProductProps> = ({ product }) => {
   return (
     <div className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:shadow-md md:flex-row">
       <div className="relative w-full overflow-hidden md:w-2/5 md:h-full">
-        <div className="absolute left-4 top-4 z-10 rounded-full bg-[#6d0f3a] px-3 py-1 text-sm font-medium text-white shadow-sm">
+        <div className="absolute left-4 top-4 z-10 rounded-full bg-[#2658A6] px-3 py-1 text-sm font-medium text-white shadow-sm">
           <div className="flex items-center gap-1">
             <Award className="h-4 w-4" />
             <span>Top Deals</span>
@@ -41,8 +41,8 @@ const FeaturedProduct: React.FC<FeaturedProductProps> = ({ product }) => {
               />
               {isSoldOut && (
                 <div className="absolute inset-0 bg-[rgba(0,0,0,0.382)] flex items-center justify-center">
-                  <div className="bg-[#015256] rounded-lg px-7 py-2.5">
-                    <span className="sold-out-badge text-white text-base md:text-lg uppercase tracking-wider whitespace-nowrap">
+                  <div className="bg-[#F4C446] rounded-lg px-7 py-2.5">
+                    <span className="sold-out-badge text-black text-base md:text-lg uppercase tracking-wider whitespace-nowrap font-bold">
                       Sold Out
                     </span>
                   </div>
@@ -80,7 +80,7 @@ const FeaturedProduct: React.FC<FeaturedProductProps> = ({ product }) => {
         <div className="mt-4 md:mt-3 flex flex-col gap-2 sm:flex-row sm:gap-2">
           <Link
             href={`/products/${slug}`}
-            className="flex-1 flex items-center justify-center rounded-lg bg-[#6d0f3a] py-2 px-3 text-sm font-semibold text-white transition-colors duration-300 hover:bg-[#4a0a27] whitespace-nowrap"
+            className="flex-1 flex items-center justify-center rounded-lg bg-[#2658A6] py-2 px-3 text-sm font-semibold text-white transition-colors duration-300 hover:bg-[#1a3d70] whitespace-nowrap"
           >
             Add to Cart
           </Link>

@@ -145,8 +145,8 @@ export default function BulkImportPage() {
               <div className="flex items-center gap-3">
                 <Loader2 className="h-5 w-5 text-[#015256] animate-spin flex-shrink-0" />
                 <div className="flex-1">
-                  <div className="text-sm font-semibold text-[#4a0a27]">Processing...</div>
-                  <div className="text-sm text-[#4a0a27]">{uploadProgress}</div>
+                  <div className="text-sm font-semibold text-[#1a3d70]">Processing...</div>
+                  <div className="text-sm text-[#1a3d70]">{uploadProgress}</div>
                 </div>
               </div>
             </div>

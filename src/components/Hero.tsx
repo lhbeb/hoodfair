@@ -86,14 +86,14 @@ const Hero = () => {
       {/* Content Container */}
       <div className="container mx-auto px-4 py-8 md:py-10 relative z-10">
         <div className="flex flex-col md:flex-row items-center min-h-[320px] md:min-h-[315px]">
-          
-          {/* White Card Overlay - Left Side */}
-          <div className="w-full max-w-[340px] md:max-w-[420px] lg:max-w-[450px] bg-white rounded-xl shadow-xl p-5 md:p-6 lg:p-8 md:ml-4 lg:ml-12">
+
+          {/* Blue Card Overlay - Left Side */}
+          <div className="w-full max-w-[340px] md:max-w-[420px] lg:max-w-[450px] bg-[#2658A6] rounded-xl shadow-xl p-5 md:p-6 lg:p-8 md:ml-4 lg:ml-12">
             {/* Heading with typing animation - PRESERVED */}
-            <h1 className="text-2xl md:text-3xl lg:text-[32px] font-bold text-[#2c2c2c] leading-tight">
+            <h1 className="text-2xl md:text-3xl lg:text-[32px] font-bold text-white leading-tight">
               <span
                 ref={typingTextRef}
-                className="block text-[#2c2c2c] h-[1.2em] mb-1"
+                className="block text-white h-[1.2em] mb-1"
               >
                 {placeholder}
               </span>
@@ -103,14 +103,14 @@ const Hero = () => {
             </h1>
 
             {/* Description - PRESERVED content */}
-            <p className="mt-3 text-sm md:text-base text-[#666666] leading-relaxed">
+            <p className="mt-3 text-sm md:text-base text-white/90 leading-relaxed">
               Authentic Burberry, Stone Island, And More, Top Tech, Bikes, And Cameras, All Checked And Ready
             </p>
 
             {/* Shop Now Button - PRESERVED href */}
-            <a 
-              href="#products" 
-              className="mt-5 inline-flex items-center justify-center px-6 py-2.5 bg-[#6d0f3a] text-white text-sm font-medium rounded-lg shadow-md hover:bg-[#4a0a27] transition-all duration-300"
+            <a
+              href="#products"
+              className="mt-5 inline-flex items-center justify-center px-6 py-2.5 bg-[#F4C446] text-[#474747] text-sm font-medium rounded-lg shadow-md hover:bg-[#F4C446]/90 transition-all duration-300"
             >
               Shop Now
             </a>

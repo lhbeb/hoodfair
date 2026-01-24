@@ -518,7 +518,7 @@ export default function AdminProductsPage() {
 
             <Link
               href="/admin/products/new"
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#015256] text-white rounded-xl hover:bg-[#4a0a27] transition-colors shadow-lg shadow-[#015256]/25"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#015256] text-white rounded-xl hover:bg-[#1a3d70] transition-colors shadow-lg shadow-[#015256]/25"
             >
               <Plus className="h-4 w-4" />
               <span className="font-medium">Add Product</span>
@@ -531,24 +531,24 @@ export default function AdminProductsPage() {
       {selectedProducts.size > 0 && (
         <div className="mb-4 px-4 py-3 bg-[#015256]/5 border border-[#015256]/20 rounded-xl flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <span className="text-sm font-medium text-[#4a0a27]">
+            <span className="text-sm font-medium text-[#1a3d70]">
               {selectedProducts.size} product{selectedProducts.size !== 1 ? 's' : ''} selected
             </span>
             <button
               onClick={handleSelectAll}
-              className="text-sm text-[#015256] hover:text-[#4a0a27] font-medium"
+              className="text-sm text-[#015256] hover:text-[#1a3d70] font-medium"
             >
               {selectedProducts.size === paginatedProducts.length ? 'Deselect Page' : 'Select Page'}
             </button>
             <button
               onClick={handleSelectAllFiltered}
-              className="text-sm text-[#015256] hover:text-[#4a0a27] font-medium"
+              className="text-sm text-[#015256] hover:text-[#1a3d70] font-medium"
             >
               {selectedProducts.size === filteredProducts.length && filteredProducts.length > 0 ? 'Deselect All Filtered' : 'Select All Filtered'}
             </button>
             <button
               onClick={() => setSelectedProducts(new Set())}
-              className="text-sm text-[#015256] hover:text-[#4a0a27] font-medium"
+              className="text-sm text-[#015256] hover:text-[#1a3d70] font-medium"
             >
               Clear Selection
             </button>
@@ -559,7 +559,7 @@ export default function AdminProductsPage() {
       {/* Filter Status */}
       {(searchQuery || statusFilter !== 'all' || featuredFilter !== 'all' || listedByFilter !== 'all') && (
         <div className="mb-4 px-4 py-2 bg-[#015256]/5 border border-[#015256]/20 rounded-xl">
-          <div className="text-sm text-[#4a0a27]">
+          <div className="text-sm text-[#1a3d70]">
             Showing <strong>{filteredProducts.length}</strong> of <strong>{products.length}</strong> product{products.length !== 1 ? 's' : ''}
             {statusFilter === 'published' && ` (${products.filter(p => p.published).length} published)`}
             {statusFilter === 'draft' && ` (${products.filter(p => !p.published).length} drafts)`}
@@ -578,7 +578,7 @@ export default function AdminProductsPage() {
           <p className="text-gray-500 mb-4">Get started by adding your first product</p>
           <Link
             href="/admin/products/new"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#015256] text-white rounded-lg hover:bg-[#4a0a27]"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#015256] text-white rounded-lg hover:bg-[#1a3d70]"
           >
             <Plus className="h-4 w-4" />
             Add Product
@@ -812,8 +812,8 @@ export default function AdminProductsPage() {
                             </span>
                           )}
                           {(product.isFeatured || product.is_featured) && (
-                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-[#015256]/10 text-[#4a0a27] text-[10px] font-medium rounded">
-                              <Star className="h-2.5 w-2.5 fill-[#4a0a27]" />
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-[#015256]/10 text-[#1a3d70] text-[10px] font-medium rounded">
+                              <Star className="h-2.5 w-2.5 fill-[#1a3d70]" />
                               Featured
                             </span>
                           )}
@@ -852,7 +852,7 @@ export default function AdminProductsPage() {
                           href={product.checkoutLink}
                           target="_blank"
                           rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-sm text-[#015256] hover:text-[#4a0a27] hover:underline font-medium"
+                        className="inline-flex items-center gap-1.5 text-sm text-[#015256] hover:text-[#1a3d70] hover:underline font-medium"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <ExternalLink className="h-4 w-4" />

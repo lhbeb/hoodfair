@@ -9,9 +9,9 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: '#6d0f3a', // Burgundy - main brand color
-        secondary: '#4a0a27', // Darker burgundy
-        accent: '#6d0f3a', // Burgundy accent
+        primary: '#2658A6', // Blue - main brand color
+        secondary: '#1a3d70', // Darker blue
+        accent: '#2658A6', // Blue accent
         text: '#262626', // Dark gray text (softer than black)
         'text-gray': '#666666', // Gray text
         'bg-light': '#f5f5f5', // Light gray background
@@ -19,8 +19,8 @@ const config: Config = {
         'nav-gray': '#e8e8e8', // Navigation bar gray
       },
       fontFamily: {
-        sans: ['Nunito', 'sans-serif'],
-        heading: ['Nunito', 'sans-serif'],
+        sans: ['Roboto', 'sans-serif'],
+        heading: ['Roboto', 'sans-serif'],
       },
       screens: {
         'xs': '475px',

@@ -36,7 +36,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode; pathnam
               <Link 
                 href="/"
                 onClick={() => this.setState({ hasError: false, error: null })}
-                className="inline-block bg-[#6d0f3a] hover:bg-[#4a0a27] text-white px-6 py-3 rounded-lg transition-colors duration-300"
+                className="inline-block bg-[#2658A6] hover:bg-[#1a3d70] text-white px-6 py-3 rounded-lg transition-colors duration-300"
               >
                 Return to Home
               </Link>

@@ -135,7 +135,7 @@ span {
 
 /* Improve focus visibility for accessibility */
 *:focus-visible {
-  outline: 2px solid #6d0f3a;
+  outline: 2px solid #2658A6;
   outline-offset: 2px;
 }
 
@@ -173,7 +173,7 @@ button {
 
 @layer base {
   html {
-    font-family: var(--font-nunito), sans-serif;
+    font-family: var(--font-roboto), sans-serif;
     overflow-x: hidden;
     overflow-y: scroll;
     /* Force scrollbar to prevent layout shift */
@@ -186,7 +186,7 @@ button {
   }
 
   body {
-    font-family: var(--font-nunito), sans-serif;
+    font-family: var(--font-roboto), sans-serif;
     overflow-x: hidden;
     position: relative;
     width: 100%;
@@ -202,7 +202,7 @@ button {
   h4,
   h5,
   h6 {
-    font-family: var(--font-nunito), sans-serif !important;
+    font-family: var(--font-roboto), sans-serif !important;
     font-style: normal !important;
     font-weight: 700 !important;
     font-stretch: normal !important;
@@ -232,7 +232,7 @@ button {
 }
 
 .loading-spinner {
-  @apply rounded-full h-12 w-12 border-t-2 border-b-2 border-[#6d0f3a];
+  @apply rounded-full h-12 w-12 border-t-2 border-b-2 border-[#2658A6];
   animation: spin 1s linear infinite;
 }
 
@@ -332,7 +332,7 @@ button {
 
 /* Improve focus visibility for accessibility */
 *:focus-visible {
-  outline: 2px solid #6d0f3a;
+  outline: 2px solid #2658A6;
   outline-offset: 2px;
 }
 
@@ -516,7 +516,7 @@ button,
 .font-medium,
 .font-bold,
 [class*="font-"] {
-  font-family: var(--font-nunito), sans-serif !important;
+  font-family: var(--font-roboto), sans-serif !important;
   font-optical-sizing: auto;
   font-style: normal !important;
   font-weight: 400 !important;
@@ -536,7 +536,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-nunito), sans-serif !important;
+  font-family: var(--font-roboto), sans-serif !important;
   font-optical-sizing: auto;
   font-style: normal !important;
   font-weight: 700 !important;

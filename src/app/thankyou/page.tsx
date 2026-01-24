@@ -111,7 +111,7 @@ export default function ThankYouPage() {
           <div className="flex justify-center">
             <Link 
               href="/"
-              className="inline-flex items-center justify-center px-6 py-3 bg-[#6d0f3a] hover:bg-[#4a0a27] text-white font-medium rounded-lg transition-colors duration-200"
+              className="inline-flex items-center justify-center px-6 py-3 bg-[#2658A6] hover:bg-[#1a3d70] text-white font-medium rounded-lg transition-colors duration-200"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Continue Shopping

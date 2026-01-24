@@ -249,7 +249,7 @@ export default function AdminSidebar() {
                     className={`
                       flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200
                       ${active
-                        ? 'bg-[#015256]/5 text-[#4a0a27] border border-[#015256]/10'
+                        ? 'bg-[#015256]/5 text-[#1a3d70] border border-[#015256]/10'
                         : 'text-gray-600 hover:bg-gray-50'
                       }
                     `}

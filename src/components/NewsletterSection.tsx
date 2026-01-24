@@ -52,7 +52,7 @@ const NewsletterSection = () => {
   };
 
   return (
-    <section className="bg-gradient-to-r from-[#6d0f3a] to-[#4a0a27] py-16 px-4">
+    <section className="bg-gradient-to-r from-[#2658A6] to-[#1a3d70] py-16 px-4">
       <div className="container mx-auto max-w-4xl">
         <div className="text-center">
           <div className="flex justify-center mb-6">
@@ -80,7 +80,7 @@ const NewsletterSection = () => {
                     if (error) setError('');
                   }}
                   placeholder="Enter your email address"
-                  className="w-full px-4 py-3 rounded-lg border-0 text-[#262626] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-[#6d0f3a] transition-all duration-200"
+                  className="w-full px-4 py-3 rounded-lg border-0 text-[#262626] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-[#2658A6] transition-all duration-200"
                   disabled={isSubmitting || isSuccess}
                 />
               </div>
@@ -88,11 +88,11 @@ const NewsletterSection = () => {
               <button
                 type="submit"
                 disabled={isSubmitting || isSuccess}
-                className="bg-white text-[#6d0f3a] hover:bg-[#6d0f3a]/10 disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 min-w-[140px]"
+                className="bg-white text-[#2658A6] hover:bg-[#2658A6]/10 disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 min-w-[140px]"
               >
                 {isSubmitting ? (
                   <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#6d0f3a]"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#2658A6]"></div>
                     Subscribing...
                   </>
                 ) : isSuccess ? (

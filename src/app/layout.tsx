@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Nunito } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
 import ClientHeader from "@/components/ClientHeader";
 import Footer from "@/components/Footer";
@@ -12,11 +12,11 @@ import { Suspense } from "react";
 import VisitNotifier from "@/components/VisitNotifier";
 import { AdminRouteCheck, PublicRouteOnly, AdminRouteOnly, CheckoutRouteOnly } from "@/components/AdminRouteCheck";
 
-const nunito = Nunito({
+const roboto = Roboto({
   subsets: ["latin"],
-  weight: ["200", "300", "400", "500", "600", "700", "800", "900", "1000"],
+  weight: ["100", "300", "400", "500", "700", "900"],
   style: ["normal", "italic"],
-  variable: "--font-nunito",
+  variable: "--font-roboto",
   display: "swap",
 });
 
@@ -77,12 +77,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`scroll-smooth ${nunito.variable}`}>
+    <html lang="en" className={`scroll-smooth ${roboto.variable}`}>
       <head>
         <link rel="icon" href="/favicon.png" type="image/png" />
         <link rel="preload" href="/logosvg.svg" as="image" type="image/svg+xml" />
       </head>
-      <body suppressHydrationWarning className={nunito.className}>
+      <body suppressHydrationWarning className={roboto.className}>
         <PublicRouteOnly>
           <VisitNotifier />
         </PublicRouteOnly>
@@ -121,7 +121,7 @@ export default function RootLayout({
             }}
           />
         </AdminRouteCheck>
-        
+
         {/* WebSite Schema */}
         <AdminRouteCheck>
           <Script
@@ -146,7 +146,7 @@ export default function RootLayout({
             }}
           />
         </AdminRouteCheck>
-        
+
         <ErrorBoundaryWrapper>
           {/* Public website with header, footer, etc. */}
           <PublicRouteOnly>
@@ -163,7 +163,7 @@ export default function RootLayout({
             </div>
             <CookieConsent />
           </PublicRouteOnly>
-          
+
           {/* Checkout page - navbar only, no distractions */}
           <CheckoutRouteOnly>
             <div className="min-h-screen flex flex-col">
@@ -175,13 +175,13 @@ export default function RootLayout({
               </main>
             </div>
           </CheckoutRouteOnly>
-          
+
           {/* Admin dashboard - clean, no public UI */}
           <AdminRouteOnly>
             {children}
           </AdminRouteOnly>
         </ErrorBoundaryWrapper>
-        
+
         {/* Tidio Live Chat Widget */}
         <AdminRouteCheck>
           <Script

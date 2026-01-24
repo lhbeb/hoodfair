@@ -477,7 +477,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
         <main className="flex-grow flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-[#262626] mb-4">Your Cart Is Empty</h1>
-            <Link href="/" className="text-[#6d0f3a] hover:text-[#4a0a27]">
+            <Link href="/" className="text-[#2658A6] hover:text-[#1a3d70]">
               Continue Shopping
             </Link>
           </div>
@@ -493,7 +493,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
           {/* Blue Verification Icon at Top */}
           <div className="flex flex-col items-center mb-4">
             <span className="inline-flex items-center justify-center bg-blue-100 rounded-full p-2 mb-2">
-              <Check className="h-7 w-7 text-[#6d0f3a]" />
+              <Check className="h-7 w-7 text-[#2658A6]" />
             </span>
           </div>
           {/* Title */}
@@ -503,8 +503,8 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
           {/* Address Card */}
           <div className="w-full max-w-xs bg-blue-50 border border-blue-100 rounded-2xl shadow p-5 mb-4 flex flex-col gap-2">
             <div className="flex items-center gap-2 mb-1">
-              <MapPin className="h-5 w-5 text-[#6d0f3a]" />
-              <span className="font-semibold text-[#6d0f3a] text-base">Confirmed Delivery Address</span>
+              <MapPin className="h-5 w-5 text-[#2658A6]" />
+              <span className="font-semibold text-[#2658A6] text-base">Confirmed Delivery Address</span>
             </div>
             <div className="text-gray-800 text-base whitespace-pre-line leading-relaxed">
               {shippingData.streetAddress && <div>{shippingData.streetAddress}</div>}
@@ -515,21 +515,21 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
             </div>
             {shippingData.email && (
               <div className="flex items-center gap-2 mt-2">
-                <Mail className="h-5 w-5 text-[#6d0f3a]" />
-                <span className="text-[#6d0f3a] text-base">{shippingData.email}</span>
+                <Mail className="h-5 w-5 text-[#2658A6]" />
+                <span className="text-[#2658A6] text-base">{shippingData.email}</span>
               </div>
             )}
           </div>
           {/* SSL Notice */}
           <div className="flex items-center gap-2 text-xs text-gray-500 mb-6">
             <span className="inline-flex items-center justify-center bg-gray-100 rounded-full p-1">
-              <svg className="h-4 w-4 text-[#6d0f3a]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="18" height="12" x="3" y="8" rx="2"/><path d="M7 8V6a5 5 0 0 1 10 0v2"/></svg>
+              <svg className="h-4 w-4 text-[#2658A6]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="18" height="12" x="3" y="8" rx="2"/><path d="M7 8V6a5 5 0 0 1 10 0v2"/></svg>
             </span>
             <span>Your information is secured with SSL.</span>
           </div>
           {/* Loading Spinner and Message */}
           <div className="flex flex-col items-center gap-2 mt-2 mb-6">
-            <div className="w-10 h-10 border-4 border-[#6d0f3a]/30 border-t-[#6d0f3a] rounded-full animate-spin mb-2"></div>
+            <div className="w-10 h-10 border-4 border-[#2658A6]/30 border-t-[#2658A6] rounded-full animate-spin mb-2"></div>
             <span className="text-base text-gray-700 font-medium">Finalizing Your Checkout. This Won&apos;t Take Long…</span>
           </div>
           {/* Trust Icon Row: Only Secure Checkout */}
@@ -545,7 +545,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
       <CheckoutNotifier />
       <main className="flex-grow py-4" style={{ position: 'relative' }}>
         <div className="container mx-auto px-4" style={{ position: 'relative' }}>
-          <Link href={`/products/${product.slug}`} className="inline-flex items-center text-[#6d0f3a] hover:text-[#4a0a27] mb-4 text-sm">
+          <Link href={`/products/${product.slug}`} className="inline-flex items-center text-[#2658A6] hover:text-[#1a3d70] mb-4 text-sm">
             <ArrowLeft className="h-3.5 w-3.5 mr-1.5" />
             <span className="hidden sm:inline">Back To Product</span>
             <span className="sm:hidden">Back</span>
@@ -577,7 +577,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-[#262626] text-base line-clamp-1 mb-1">{product.title}</h3>
-                        <p className="text-[#6d0f3a] font-bold text-xl mb-1">${product.price.toFixed(2)}</p>
+                        <p className="text-[#2658A6] font-bold text-xl mb-1">${product.price.toFixed(2)}</p>
                         <p className="text-gray-400 text-xs leading-tight">Tap To View/Hide Summary</p>
                       </div>
                     </div>
@@ -603,12 +603,12 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                         </div>
                         <div className="flex justify-between items-center text-sm">
                           <span className="text-gray-600">Shipping</span>
-                          <span className="font-medium text-[#6d0f3a]">Free</span>
+                          <span className="font-medium text-[#2658A6]">Free</span>
                         </div>
                         <div className="border-t border-gray-200 pt-3">
                           <div className="flex justify-between items-center">
                             <span className="text-base font-semibold text-[#262626]">Total</span>
-                            <span className="text-lg font-bold text-[#6d0f3a]">${product.price.toFixed(2)}</span>
+                            <span className="text-lg font-bold text-[#2658A6]">${product.price.toFixed(2)}</span>
                           </div>
                         </div>
                       </div>
@@ -639,7 +639,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                               value={shippingData.streetAddress}
                               onChange={handleInputChange}
                               required
-                              className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6d0f3a] focus:border-[#6d0f3a] transition-all duration-300"
+                              className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] transition-all duration-300"
                               placeholder="Enter your street address"
                               autoComplete="street-address"
                             />
@@ -658,7 +658,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                                 value={shippingData.city}
                                 onChange={handleInputChange}
                                 required
-                                className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6d0f3a] focus:border-[#6d0f3a] transition-all duration-300"
+                                className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] transition-all duration-300"
                                 placeholder="Enter your city"
                                 autoComplete="address-level2"
                               />
@@ -698,7 +698,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                                   }
                                 }}
                                 required
-                                className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6d0f3a] focus:border-[#6d0f3a] transition-all duration-300"
+                                className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] transition-all duration-300"
                                 placeholder="Enter state/province"
                                 autoComplete="address-level1"
                               />
@@ -712,7 +712,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                                       aria-selected={stateSuggestionIndex === index}
                                       tabIndex={stateSuggestionIndex === index ? 0 : -1}
                                       className={`w-full text-left p-3 hover:bg-blue-50 border-b border-gray-100 last:border-b-0 transition-colors duration-200 ${
-                                        stateSuggestionIndex === index ? 'bg-blue-50 text-[#6d0f3a]' : 'text-[#262626]'
+                                        stateSuggestionIndex === index ? 'bg-blue-50 text-[#2658A6]' : 'text-[#262626]'
                                       }`}
                                       onClick={() => handleStateSelect(suggestion)}
                                     >
@@ -733,7 +733,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                               value={shippingData.zipCode}
                               onChange={handleInputChange}
                               required
-                              className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6d0f3a] focus:border-[#6d0f3a] transition-all duration-300"
+                              className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] transition-all duration-300"
                               placeholder="Enter your zip code"
                               autoComplete="postal-code"
                             />
@@ -753,7 +753,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                               value={shippingData.email}
                               onChange={handleInputChange}
                               required
-                              className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6d0f3a] focus:border-[#6d0f3a] transition-all duration-300"
+                              className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] transition-all duration-300"
                               placeholder="Enter your email address"
                               autoComplete="email"
                             />
@@ -768,10 +768,10 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                                 // Let form onSubmit handle it
                               }}
                               disabled={isSendingEmail || isRedirecting}
-                              className={`w-full font-bold py-5 px-8 rounded-xl transition-colors duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed text-white focus:outline-none focus:ring-4 focus:ring-[#6d0f3a] focus:ring-offset-2 text-xl ${
+                              className={`w-full font-bold py-5 px-8 rounded-xl transition-colors duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed text-white focus:outline-none focus:ring-4 focus:ring-[#2658A6] focus:ring-offset-2 text-xl ${
                                 isSendingEmail || isRedirecting
                                   ? 'bg-gray-400 cursor-not-allowed'
-                                  : 'bg-[#6d0f3a] hover:bg-[#4a0a27]'
+                                  : 'bg-[#2658A6] hover:bg-[#1a3d70]'
                               }`}
                             >
                             {isSendingEmail ? (
@@ -797,7 +797,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                         <div className="hidden lg:block mt-8">
                           <div className="flex flex-col items-center justify-center space-y-4 text-center w-full">
                             <div className="text-sm text-gray-600">
-                              <span className="font-medium text-[#6d0f3a]">Secure Checkout</span> - SSL Encrypted
+                              <span className="font-medium text-[#2658A6]">Secure Checkout</span> - SSL Encrypted
                             </div>
                             <p className="text-xs text-gray-500 max-w-sm">
                               Shop with confidence - Your payment information is protected by industry-leading encryption
@@ -815,15 +815,15 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                               />
                             </div>
                             <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-gray-500 mt-2">
-                              <Link href="/terms" className="hover:text-[#6d0f3a] hover:underline transition-colors">
+                              <Link href="/terms" className="hover:text-[#2658A6] hover:underline transition-colors">
                                 Terms of Service
                               </Link>
                               <span className="text-gray-300">•</span>
-                              <Link href="/return-policy" className="hover:text-[#6d0f3a] hover:underline transition-colors">
+                              <Link href="/return-policy" className="hover:text-[#2658A6] hover:underline transition-colors">
                                 Refund and Return Policy
                               </Link>
                               <span className="text-gray-300">•</span>
-                              <Link href="/shipping-policy" className="hover:text-[#6d0f3a] hover:underline transition-colors">
+                              <Link href="/shipping-policy" className="hover:text-[#2658A6] hover:underline transition-colors">
                                 Shipping Policy
                               </Link>
                             </div>
@@ -854,10 +854,10 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                                 <span>Qty: {cartItem.quantity}</span>
                               </div>
                               <div className="flex items-center justify-between mt-1">
-                                <span className="font-bold text-lg text-[#6d0f3a]">${product.price.toFixed(2)}</span>
+                                <span className="font-bold text-lg text-[#2658A6]">${product.price.toFixed(2)}</span>
                                 <button
                                   onClick={handleClearCart}
-                                  className="p-2 rounded-full hover:bg-blue-50 text-[#6d0f3a] transition-colors"
+                                  className="p-2 rounded-full hover:bg-blue-50 text-[#2658A6] transition-colors"
                                   aria-label="Clear Cart"
                                 >
                                   <Trash className="h-5 w-5" />
@@ -873,12 +873,12 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                             </div>
                             <div className="flex justify-between text-sm">
                                <span className="text-gray-600">Shipping</span>
-                               <span className="font-medium text-[#6d0f3a]">Free</span>
+                               <span className="font-medium text-[#2658A6]">Free</span>
                              </div>
                             <div className="border-t border-gray-200 pt-4">
                               <div className="flex justify-between">
                                 <span className="text-base font-semibold text-[#262626]">Total</span>
-                                <span className="text-lg font-bold text-[#6d0f3a]">${product.price.toFixed(2)}</span>
+                                <span className="text-lg font-bold text-[#2658A6]">${product.price.toFixed(2)}</span>
                               </div>
                             </div>
                           </div>
@@ -907,7 +907,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                         value={shippingData.streetAddress}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6d0f3a] focus:border-[#6d0f3a] transition-all duration-300"
+                        className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] transition-all duration-300"
                         placeholder="Enter your street address"
                         autoComplete="street-address"
                       />
@@ -925,7 +925,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                         value={shippingData.city}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6d0f3a] focus:border-[#6d0f3a] transition-all duration-300"
+                        className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] transition-all duration-300"
                         placeholder="Enter your city"
                         autoComplete="address-level2"
                       />
@@ -969,7 +969,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                             }
                           }}
                           required
-                          className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6d0f3a] focus:border-[#6d0f3a] transition-all duration-300"
+                          className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] transition-all duration-300"
                           placeholder="Enter your state or province"
                           autoComplete="address-level1"
                         />
@@ -1002,7 +1002,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                         value={shippingData.zipCode}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6d0f3a] focus:border-[#6d0f3a] transition-all duration-300"
+                        className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] transition-all duration-300"
                         placeholder="10001"
                         autoComplete="postal-code"
                       />
@@ -1020,7 +1020,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                         value={shippingData.email}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6d0f3a] focus:border-[#6d0f3a] transition-all duration-300"
+                        className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] transition-all duration-300"
                         placeholder="Enter your email address"
                         autoComplete="email"
                       />
@@ -1038,10 +1038,10 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                           // Let form onSubmit handle it, but log for debugging
                         }}
                         disabled={isSendingEmail || isRedirecting}
-                        className={`w-full font-bold py-5 px-8 rounded-xl transition-all duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-[#6d0f3a] focus:ring-offset-2 text-xl ${
+                        className={`w-full font-bold py-5 px-8 rounded-xl transition-all duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-[#2658A6] focus:ring-offset-2 text-xl ${
                           isSendingEmail || isRedirecting
                             ? 'bg-gray-400 cursor-not-allowed text-white'
-                            : 'bg-[#6d0f3a] hover:bg-[#4a0a27] text-white'
+                            : 'bg-[#2658A6] hover:bg-[#1a3d70] text-white'
                         }`}
                       >
                         {isSendingEmail ? (
@@ -1071,10 +1071,10 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                           // Let form onSubmit handle it, but log for debugging
                         }}
                         disabled={isSendingEmail || isRedirecting}
-                        className={`w-full font-bold py-4 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-[#6d0f3a] focus:ring-offset-2 text-lg sm:text-xl ${
+                        className={`w-full font-bold py-4 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-[#2658A6] focus:ring-offset-2 text-lg sm:text-xl ${
                           isSendingEmail || isRedirecting
                             ? 'bg-gray-400 cursor-not-allowed text-white'
-                            : 'bg-[#6d0f3a] hover:bg-[#4a0a27] text-white'
+                            : 'bg-[#2658A6] hover:bg-[#1a3d70] text-white'
                         }`}
                       >
                         {isSendingEmail ? (
@@ -1098,7 +1098,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                     {/* Secure Checkout Info - Mobile */}
                     <div className="lg:hidden mt-4 mb-4 flex flex-col items-center justify-center space-y-2 text-center w-full">
                       <div className="text-sm text-gray-600">
-                        <span className="font-medium text-[#6d0f3a]">Secure Checkout</span> - SSL Encrypted
+                        <span className="font-medium text-[#2658A6]">Secure Checkout</span> - SSL Encrypted
                       </div>
                       <p className="text-xs text-gray-500 max-w-sm">
                         Shop with confidence - Your payment information is protected by industry-leading encryption
@@ -1116,15 +1116,15 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                         />
                       </div>
                       <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-gray-500 mt-2 px-4">
-                        <Link href="/terms" className="hover:text-[#6d0f3a] hover:underline transition-colors">
+                        <Link href="/terms" className="hover:text-[#2658A6] hover:underline transition-colors">
                           Terms of Service
                         </Link>
                         <span className="text-gray-300">•</span>
-                        <Link href="/return-policy" className="hover:text-[#6d0f3a] hover:underline transition-colors">
+                        <Link href="/return-policy" className="hover:text-[#2658A6] hover:underline transition-colors">
                           Refund and Return Policy
                         </Link>
                         <span className="text-gray-300">•</span>
-                        <Link href="/shipping-policy" className="hover:text-[#6d0f3a] hover:underline transition-colors">
+                        <Link href="/shipping-policy" className="hover:text-[#2658A6] hover:underline transition-colors">
                           Shipping Policy
                         </Link>
                       </div>
@@ -1139,7 +1139,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
               {/* Compact Shipping Summary */}
               <div className="bg-white rounded-2xl shadow-sm p-4 mb-6 border border-gray-100">
                 <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-[#6d0f3a] rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-[#2658A6] rounded-full flex items-center justify-center flex-shrink-0">
                     <MapPin className="h-5 w-5 text-white" />
                   </div>
                   <div>
@@ -1156,7 +1156,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                 {isRedirecting ? (
                   <div className="p-12 text-center">
                     <div className="flex flex-col items-center space-y-6">
-                      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#6d0f3a]"></div>
+                      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#2658A6]"></div>
                       <div>
                         <h3 className="text-xl font-semibold text-[#262626] mb-2">Your Address Has Been Confirmed</h3>
                         <p className="text-gray-600">Redirecting You To Our Secure Payment Processor...</p>
@@ -1199,7 +1199,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                               window.location.href = product.checkoutLink;
                             }, 1000);
                           }}
-                          className="w-full bg-[#6d0f3a] hover:bg-[#4a0a27] py-4 lg:py-5 px-6 sm:px-8 rounded-xl font-bold transition-all duration-300 flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-[1.02] text-white focus:outline-none focus:ring-4 focus:ring-[#6d0f3a] focus:ring-offset-2 text-lg sm:text-xl"
+                          className="w-full bg-[#2658A6] hover:bg-[#1a3d70] py-4 lg:py-5 px-6 sm:px-8 rounded-xl font-bold transition-all duration-300 flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-[1.02] text-white focus:outline-none focus:ring-4 focus:ring-[#2658A6] focus:ring-offset-2 text-lg sm:text-xl"
                         >
                         {isRedirecting ? (
                           <>

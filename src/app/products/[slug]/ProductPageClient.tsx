@@ -291,7 +291,7 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
           <p className="text-gray-600 mb-8">The product you&apos;re looking for doesn&apos;t exist.</p>
           <Link
             href="/"
-            className="inline-block bg-[#6d0f3a] hover:bg-[#4a0a27] text-white px-6 py-3 rounded-lg transition-colors duration-300"
+            className="inline-block bg-[#2658A6] hover:bg-[#1a3d70] text-white px-6 py-3 rounded-lg transition-colors duration-300"
           >
             Return to Home
           </Link>
@@ -311,7 +311,7 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
           <p className="text-gray-600 mb-8">The product information is incomplete.</p>
           <Link
             href="/"
-            className="inline-block bg-[#6d0f3a] hover:bg-[#4a0a27] text-white px-6 py-3 rounded-lg transition-colors duration-300"
+            className="inline-block bg-[#2658A6] hover:bg-[#1a3d70] text-white px-6 py-3 rounded-lg transition-colors duration-300"
           >
             Return to Home
           </Link>
@@ -364,7 +364,7 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
                       <button
                         key={idx}
                         onClick={() => setActiveImage(idx)}
-                        className={`relative flex-shrink-0 w-20 h-20 rounded-md overflow-hidden ${activeImage === idx ? 'ring-2 ring-[#6d0f3a]' : 'ring-1 ring-gray-200'}`}
+                        className={`relative flex-shrink-0 w-20 h-20 rounded-md overflow-hidden ${activeImage === idx ? 'ring-2 ring-[#2658A6]' : 'ring-1 ring-gray-200'}`}
                       >
                         <Image src={image} alt={`${title || 'Product'} thumbnail ${idx + 1}`} fill sizes="80px" className="object-cover" onError={(e) => {
                           console.error('Thumbnail failed to load:', image);
@@ -378,10 +378,10 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
               )}
               {images.length > 1 && (
                 <>
-                  <button onClick={() => setActiveImage((prev) => (prev > 0 ? prev - 1 : images.length - 1))} className="absolute left-4 top-1/2 -translate-y-1/2 transform bg-white/80 hover:bg-[#6d0f3a] hover:text-white p-2 rounded-full transition-all duration-300 z-10">
+                  <button onClick={() => setActiveImage((prev) => (prev > 0 ? prev - 1 : images.length - 1))} className="absolute left-4 top-1/2 -translate-y-1/2 transform bg-white/80 hover:bg-[#2658A6] hover:text-white p-2 rounded-full transition-all duration-300 z-10">
                     <ChevronLeft className="h-6 w-6" />
                   </button>
-                  <button onClick={() => setActiveImage((prev) => (prev < images.length - 1 ? prev + 1 : 0))} className="absolute right-4 top-1/2 -translate-y-1/2 transform bg-white/80 hover:bg-[#6d0f3a] hover:text-white p-2 rounded-full transition-all duration-300 z-10">
+                  <button onClick={() => setActiveImage((prev) => (prev < images.length - 1 ? prev + 1 : 0))} className="absolute right-4 top-1/2 -translate-y-1/2 transform bg-white/80 hover:bg-[#2658A6] hover:text-white p-2 rounded-full transition-all duration-300 z-10">
                     <ChevronRight className="h-6 w-6" />
                   </button>
                 </>
@@ -447,14 +447,14 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
                               <path d="M13.3334 14.666V7.33268H11.3334C10.9652 7.33268 10.6667 7.0342 10.6667 6.66602C10.6667 6.29783 10.9652 5.99935 11.3334 5.99935H14C14.3682 5.99935 14.6667 6.29783 14.6667 6.66602V15.3327C14.6667 15.7009 14.3682 15.9993 14 15.9993H2.00004C1.63185 15.9993 1.33337 15.7009 1.33337 15.3327V6.66602C1.33337 6.29783 1.63185 5.99935 2.00004 5.99935H4.66671C5.0349 5.99935 5.33337 6.29783 5.33337 6.66602C5.33337 7.0342 5.0349 7.33268 4.66671 7.33268H2.66671V14.666H13.3334Z"></path>
                             </svg>
                           </button>
-                      <button onClick={handleAddToCart} disabled={isAddingToCart || isBuyingNow} className="flex-1 lg:w-full bg-[#6d0f3a] hover:bg-[#4a0a27] text-white py-3 lg:py-4 px-6 rounded-xl font-semibold transition-colors duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed text-sm lg:text-base">
+                      <button onClick={handleAddToCart} disabled={isAddingToCart || isBuyingNow} className="flex-1 lg:w-full bg-[#2658A6] hover:bg-[#1a3d70] text-white py-3 lg:py-4 px-6 rounded-xl font-semibold transition-colors duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed text-sm lg:text-base">
                         {isAddingToCart ? <><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>Adding to Cart...</> : <><ShoppingCart className="h-5 w-5 mr-2" />Add to Cart</>}
                       </button>
                     </div>
                     <button 
                       onClick={handleBuyNow} 
                       disabled={isAddingToCart || isBuyingNow} 
-                      className="hidden lg:flex w-full bg-transparent border-2 border-[#6d0f3a] hover:border-[#4a0a27] text-[#6d0f3a] hover:text-[#4a0a27] py-4 px-6 rounded-xl font-semibold transition-colors duration-200 items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="hidden lg:flex w-full bg-transparent border-2 border-[#2658A6] hover:border-[#1a3d70] text-[#2658A6] hover:text-[#1a3d70] py-4 px-6 rounded-xl font-semibold transition-colors duration-200 items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isBuyingNow ? (
                         <>
@@ -480,10 +480,10 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
           {/* FAQ Section - Full Width */}
           <div className="mt-16 w-full">
             <div className="bg-gray-50 rounded-xl p-6 sm:p-8">
-              <button onClick={() => setShowFAQ(!showFAQ)} className="w-full flex items-center justify-between text-left text-[#262626] hover:text-[#6d0f3a] transition-colors duration-300">
+              <button onClick={() => setShowFAQ(!showFAQ)} className="w-full flex items-center justify-between text-left text-[#262626] hover:text-[#2658A6] transition-colors duration-300">
                 <span className="text-xl font-medium">Frequently Asked Questions</span>
                 <div className="flex items-center space-x-2">
-                  {!showFAQ && <span className="text-sm text-[#6d0f3a] font-medium">({faqItems.length - 1} more questions)</span>}
+                  {!showFAQ && <span className="text-sm text-[#2658A6] font-medium">({faqItems.length - 1} more questions)</span>}
                   {showFAQ ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
                 </div>
               </button>
@@ -511,18 +511,18 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
       {showZoom && (
         <div className="fixed inset-0 bg-black bg-opacity-90 z-50" onClick={() => setShowZoom(false)}>
           <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
-            <button onClick={(e) => { e.stopPropagation(); handleZoomOut(); }} className="p-2 text-white hover:text-[#6d0f3a] transition-colors duration-200" aria-label="Zoom out"><span className="text-2xl">−</span></button>
-            <button onClick={(e) => { e.stopPropagation(); handleZoomIn(); }} className="p-2 text-white hover:text-[#6d0f3a] transition-colors duration-200" aria-label="Zoom in"><span className="text-2xl">+</span></button>
-            <button onClick={(e) => { e.stopPropagation(); resetZoom(); }} className="p-2 text-white hover:text-[#6d0f3a] transition-colors duration-200" aria-label="Reset zoom"><span className="text-lg">⟲</span></button>
-            <button onClick={(e) => { e.stopPropagation(); setShowZoom(false); }} className="p-2 text-white hover:text-[#6d0f3a] transition-colors duration-200" aria-label="Close zoom view"><X className="h-8 w-8" /></button>
+            <button onClick={(e) => { e.stopPropagation(); handleZoomOut(); }} className="p-2 text-white hover:text-[#2658A6] transition-colors duration-200" aria-label="Zoom out"><span className="text-2xl">−</span></button>
+            <button onClick={(e) => { e.stopPropagation(); handleZoomIn(); }} className="p-2 text-white hover:text-[#2658A6] transition-colors duration-200" aria-label="Zoom in"><span className="text-2xl">+</span></button>
+            <button onClick={(e) => { e.stopPropagation(); resetZoom(); }} className="p-2 text-white hover:text-[#2658A6] transition-colors duration-200" aria-label="Reset zoom"><span className="text-lg">⟲</span></button>
+            <button onClick={(e) => { e.stopPropagation(); setShowZoom(false); }} className="p-2 text-white hover:text-[#2658A6] transition-colors duration-200" aria-label="Close zoom view"><X className="h-8 w-8" /></button>
           </div>
           <div className="absolute inset-0 flex items-center justify-center p-4" onClick={(e) => e.stopPropagation()} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
             <div className="relative w-full h-full">
               <Image src={images[activeImage]} alt={`${title} - Image ${activeImage + 1}`} fill sizes="100vw" className="object-contain transition-transform duration-200" style={{ transform: `scale(${zoomLevel})` }} onClick={(e) => e.stopPropagation()} />
               {images.length > 1 && (
                 <>
-                  <button onClick={(e) => { e.stopPropagation(); setActiveImage((prev) => (prev > 0 ? prev - 1 : images.length - 1)); setZoomLevel(1); }} className="absolute left-4 top-1/2 -translate-y-1/2 transform bg-white/10 hover:bg-[#6d0f3a] p-3 rounded-full text-white transition-colors duration-200" aria-label="Previous image"><ChevronLeft className="h-8 w-8" /></button>
-                  <button onClick={(e) => { e.stopPropagation(); setActiveImage((prev) => (prev < images.length - 1 ? prev + 1 : 0)); setZoomLevel(1); }} className="absolute right-4 top-1/2 -translate-y-1/2 transform bg-white/10 hover:bg-[#6d0f3a] p-3 rounded-full text-white transition-colors duration-200" aria-label="Next image"><ChevronRight className="h-8 w-8" /></button>
+                  <button onClick={(e) => { e.stopPropagation(); setActiveImage((prev) => (prev > 0 ? prev - 1 : images.length - 1)); setZoomLevel(1); }} className="absolute left-4 top-1/2 -translate-y-1/2 transform bg-white/10 hover:bg-[#2658A6] p-3 rounded-full text-white transition-colors duration-200" aria-label="Previous image"><ChevronLeft className="h-8 w-8" /></button>
+                  <button onClick={(e) => { e.stopPropagation(); setActiveImage((prev) => (prev < images.length - 1 ? prev + 1 : 0)); setZoomLevel(1); }} className="absolute right-4 top-1/2 -translate-y-1/2 transform bg-white/10 hover:bg-[#2658A6] p-3 rounded-full text-white transition-colors duration-200" aria-label="Next image"><ChevronRight className="h-8 w-8" /></button>
                 </>
               )}
             </div>

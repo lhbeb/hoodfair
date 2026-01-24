@@ -30,8 +30,8 @@ const SameDayShipping: React.FC<SameDayShippingProps> = ({ fullWidth = false, co
           </div>
 
           {/* Right Section - Content */}
-          <div className="md:w-[55%] bg-[#6d0f3a] text-white p-12 flex flex-col justify-center">
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6 text-[#febb3b]">
+          <div className="md:w-[55%] bg-[#2658A6] text-white p-12 flex flex-col justify-center">
+            <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6 text-[#F4C446]">
               Same Day Shipping
             </h1>
 
@@ -53,7 +53,7 @@ const SameDayShipping: React.FC<SameDayShippingProps> = ({ fullWidth = false, co
         {/* Card 1 */}
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <div className="flex items-start gap-4">
-            <div className="bg-[#6d0f3a] rounded-full p-3 flex-shrink-0">
+            <div className="bg-[#2658A6] rounded-full p-3 flex-shrink-0">
               <Clock className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -70,7 +70,7 @@ const SameDayShipping: React.FC<SameDayShippingProps> = ({ fullWidth = false, co
         {/* Card 2 */}
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <div className="flex items-start gap-4">
-            <div className="bg-[#6d0f3a] rounded-full p-3 flex-shrink-0">
+            <div className="bg-[#2658A6] rounded-full p-3 flex-shrink-0">
               <Package className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -87,7 +87,7 @@ const SameDayShipping: React.FC<SameDayShippingProps> = ({ fullWidth = false, co
         {/* Card 3 */}
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <div className="flex items-start gap-4">
-            <div className="bg-[#6d0f3a] rounded-full p-3 flex-shrink-0">
+            <div className="bg-[#2658A6] rounded-full p-3 flex-shrink-0">
               <Truck className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -109,12 +109,12 @@ const SameDayShipping: React.FC<SameDayShippingProps> = ({ fullWidth = false, co
             Place your order now and get it shipped today
           </p>
           <p className="text-2xl md:text-3xl font-bold text-[#262626]">
-            Order by <span className="text-[#6d0f3a]">2:00 PM EST</span> for same-day shipping
+            Order by <span className="text-[#2658A6]">2:00 PM EST</span> for same-day shipping
           </p>
         </div>
         <a
           href="#products"
-          className="bg-[#6d0f3a] hover:bg-[#4a0a27] text-white font-bold py-4 px-10 rounded-xl text-lg transition-colors whitespace-nowrap"
+          className="bg-[#2658A6] hover:bg-[#1a3d70] text-white font-bold py-4 px-10 rounded-xl text-lg transition-colors whitespace-nowrap"
         >
           Shop Now
         </a>
