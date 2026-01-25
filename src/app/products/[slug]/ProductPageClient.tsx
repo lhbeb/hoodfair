@@ -50,10 +50,10 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
     if (!product || typeof window === 'undefined') return;
 
     const sessionKey = `product_viewed_${product.slug}`;
-    
+
     // Check if we already have a count for this product in this session
     const storedCount = sessionStorage.getItem(sessionKey);
-    
+
     if (storedCount) {
       // Use the stored count
       setViewedCount(parseInt(storedCount, 10));
@@ -65,11 +65,11 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
         hash = ((hash << 5) - hash) + char;
         hash = hash & hash;
       }
-      
-          // Generate a random number between 27 and 123 based on hash
-          const seed = Math.abs(hash);
-          const count = 27 + (seed % 97); // 27 to 123 range (123 - 27 + 1 = 97)
-      
+
+      // Generate a random number between 27 and 123 based on hash
+      const seed = Math.abs(hash);
+      const count = 27 + (seed % 97); // 27 to 123 range (123 - 27 + 1 = 97)
+
       // Store it in sessionStorage for this session
       sessionStorage.setItem(sessionKey, count.toString());
       setViewedCount(count);
@@ -85,7 +85,7 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
 
   const handleAddToCart = async () => {
     debugLog('handleAddToCart', 'Function called', 'log');
-    
+
     if (!product) {
       debugError('handleAddToCart: product is null', new Error('Cannot add to cart: product is null'));
       setIsAddingToCart(false);
@@ -97,20 +97,20 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
       alert('This product is currently sold out.');
       return;
     }
-    
+
     debugLog('handleAddToCart', { productId: product.id, productSlug: product.slug }, 'log');
     setIsAddingToCart(true);
-    
+
     try {
       if (typeof window === 'undefined') {
         throw new Error('Window is not available');
       }
-      
+
       debugLog('handleAddToCart', 'Calling addToCart...', 'log');
-      
+
       // Add to cart - this is client-side only (localStorage)
       addToCart(product);
-      
+
       // Send Telegram notification for "Add to Cart" action
       try {
         const { sendTelegramNotification } = await import('@/utils/telegram-notify');
@@ -125,14 +125,14 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
         // Don't break the flow if notification fails
         console.warn('Failed to send add to cart notification:', notifyError);
       }
-      
+
       debugLog('handleAddToCart', 'addToCart completed, waiting 100ms...', 'log');
-      
+
       // Small delay to ensure localStorage is updated
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       debugNavigation('handleAddToCart', 'Attempting navigation to /checkout');
-      
+
       // Redirect to checkout - client-side navigation only
       if (typeof window !== 'undefined') {
         try {
@@ -140,7 +140,7 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
           debugLog('handleAddToCart', 'Using router.push', 'log');
           router.push('/checkout');
           debugLog('handleAddToCart', 'router.push called successfully', 'log');
-          
+
           // Small delay before scroll
           setTimeout(() => {
             try {
@@ -163,7 +163,7 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
           }
         }
       }
-      
+
       debugLog('handleAddToCart', 'SUCCESS - Navigation completed', 'log');
     } catch (error) {
       debugError('handleAddToCart: CRITICAL ERROR', error);
@@ -184,19 +184,19 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
       alert('This product is currently sold out.');
       return;
     }
-    
+
     setIsBuyingNow(true);
-    
+
     // Use a small delay to ensure the UI updates
     await new Promise(resolve => setTimeout(resolve, 100));
-    
+
     try {
       if (typeof window === 'undefined') {
         throw new Error('Window is not available');
       }
-      
+
       addToCart(product);
-      
+
       // Redirect to checkout after adding to cart
       setTimeout(() => {
         preventScrollOnClick(() => {
@@ -299,9 +299,9 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
       </div>
     );
   }
-  
+
   const { slug, title, description, price, images, condition, reviews } = product || {};
-  
+
   // Safety checks
   if (!slug || !title || !images || images.length === 0) {
     return (
@@ -322,7 +322,7 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-gray-100">
-      <main className="flex-grow bg-gray-100 py-12 pb-24 lg:pb-12">
+      <main className="flex-grow bg-gray-100 pt-4 pb-24 lg:py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:items-start">
             <div className="relative lg:sticky lg:top-0 lg:self-start">
@@ -334,8 +334,8 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
                         <div className="h-16 w-16 bg-gray-300 rounded-full" />
                       </div>
                     )}
-                    <Image 
-                      src={images[activeImage]} 
+                    <Image
+                      src={images[activeImage]}
                       alt={`${title || 'Product'} - Image ${activeImage + 1}`}
                       fill
                       priority
@@ -387,7 +387,7 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
                 </>
               )}
             </div>
-            
+
             <div className="lg:h-[calc(100vh-4rem)] lg:overflow-y-auto lg:pr-4 scrollbar-hide">
               <h1 className="text-3xl font-medium text-[#262626]">{title}</h1>
               <div className="mt-2 text-gray-600">{condition}</div>
@@ -399,13 +399,13 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
                 </div>
               )}
               <div className="mt-4 text-4xl font-bold text-[#262626]">${new Intl.NumberFormat('en-US').format(price)}</div>
-              
+
               <ClientOnly>
                 {viewedCount !== null && viewedCount > 0 && (
-                  <div className="mt-6 bg-[#e9ffb4]/20 border border-[#e9ffb4] rounded-xl p-3 sm:p-4">
+                  <div className="mt-6 bg-[#2658A6]/10 border border-[#2658A6]/30 rounded-xl p-3 sm:p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2 sm:space-x-4">
-                        <div className="flex items-center text-gray-800">
+                        <div className="flex items-center text-[#2658A6]">
                           <Eye className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-1.5" />
                           <span className="text-xs sm:text-sm font-medium">
                             {viewedCount.toLocaleString()} viewed in the last 24 hours
@@ -413,8 +413,8 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
                         </div>
                       </div>
                       <div className="flex items-center">
-                        <div className="w-2 h-2 bg-[#015256] rounded-full animate-pulse mr-2"></div>
-                        <span className="text-xs text-gray-600 font-medium hidden sm:inline">Live activity</span>
+                        <div className="w-2 h-2 bg-[#2658A6] rounded-full animate-pulse mr-2"></div>
+                        <span className="text-xs text-[#2658A6] font-medium hidden sm:inline">Live activity</span>
                       </div>
                     </div>
                   </div>
@@ -427,33 +427,33 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
                   /* Sold Out / Offer Expired Message */
                   <div className="w-full bg-gray-100 rounded-lg py-3 px-4 text-center">
                     <p className="text-sm text-gray-600">
-                      {product.checkoutLink === '#' 
-                        ? 'Sorry, this offer has expired' 
+                      {product.checkoutLink === '#'
+                        ? 'Sorry, this offer has expired'
                         : 'Sorry, this product is sold out'}
                     </p>
                   </div>
                 ) : (
                   <>
                     <div className="flex gap-3 lg:flex-col lg:gap-3">
-                          {/* Share Button - Mobile Only */}
-                          <button 
-                            onClick={handleShare}
-                            className="lg:hidden flex-shrink-0 w-14 h-14 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center transition-colors duration-200 group"
-                            style={{ color: '#6b7280' }}
-                            aria-label="Share product"
-                          >
-                            <svg className="h-6 w-6 group-hover:opacity-80 transition-opacity" fill="currentColor" fillRule="nonzero" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M4.86197 3.52794L7.52828 0.861631L7.53151 0.858423C7.59476 0.795922 7.6674 0.748648 7.74485 0.716601C7.82346 0.684006 7.90965 0.666016 8.00004 0.666016C8.18414 0.666016 8.3508 0.740635 8.47145 0.861278L11.1381 3.52794C11.3985 3.78829 11.3985 4.2104 11.1381 4.47075C10.8778 4.7311 10.4557 4.7311 10.1953 4.47075L8.66671 2.94216V10.666C8.66671 11.0342 8.36823 11.3327 8.00004 11.3327C7.63185 11.3327 7.33337 11.0342 7.33337 10.666V2.94216L5.80478 4.47075C5.54443 4.7311 5.12232 4.7311 4.86197 4.47075C4.60162 4.2104 4.60162 3.78829 4.86197 3.52794Z"></path>
-                              <path d="M13.3334 14.666V7.33268H11.3334C10.9652 7.33268 10.6667 7.0342 10.6667 6.66602C10.6667 6.29783 10.9652 5.99935 11.3334 5.99935H14C14.3682 5.99935 14.6667 6.29783 14.6667 6.66602V15.3327C14.6667 15.7009 14.3682 15.9993 14 15.9993H2.00004C1.63185 15.9993 1.33337 15.7009 1.33337 15.3327V6.66602C1.33337 6.29783 1.63185 5.99935 2.00004 5.99935H4.66671C5.0349 5.99935 5.33337 6.29783 5.33337 6.66602C5.33337 7.0342 5.0349 7.33268 4.66671 7.33268H2.66671V14.666H13.3334Z"></path>
-                            </svg>
-                          </button>
+                      {/* Share Button - Mobile Only */}
+                      <button
+                        onClick={handleShare}
+                        className="lg:hidden flex-shrink-0 w-14 h-14 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center transition-colors duration-200 group"
+                        style={{ color: '#6b7280' }}
+                        aria-label="Share product"
+                      >
+                        <svg className="h-6 w-6 group-hover:opacity-80 transition-opacity" fill="currentColor" fillRule="nonzero" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4.86197 3.52794L7.52828 0.861631L7.53151 0.858423C7.59476 0.795922 7.6674 0.748648 7.74485 0.716601C7.82346 0.684006 7.90965 0.666016 8.00004 0.666016C8.18414 0.666016 8.3508 0.740635 8.47145 0.861278L11.1381 3.52794C11.3985 3.78829 11.3985 4.2104 11.1381 4.47075C10.8778 4.7311 10.4557 4.7311 10.1953 4.47075L8.66671 2.94216V10.666C8.66671 11.0342 8.36823 11.3327 8.00004 11.3327C7.63185 11.3327 7.33337 11.0342 7.33337 10.666V2.94216L5.80478 4.47075C5.54443 4.7311 5.12232 4.7311 4.86197 4.47075C4.60162 4.2104 4.60162 3.78829 4.86197 3.52794Z"></path>
+                          <path d="M13.3334 14.666V7.33268H11.3334C10.9652 7.33268 10.6667 7.0342 10.6667 6.66602C10.6667 6.29783 10.9652 5.99935 11.3334 5.99935H14C14.3682 5.99935 14.6667 6.29783 14.6667 6.66602V15.3327C14.6667 15.7009 14.3682 15.9993 14 15.9993H2.00004C1.63185 15.9993 1.33337 15.7009 1.33337 15.3327V6.66602C1.33337 6.29783 1.63185 5.99935 2.00004 5.99935H4.66671C5.0349 5.99935 5.33337 6.29783 5.33337 6.66602C5.33337 7.0342 5.0349 7.33268 4.66671 7.33268H2.66671V14.666H13.3334Z"></path>
+                        </svg>
+                      </button>
                       <button onClick={handleAddToCart} disabled={isAddingToCart || isBuyingNow} className="flex-1 lg:w-full bg-[#2658A6] hover:bg-[#1a3d70] text-white py-3 lg:py-4 px-6 rounded-xl font-semibold transition-colors duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed text-sm lg:text-base">
                         {isAddingToCart ? <><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>Adding to Cart...</> : <><ShoppingCart className="h-5 w-5 mr-2" />Add to Cart</>}
                       </button>
                     </div>
-                    <button 
-                      onClick={handleBuyNow} 
-                      disabled={isAddingToCart || isBuyingNow} 
+                    <button
+                      onClick={handleBuyNow}
+                      disabled={isAddingToCart || isBuyingNow}
                       className="hidden lg:flex w-full bg-transparent border-2 border-[#2658A6] hover:border-[#1a3d70] text-[#2658A6] hover:text-[#1a3d70] py-4 px-6 rounded-xl font-semibold transition-colors duration-200 items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isBuyingNow ? (
