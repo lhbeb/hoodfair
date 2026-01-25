@@ -1,6 +1,7 @@
 "use client";
 
 import AdminSidebar from './AdminSidebar';
+import ScrollLockDebug from './ScrollLockDebug';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -12,7 +13,7 @@ export default function AdminLayout({ children, title, subtitle }: AdminLayoutPr
   return (
     <div className="min-h-screen bg-gray-50/50">
       <AdminSidebar />
-      
+
       <div className="lg:ml-64">
         {/* Header */}
         {(title || subtitle) && (
@@ -33,6 +34,9 @@ export default function AdminLayout({ children, title, subtitle }: AdminLayoutPr
           {children}
         </main>
       </div>
+
+      {/* Emergency scroll unlock button (only shows when scroll is stuck) */}
+      <ScrollLockDebug />
     </div>
   );
 }

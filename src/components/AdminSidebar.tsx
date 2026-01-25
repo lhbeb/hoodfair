@@ -16,6 +16,7 @@ import {
   LayoutDashboard
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { lockScroll, unlockScroll } from '@/utils/scrollUtils';
 
 interface NavItem {
   name: string;
@@ -105,6 +106,21 @@ export default function AdminSidebar() {
       };
     }
   }, [mounted]);
+
+  // Handle scroll locking when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      lockScroll();
+    } else {
+      unlockScroll();
+    }
+
+    // Cleanup: always unlock on unmount
+    return () => {
+      unlockScroll();
+    };
+  }, [mobileMenuOpen]);
+
 
   const handleLogout = () => {
     localStorage.removeItem('admin_token');
