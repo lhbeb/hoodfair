@@ -141,9 +141,9 @@ export default function BulkImportPage() {
           )}
 
           {uploadProgress && (
-            <div className="mb-6 p-4 bg-[#015256]/5 border border-[#015256]/20 rounded-lg">
+            <div className="mb-6 p-4 bg-[#2658A6]/5 border border-[#2658A6]/20 rounded-lg">
               <div className="flex items-center gap-3">
-                <Loader2 className="h-5 w-5 text-[#015256] animate-spin flex-shrink-0" />
+                <Loader2 className="h-5 w-5 text-[#2658A6] animate-spin flex-shrink-0" />
                 <div className="flex-1">
                   <div className="text-sm font-semibold text-[#1a3d70]">Processing...</div>
                   <div className="text-sm text-[#1a3d70]">{uploadProgress}</div>
@@ -243,7 +243,7 @@ export default function BulkImportPage() {
                 border-2 border-dashed rounded-lg p-12 text-center transition-colors
                 ${
                   dragActive
-                    ? 'border-[#015256] bg-[#015256]/5'
+                    ? 'border-[#2658A6] bg-[#2658A6]/5'
                     : 'border-gray-300 hover:border-gray-400 bg-gray-50'
                 }
                 ${uploading ? 'opacity-50 pointer-events-none' : 'cursor-pointer'}

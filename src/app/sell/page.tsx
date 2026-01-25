@@ -26,7 +26,7 @@ export default function SellPage() {
                 Hi, I&apos;m Shaylah
               </h1>
               <p className="text-xl md:text-2xl mb-6 text-white/90 leading-relaxed">
-                Let me show you how to turn your unused items into cash on Revibee. It&apos;s easier than you think, and I&apos;ll be with you every step of the way.
+                Let me show you how to turn your unused items into cash on HoodFair. It&apos;s easier than you think, and I&apos;ll be with you every step of the way.
               </p>
               <Link
                 href="/contact"
@@ -40,12 +40,12 @@ export default function SellPage() {
         </div>
       </section>
 
-      {/* Why Sell on Revibee - Storytelling */}
+      {/* Why Sell on HoodFair - Storytelling */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-[#262626] mb-8 text-center">
-              Why Sell on Revibee? Let Me Tell You...
+              Why Sell on HoodFair? Let Me Tell You...
             </h2>
             
             <div className="space-y-8">
@@ -73,7 +73,7 @@ export default function SellPage() {
                   <div>
                     <h3 className="text-2xl font-bold text-[#262626] mb-3">Thousands of Visitors Every Day</h3>
                     <p className="text-lg text-gray-700 leading-relaxed">
-                      Our traffic is massive. Thousands of people visit Revibee every single day, looking for exactly what you have. That means more eyes on your items, more potential buyers, and faster sales. It&apos;s that simple.
+                      Our traffic is massive. Thousands of people visit HoodFair every single day, looking for exactly what you have. That means more eyes on your items, more potential buyers, and faster sales. It&apos;s that simple.
                     </p>
                   </div>
                 </div>
@@ -262,8 +262,8 @@ export default function SellPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-[#262626] mb-1">Email</h3>
-                  <a href="mailto:support@revibee.com" className="text-[#2658A6] hover:underline">
-                    support@revibee.com
+                  <a href="mailto:support@hoodfair.com" className="text-[#2658A6] hover:underline">
+                    support@hoodfair.com
                   </a>
                 </div>
               </div>

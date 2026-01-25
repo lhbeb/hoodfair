@@ -45,13 +45,13 @@ export default function AdminLoginPage() {
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
       
       {/* Gradient Orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#015256]/20 rounded-full blur-3xl"></div>
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#2658A6]/20 rounded-full blur-3xl"></div>
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
 
       <div className="relative w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#015256] to-indigo-600 rounded-2xl shadow-2xl shadow-[#015256]/30 mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#2658A6] to-indigo-600 rounded-2xl shadow-2xl shadow-[#2658A6]/30 mb-4">
             <Lock className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-white">Admin Portal</h1>
@@ -80,7 +80,7 @@ export default function AdminLoginPage() {
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Enter username"
                   required
-                  className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#015256] focus:border-transparent transition-all"
+                  className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-transparent transition-all"
                 />
               </div>
             </div>
@@ -97,7 +97,7 @@ export default function AdminLoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter password"
                   required
-                  className="w-full pl-12 pr-12 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#015256] focus:border-transparent transition-all"
+                  className="w-full pl-12 pr-12 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-transparent transition-all"
                 />
                 <button
                   type="button"
@@ -112,7 +112,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-gradient-to-r from-[#015256] to-indigo-600 text-white font-semibold rounded-xl hover:from-[#1a3d70] hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-[#015256] focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#015256]/25"
+              className="w-full py-3.5 bg-gradient-to-r from-[#2658A6] to-indigo-600 text-white font-semibold rounded-xl hover:from-[#1a3d70] hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#2658A6]/25"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>

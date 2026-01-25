@@ -5,7 +5,7 @@ export default function ShippingPolicyPage() {
         <h1 className="text-3xl font-bold text-[#262626] mb-6">Shipping Policy</h1>
         <div className="prose max-w-none text-gray-600">
           <p className="text-lg mb-6">
-            At Revibee, we strive to provide fast, reliable shipping services to all our customers. Here&apos;s everything you need to know about our shipping policy.
+            At HoodFair, we strive to provide fast, reliable shipping services to all our customers. Here&apos;s everything you need to know about our shipping policy.
           </p>
 
           {/* Same-Day Shipping Highlight Section */}
@@ -110,7 +110,7 @@ export default function ShippingPolicyPage() {
           </p>
           <ul className="list-none mt-4">
             <li>Phone: +17176484487</li>
-            <li>Email: support@revibee.com</li>
+            <li>Email: support@hoodfair.com</li>
             <li>Hours: Monday - Friday, 9:00 AM - 5:00 PM EST</li>
           </ul>
           <div className="bg-blue-50 p-6 rounded-lg mt-8">

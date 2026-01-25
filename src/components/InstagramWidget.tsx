@@ -13,7 +13,7 @@ const InstagramWidget: React.FC = () => {
             <div className="w-full h-full bg-white rounded-full overflow-hidden">
               <Image
                 src="https://i.ibb.co/RGcM1gLY/pdp1.png"
-                alt="Revibee Profile"
+                alt="HoodFair Profile"
                 width={80}
                 height={80}
               />
@@ -22,8 +22,8 @@ const InstagramWidget: React.FC = () => {
           
           {/* Profile Info */}
           <div className="flex-grow">
-            <h3 className="font-bold text-[#262626] text-xl mb-1">@revibeecom</h3>
-                <p className="text-gray-600 text-sm mb-3">Revibee</p>
+            <h3 className="font-bold text-[#262626] text-xl mb-1">@hoodfaircom</h3>
+                <p className="text-gray-600 text-sm mb-3">HoodFair</p>
             
             {/* Statistics */}
             <div className="flex items-center space-x-6 text-sm">
@@ -45,7 +45,7 @@ const InstagramWidget: React.FC = () => {
 
         {/* Follow Button */}
         <a
-          href="https://go.revibee.com/p144"
+          href="https://go.hoodfair.com/p144"
           target="_blank"
           rel="noopener noreferrer"
           className="w-full inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"

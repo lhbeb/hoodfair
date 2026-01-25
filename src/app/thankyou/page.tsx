@@ -95,8 +95,8 @@ export default function ThankYouPage() {
             </p>
             <div className="space-y-1 text-sm">
               <p className="text-gray-700">
-                📧 <a href="mailto:support@revibee.com" className="text-blue-600 hover:text-blue-700 font-medium">
-                  support@revibee.com
+                📧 <a href="mailto:support@hoodfair.com" className="text-blue-600 hover:text-blue-700 font-medium">
+                  support@hoodfair.com
                 </a>
               </p>
               <p className="text-gray-700">

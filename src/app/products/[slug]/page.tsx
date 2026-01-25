@@ -5,14 +5,14 @@ import ProductPageClient from './ProductPageClient';
 import type { Metadata, ResolvingMetadata } from 'next';
 
 // Hardcoded base URL (no environment variable needed)
-const BASE_URL = 'https://revibee.com';
+const BASE_URL = 'https://hoodfair.com';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }, parent: ResolvingMetadata): Promise<Metadata> {
   try {
     const { slug } = await params;
     if (!slug) {
       return {
-        title: 'Product Not Found | Revibee',
+        title: 'Product Not Found | HoodFair',
       };
     }
     
@@ -26,11 +26,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
     if (!product) {
       return {
-        title: 'Product Not Found | Revibee',
+        title: 'Product Not Found | HoodFair',
       };
     }
 
-    const title = `${product.title || 'Product'} - ${product.brand || ''} | ${product.category || ''} | Revibee`;
+    const title = `${product.title || 'Product'} - ${product.brand || ''} | ${product.category || ''} | HoodFair`;
     const description = (product.description || '').substring(0, 155) + '...';
     const canonicalUrl = `${BASE_URL}/products/${product.slug}`;
 
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title,
       description,
       url: canonicalUrl,
-      siteName: 'Revibee',
+      siteName: 'HoodFair',
       images: (product.images || []).map(img => ({ url: new URL(img, BASE_URL).toString() })),
       type: 'website',
     },
@@ -59,8 +59,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   } catch (error) {
     console.error('Error generating metadata:', error);
     return {
-      title: 'Product | Revibee',
-      description: 'Browse our products on Revibee',
+      title: 'Product | HoodFair',
+      description: 'Browse our products on HoodFair',
     };
   }
 }

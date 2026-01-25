@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
         `📅 <b>Date:</b> <code>${date}</code>`,
         `⏰ <b>Time:</b> <code>${time}</code>`,
         '',
-        'ℹ️ <b>User is learning about Revibee!</b> ℹ️'
+        'ℹ️ <b>User is learning about HoodFair!</b> ℹ️'
       ].join('\n');
     } else {
       // Regular visit notification

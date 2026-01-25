@@ -21,29 +21,29 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "Revibee - Everything You Want, One Marketplace.",
-  description: "Shop millions of products at Revibee: electronics, fashion, home, collectibles, toys, beauty, gadgets, and more. Discover unbeatable deals, fast shipping, and a secure shopping experience—just like eBay, but happier!",
-  keywords: "Revibee, online marketplace, general store, electronics, fashion, home, collectibles, toys, beauty, gadgets, deals, shopping, eBay alternative, secure checkout, fast shipping",
-  authors: [{ name: "Revibee" }],
-  creator: "Revibee",
-  publisher: "Revibee",
+  title: "HoodFair - Everything You Want, One Marketplace.",
+  description: "Shop millions of products at HoodFair: electronics, fashion, home, collectibles, toys, beauty, gadgets, and more. Discover unbeatable deals, fast shipping, and a secure shopping experience—just like eBay, but happier!",
+  keywords: "HoodFair, online marketplace, general store, electronics, fashion, home, collectibles, toys, beauty, gadgets, deals, shopping, eBay alternative, secure checkout, fast shipping",
+  authors: [{ name: "HoodFair" }],
+  creator: "HoodFair",
+  publisher: "HoodFair",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://revibee.com"),
+  metadataBase: new URL("https://hoodfair.com"),
   openGraph: {
-    title: "Revibee - Everything You Want, One Marketplace.",
-    description: "Shop millions of products at Revibee: electronics, fashion, home, collectibles, toys, beauty, gadgets, and more. Discover unbeatable deals, fast shipping, and a secure shopping experience—just like eBay, but happier!",
-    url: "https://revibee.com",
-    siteName: "Revibee",
+    title: "HoodFair - Everything You Want, One Marketplace.",
+    description: "Shop millions of products at HoodFair: electronics, fashion, home, collectibles, toys, beauty, gadgets, and more. Discover unbeatable deals, fast shipping, and a secure shopping experience—just like eBay, but happier!",
+    url: "https://hoodfair.com",
+    siteName: "HoodFair",
     images: [
       {
         url: "/g7x.webp",
         width: 1200,
         height: 630,
-        alt: "Revibee - Online Marketplace for Everything",
+        alt: "HoodFair - Online Marketplace for Everything",
       },
     ],
     locale: "en_US",
@@ -51,8 +51,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Revibee - Everything You Want, One Marketplace.",
-    description: "Shop millions of products at Revibee: electronics, fashion, home, collectibles, toys, beauty, gadgets, and more. Discover unbeatable deals, fast shipping, and a secure shopping experience—just like eBay, but happier!",
+    title: "HoodFair - Everything You Want, One Marketplace.",
+    description: "Shop millions of products at HoodFair: electronics, fashion, home, collectibles, toys, beauty, gadgets, and more. Discover unbeatable deals, fast shipping, and a secure shopping experience—just like eBay, but happier!",
     images: ["/g7x.webp"],
   },
   robots: {
@@ -95,19 +95,19 @@ export default function RootLayout({
               __html: JSON.stringify({
                 "@context": "https://schema.org",
                 "@type": "Organization",
-                "name": "Revibee",
-                "url": "https://revibee.com",
-                "logo": "https://revibee.com/logosvg.svg",
-                "description": "Revibee - Where Savings Make You Smile. Discover premium cameras and photography equipment at unbeatable prices.",
+                "name": "HoodFair",
+                "url": "https://hoodfair.com",
+                "logo": "https://hoodfair.com/logosvg.svg",
+                "description": "HoodFair - Where Savings Make You Smile. Discover premium cameras and photography equipment at unbeatable prices.",
                 "sameAs": [
-                  "https://twitter.com/revibee",
-                  "https://facebook.com/revibee",
-                  "https://instagram.com/revibee"
+                  "https://twitter.com/hoodfair",
+                  "https://facebook.com/hoodfair",
+                  "https://instagram.com/hoodfair"
                 ],
                 "contactPoint": {
                   "@type": "ContactPoint",
                   "contactType": "customer service",
-                  "email": "support@revibee.com"
+                  "email": "support@hoodfair.com"
                 },
                 "address": {
                   "@type": "PostalAddress",
@@ -131,14 +131,14 @@ export default function RootLayout({
               __html: JSON.stringify({
                 "@context": "https://schema.org",
                 "@type": "WebSite",
-                "name": "Revibee",
-                "url": "https://revibee.com",
-                "description": "Revibee - Where Savings Make You Smile. Discover premium cameras and photography equipment at unbeatable prices.",
+                "name": "HoodFair",
+                "url": "https://hoodfair.com",
+                "description": "HoodFair - Where Savings Make You Smile. Discover premium cameras and photography equipment at unbeatable prices.",
                 "potentialAction": {
                   "@type": "SearchAction",
                   "target": {
                     "@type": "EntryPoint",
-                    "urlTemplate": "https://revibee.com/api/products/search?q={search_term_string}"
+                    "urlTemplate": "https://hoodfair.com/api/products/search?q={search_term_string}"
                   },
                   "query-input": "required name=search_term_string"
                 }

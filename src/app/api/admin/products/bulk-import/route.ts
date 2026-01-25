@@ -118,7 +118,7 @@ async function generateUniqueSlug(baseSlug: string): Promise<string> {
   // If it exists, try appending -2, -3, etc. until we find a unique one
   let counter = 2;
   let uniqueSlug = `${baseSlug}-${counter}`;
-  
+
   while (true) {
     const { data: checkProducts, error: slugCheckError } = await supabaseAdmin
       .from('products')
@@ -139,7 +139,7 @@ async function generateUniqueSlug(baseSlug: string): Promise<string> {
     // Try next number
     counter++;
     uniqueSlug = `${baseSlug}-${counter}`;
-    
+
     // Safety check to prevent infinite loops (shouldn't happen in practice)
     if (counter > 1000) {
       throw new Error(`Unable to generate unique slug for ${baseSlug} after 1000 attempts`);
@@ -154,7 +154,7 @@ async function processProductFromZip(
 ): Promise<ImportResult> {
   // Normalize directory path (remove trailing slash, handle different separators)
   const normalizedDir = productDir.replace(/\\/g, '/').replace(/\/$/, '');
-  
+
   // Find product.json in the directory
   // Match entries like: "product-slug/product.json" or "product-slug\\product.json"
   const productJsonEntry = zipEntries.find(
@@ -277,14 +277,14 @@ async function processProductFromZip(
           // Check if entry is in the product directory and matches the image name
           if (normalizedDir === '') {
             // Root level: check if it matches the image name directly or in images/ folder
-            return (entryPath === imageName || 
-                   entryPath === `images/${imageName}` ||
-                   entryPath.endsWith(`/${imageName}`)) && !entry.isDirectory;
+            return (entryPath === imageName ||
+              entryPath === `images/${imageName}` ||
+              entryPath.endsWith(`/${imageName}`)) && !entry.isDirectory;
           } else {
             // In a subdirectory
             const isInDir = entryPath.startsWith(normalizedDir + '/');
-            const matchesName = entryPath === `${normalizedDir}/${imageName}` || 
-                               entryPath.endsWith(`/${imageName}`);
+            const matchesName = entryPath === `${normalizedDir}/${imageName}` ||
+              entryPath.endsWith(`/${imageName}`);
             return isInDir && matchesName && !entry.isDirectory;
           }
         }
@@ -296,9 +296,9 @@ async function processProductFromZip(
       imageEntry = zipEntries.find(
         (entry) => {
           const entryPath = entry.entryName.replace(/\\/g, '/');
-          return entryPath === `images/${imageName}` || 
-                 entryPath.endsWith(`/images/${imageName}`) ||
-                 entryPath.endsWith(`/${imageName}`);
+          return entryPath === `images/${imageName}` ||
+            entryPath.endsWith(`/images/${imageName}`) ||
+            entryPath.endsWith(`/${imageName}`);
         }
       ) || null;
     }
@@ -351,7 +351,7 @@ async function processProductFromZip(
   }
 
   const productPayload = {
-    id: productData.id || slug,
+    id: slug, // Use the new unique slug as ID to prevent duplicate primary key errors
     slug,
     title: productData.title,
     description: productData.description,
@@ -360,7 +360,7 @@ async function processProductFromZip(
     condition: productData.condition,
     category: productData.category,
     brand: productData.brand,
-    payee_email: (productData.payeeEmail || productData.payee_email || '').trim() || null,
+    payee_email: (productData.payeeEmail || productData.payee_email || '').trim() || 'admin@hoodfair.com',
     checkout_link: checkoutLink,
     currency: productData.currency || 'USD',
     rating: productData.rating || 0,

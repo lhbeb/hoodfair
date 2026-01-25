@@ -186,7 +186,7 @@ const Header = () => {
             <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
               <Image
                 src="/logosvg.svg"
-                alt="Revibee Logo"
+                alt="HoodFair Logo"
                 width={160}
                 height={36}
                 priority

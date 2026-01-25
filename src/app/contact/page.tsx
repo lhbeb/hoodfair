@@ -105,7 +105,7 @@ export default function ContactPage() {
                         disabled={isSending}
                       >
                         <option value="">Select a reason</option>
-                        <option value="selling">Selling on Revibee</option>
+                        <option value="selling">Selling on HoodFair</option>
                         <option value="order-inquiry">Inquiring about an order</option>
                         <option value="track-order">Track my order</option>
                         <option value="return-refund">Return or refund request</option>
@@ -179,7 +179,7 @@ export default function ContactPage() {
                       <Mail className="h-6 w-6 text-[#2658A6] mt-1" />
                       <div className="ml-4">
                         <h3 className="font-medium text-[#262626]">Email</h3>
-                        <p className="text-gray-600 mt-1">support@revibee.com</p>
+                        <p className="text-gray-600 mt-1">support@hoodfair.com</p>
                       </div>
                     </div>
                     <div className="border-t border-gray-200 pt-6">

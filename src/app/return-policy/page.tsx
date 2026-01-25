@@ -7,7 +7,7 @@ export default function ReturnPolicyPage() {
         <div className="prose max-w-none text-gray-700 space-y-8">
           {/* Introduction */}
           <p className="text-lg leading-relaxed">
-            At Revibee, your satisfaction is our highest priority. We want every customer to feel confident when ordering from us. If your purchase is not right for any reason, we are here to make the process simple, fair, and transparent.
+            At HoodFair, your satisfaction is our highest priority. We want every customer to feel confident when ordering from us. If your purchase is not right for any reason, we are here to make the process simple, fair, and transparent.
           </p>
 
           {/* 30 Day Satisfaction Guarantee */}
@@ -35,7 +35,7 @@ export default function ReturnPolicyPage() {
           <div>
             <h2 className="text-3xl font-bold text-[#262626] mt-10 mb-4">Items Purchased From Marketplace Sellers</h2>
             <p className="mb-4">
-              Some products on Revibee come from approved private sellers.
+              Some products on HoodFair come from approved private sellers.
             </p>
             <p className="mb-4">For these items:</p>
             <ul className="list-disc pl-6 space-y-2 mb-4">
@@ -45,7 +45,7 @@ export default function ReturnPolicyPage() {
               <li>Returns must be sent back to our warehouse, not to the seller directly.</li>
             </ul>
             <p>
-              Revibee handles all inspections and quality reviews, so the return experience is the same as with our own inventory.
+              HoodFair handles all inspections and quality reviews, so the return experience is the same as with our own inventory.
             </p>
           </div>
 
@@ -57,7 +57,7 @@ export default function ReturnPolicyPage() {
             </p>
             <ol className="list-decimal pl-6 space-y-3 mb-4">
               <li>
-                Contact our customer service team at <strong>+1 717 648 4487</strong> or <strong>support@revibee.com</strong>.
+                Contact our customer service team at <strong>+1 717 648 4487</strong> or <strong>support@hoodfair.com</strong>.
               </li>
               <li>We will issue a return authorization number and provide return instructions.</li>
               <li>Pack the item securely. Original packaging is preferred but not always required.</li>
@@ -122,7 +122,7 @@ export default function ReturnPolicyPage() {
           <div>
             <h2 className="text-3xl font-bold text-[#262626] mt-10 mb-4">Refund Eligibility for Marketplace Seller Items</h2>
             <p className="mb-4">
-              Marketplace seller items follow the same refund standards as Revibee inventory.
+              Marketplace seller items follow the same refund standards as HoodFair inventory.
             </p>
             <p>
               If an item fails our inspection upon return, we will notify you with clear details and work toward a fair resolution.
@@ -142,7 +142,7 @@ export default function ReturnPolicyPage() {
               </div>
               <div>
                 <div className="font-medium text-[#262626] mb-1">Email:</div>
-                <div className="text-gray-600">support@revibee.com</div>
+                <div className="text-gray-600">support@hoodfair.com</div>
               </div>
               <div>
                 <div className="font-medium text-[#262626] mb-1">Address:</div>
@@ -160,7 +160,7 @@ export default function ReturnPolicyPage() {
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200 mt-10">
             <h2 className="text-2xl font-bold text-[#262626] mb-4">Our Promise</h2>
             <p className="mb-4">
-              At Revibee, we believe in doing the right thing. If something is not right with your order, we want to fix it quickly and fairly. We treat every customer with respect, transparency, and care.
+              At HoodFair, we believe in doing the right thing. If something is not right with your order, we want to fix it quickly and fairly. We treat every customer with respect, transparency, and care.
             </p>
             <p>
               Your trust matters to us, and we are committed to making your experience positive from start to finish.

@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { getAllProducts } from '@/lib/data';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://revibee.com';
+  const baseUrl = 'https://hoodfair.com';
   
   // Get all products
   const products = await getAllProducts();

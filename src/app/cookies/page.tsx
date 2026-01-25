@@ -8,7 +8,7 @@ const CookiesPage = () => (
       <div className="prose max-w-none text-gray-700 space-y-8">
         {/* Introduction */}
         <p className="text-lg leading-relaxed">
-          This Cookies Policy explains how Revibee uses cookies and similar tracking technologies on our website. By using our website, you agree to the use of cookies as described in this policy.
+          This Cookies Policy explains how HoodFair uses cookies and similar tracking technologies on our website. By using our website, you agree to the use of cookies as described in this policy.
         </p>
 
         {/* What Are Cookies */}
@@ -108,7 +108,7 @@ const CookiesPage = () => (
             </div>
             <div>
               <div className="font-medium text-[#262626] mb-1">Email:</div>
-              <div className="text-gray-600">support@revibee.com</div>
+              <div className="text-gray-600">support@hoodfair.com</div>
             </div>
             <div>
               <div className="font-medium text-[#262626] mb-1">Address:</div>

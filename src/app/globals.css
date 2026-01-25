@@ -188,12 +188,13 @@ button {
   body {
     font-family: var(--font-roboto), sans-serif;
     overflow-x: hidden;
+    overflow-y: auto;
     position: relative;
     width: 100%;
     margin: 0;
     padding: 0;
     /* Prevent bounce scrolling on iOS */
-    overscroll-behavior: none;
+    overscroll-behavior-x: none;
   }
 
   h1,

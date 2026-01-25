@@ -16,7 +16,7 @@ const InstagramSection: React.FC = () => {
                   <div className="w-full h-full bg-white rounded-full overflow-hidden">
                     <Image
                       src="https://i.ibb.co/RGcM1gLY/pdp1.png"
-                      alt="Revibee Profile"
+                      alt="HoodFair Profile"
                       width={80}
                       height={80}
                       className="object-cover w-full h-full"
@@ -26,8 +26,8 @@ const InstagramSection: React.FC = () => {
                 
                 {/* Profile Details */}
                 <div className="flex-grow">
-                  <h3 className="font-bold text-[#262626] text-lg sm:text-xl mb-1">@revibeecom</h3>
-                  <p className="text-gray-600 text-sm sm:text-base mb-2">Revibee</p>
+                  <h3 className="font-bold text-[#262626] text-lg sm:text-xl mb-1">@hoodfaircom</h3>
+                  <p className="text-gray-600 text-sm sm:text-base mb-2">HoodFair</p>
                   
                   {/* Statistics */}
                   <div className="flex items-center space-x-4 sm:space-x-6 text-sm">
@@ -50,7 +50,7 @@ const InstagramSection: React.FC = () => {
               {/* Follow Us Button */}
               <div className="flex-shrink-0">
                 <a
-                  href="https://go.revibee.com/p144"
+                  href="https://go.hoodfair.com/p144"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"

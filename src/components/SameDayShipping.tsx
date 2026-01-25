@@ -21,7 +21,7 @@ const SameDayShipping: React.FC<SameDayShippingProps> = ({ fullWidth = false, co
             <div className="relative w-full min-h-[400px]">
               <Image
                 src="/delivery-guy.png"
-                alt="Revibee delivery person"
+                alt="HoodFair delivery person"
                 fill
                 className="object-cover"
                 priority
@@ -36,7 +36,7 @@ const SameDayShipping: React.FC<SameDayShippingProps> = ({ fullWidth = false, co
             </h1>
 
             <h3 className="text-lg leading-relaxed font-normal mb-12">
-              Order by 2:00 PM EST and we&apos;ll process, pack, and ship your order the same day. At <strong>Revibee</strong>, we deliver speed and reliability you can count on with trusted delivery partners.
+              Order by 2:00 PM EST and we&apos;ll process, pack, and ship your order the same day. At <strong>HoodFair</strong>, we deliver speed and reliability you can count on with trusted delivery partners.
             </h3>
             <Link
               href="/shipping-policy"

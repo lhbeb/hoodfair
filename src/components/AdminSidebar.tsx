@@ -2,11 +2,11 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  Package, 
-  ShoppingCart, 
-  Plus, 
-  Upload, 
+import {
+  Package,
+  ShoppingCart,
+  Plus,
+  Upload,
   LogOut,
   ChevronLeft,
   Home,
@@ -81,7 +81,7 @@ export default function AdminSidebar() {
           // For other errors, silently fail (non-critical feature)
         } catch (fetchError: any) {
           clearTimeout(timeoutId);
-          
+
           // Only log if it's not an abort (timeout) or network error
           if (fetchError.name !== 'AbortError' && fetchError.name !== 'TypeError') {
             // Silently fail - this is non-critical
@@ -156,11 +156,11 @@ export default function AdminSidebar() {
         {/* Logo/Header */}
         <div className="h-16 flex items-center px-5 border-b border-gray-100">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 bg-gradient-to-br from-[#015256] to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-[#015256]/20 group-hover:shadow-[#015256]/30 transition-shadow">
+            <div className="w-9 h-9 bg-gradient-to-br from-[#2658A6] to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-[#2658A6]/20 group-hover:shadow-[#2658A6]/30 transition-shadow">
               <Home className="h-5 w-5 text-white" />
             </div>
             <div>
-              <span className="font-bold text-[#262626]">Revibee</span>
+              <span className="font-bold text-[#262626]">HoodFair</span>
               <span className="text-[10px] text-gray-400 block -mt-0.5">Admin Panel</span>
             </div>
           </Link>
@@ -169,7 +169,7 @@ export default function AdminSidebar() {
         {/* Admin Profile Card */}
         <div className="mx-4 my-4 p-4 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl border border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#015256] to-indigo-700 rounded-full flex items-center justify-center ring-2 ring-white shadow-lg">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#2658A6] to-indigo-700 rounded-full flex items-center justify-center ring-2 ring-white shadow-lg">
               <span className="text-white font-bold text-sm">A</span>
             </div>
             <div className="flex-1 min-w-0">
@@ -192,7 +192,7 @@ export default function AdminSidebar() {
               {getMainNavItems(ordersCount).map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.path);
-                
+
                 return (
                   <Link
                     key={item.path}
@@ -201,7 +201,7 @@ export default function AdminSidebar() {
                     className={`
                       flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
                       ${active
-                        ? 'bg-[#015256] text-white shadow-lg shadow-[#015256]/25'
+                        ? 'bg-[#2658A6] text-white shadow-lg shadow-[#2658A6]/25'
                         : 'text-gray-600 hover:bg-gray-100 hover:text-[#262626]'
                       }
                     `}
@@ -219,9 +219,8 @@ export default function AdminSidebar() {
                       )}
                     </div>
                     {item.badge !== undefined && item.badge > 0 && (
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-semibold min-w-[1.5rem] text-center ${
-                        active ? 'bg-white/20 text-white' : 'bg-red-500 text-white'
-                      }`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-semibold min-w-[1.5rem] text-center ${active ? 'bg-white/20 text-white' : 'bg-red-500 text-white'
+                        }`}>
                         {item.badge}
                       </span>
                     )}
@@ -240,7 +239,7 @@ export default function AdminSidebar() {
               {quickActions.map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.path);
-                
+
                 return (
                   <Link
                     key={item.path}
@@ -249,12 +248,12 @@ export default function AdminSidebar() {
                     className={`
                       flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200
                       ${active
-                        ? 'bg-[#015256]/5 text-[#1a3d70] border border-[#015256]/10'
+                        ? 'bg-[#2658A6]/5 text-[#1a3d70] border border-[#2658A6]/10'
                         : 'text-gray-600 hover:bg-gray-50'
                       }
                     `}
                   >
-                    <Icon className={`h-4 w-4 ${active ? 'text-[#015256]' : 'text-gray-400'}`} />
+                    <Icon className={`h-4 w-4 ${active ? 'text-[#2658A6]' : 'text-gray-400'}`} />
                     <span className="font-medium text-sm">{item.name}</span>
                   </Link>
                 );
@@ -272,7 +271,7 @@ export default function AdminSidebar() {
             <ChevronLeft className="h-5 w-5 text-gray-400" />
             <span className="font-medium text-sm">Back to Store</span>
           </Link>
-          
+
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-600 hover:bg-red-50 transition-colors"

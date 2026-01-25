@@ -12,7 +12,7 @@ const Footer = () => {
             <Link href="/" className="flex items-center space-x-2 mb-4">
               <Image 
                 src="/logosvg.svg" 
-                alt="Revibee Logo" 
+                alt="HoodFair Logo" 
                 width={134}
                 height={28}
                 className="w-[134px] brightness-0 invert"
@@ -30,8 +30,8 @@ const Footer = () => {
               </div>
               <div className="flex items-center">
                 <Mail className="h-5 w-5 text-[#2658A6] mr-2" />
-                <a href="mailto:support@revibee.com" className="hover:text-[#2658A6] transition-colors duration-300">
-                  support@revibee.com
+                <a href="mailto:support@hoodfair.com" className="hover:text-[#2658A6] transition-colors duration-300">
+                  support@hoodfair.com
                 </a>
               </div>
               <div className="flex items-start">
@@ -40,7 +40,7 @@ const Footer = () => {
               </div>
               <div className="pt-2">
                 <a 
-                  href="https://go.revibee.com/p146" 
+                  href="https://go.hoodfair.com/p146" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center text-gray-300 hover:text-[#2658A6] transition-colors duration-300"
@@ -58,7 +58,7 @@ const Footer = () => {
               <li><Link href="/" className="hover:text-[#2658A6] transition-colors duration-300">Home</Link></li>
               <li><Link href="/#products" className="hover:text-[#2658A6] transition-colors duration-300">Products</Link></li>
               <li><Link href="/#featured" className="hover:text-[#2658A6] transition-colors duration-300">Featured</Link></li>
-              <li><Link href="/sell" className="hover:text-[#2658A6] transition-colors duration-300">Sell on Revibee</Link></li>
+              <li><Link href="/sell" className="hover:text-[#2658A6] transition-colors duration-300">Sell on HoodFair</Link></li>
               <li><Link href="/track" className="hover:text-[#2658A6] transition-colors duration-300">Track Order</Link></li>
               <li><Link href="/contact" className="hover:text-[#2658A6] transition-colors duration-300">Contact Us</Link></li>
             </ul>
@@ -89,7 +89,7 @@ const Footer = () => {
                 className="h-16 w-auto max-w-full object-contain brightness-110 contrast-110" 
               />
             </div>
-            <p className="text-center">© 2025 Revibee. All rights reserved.</p>
+            <p className="text-center">© 2025 HoodFair. All rights reserved.</p>
           </div>
         </div>
       </div>

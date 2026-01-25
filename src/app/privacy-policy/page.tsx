@@ -8,7 +8,7 @@ const PrivacyPolicyPage = () => (
       <div className="prose max-w-none text-gray-700 space-y-8">
         {/* Introduction */}
         <p className="text-lg leading-relaxed">
-          At Revibee, your privacy is important to us. This Privacy Policy explains what information we collect, how we use it, how we protect it, and the choices you have regarding your personal data when you visit or use our website.
+          At HoodFair, your privacy is important to us. This Privacy Policy explains what information we collect, how we use it, how we protect it, and the choices you have regarding your personal data when you visit or use our website.
         </p>
 
         {/* Information We Collect */}
@@ -143,7 +143,7 @@ const PrivacyPolicyPage = () => (
             </div>
             <div>
               <div className="font-medium text-[#262626] mb-1">Email:</div>
-              <div className="text-gray-600">support@revibee.com</div>
+              <div className="text-gray-600">support@hoodfair.com</div>
             </div>
             <div>
               <div className="font-medium text-[#262626] mb-1">Address:</div>

@@ -35,14 +35,14 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
 
   const faqItems = useMemo(() => [
     { question: "Are the items new or used?", answer: "We offer both new and second-hand items. Product condition is clearly listed in the description (e.g., Brand New, Like New, Refurbished, or Used – Good Condition)." },
-    { question: "Do products come with a warranty?", answer: "New items typically include a manufacturer warranty. For second-hand items, we offer a 30-day Revibee Guarantee for returns and exchanges, unless otherwise stated." },
-    { question: "Can I return a product if it doesn't meet my expectations?", answer: "Absolutely! Your satisfaction is our top priority. We offer a generous 30-day return window. Contact us at +17176484487 or support@revibee.com and we'll work with you to make it right. Read our Return Policy for complete details." },
+    { question: "Do products come with a warranty?", answer: "New items typically include a manufacturer warranty. For second-hand items, we offer a 30-day HoodFair Guarantee for returns and exchanges, unless otherwise stated." },
+    { question: "Can I return a product if it doesn't meet my expectations?", answer: "Absolutely! Your satisfaction is our top priority. We offer a generous 30-day return window. Contact us at +17176484487 or support@hoodfair.com and we'll work with you to make it right. Read our Return Policy for complete details." },
     { question: "How long does shipping take?", answer: "Orders placed before 2:00 PM EST ship the same day! Standard processing is 1 business day. Domestic US shipping takes 5-8 business days, and Canada shipping takes 7-10 business days. You'll receive tracking information via email once your order ships." },
     { question: "Is there free shipping?", answer: "Yes, we offer free standard shipping on all orders currently. Express options are also available at checkout." },
     { question: "Are your second-hand products tested?", answer: "Absolutely. All second-hand electronics go through a multi-point inspection and are fully functional unless otherwise stated." },
     { question: "Can I trust the product photos?", answer: "Yes — what you see is what you get. Our photos show the actual product (or a very close representation for new items). We do not use stock images for used items." },
     { question: "Is local pickup available?", answer: "Currently, we are an online-only store, but we're working on introducing local pickup options in select cities soon." },
-    { question: "How can I contact customer support?", answer: "We're here to help! Call us at +17176484487 or email support@revibee.com. Business hours: Monday-Friday 9:00 AM - 5:00 PM EST, Saturday 10:00 AM - 3:00 PM EST. We respond to all inquiries promptly and are committed to resolving any issues quickly." }
+    { question: "How can I contact customer support?", answer: "We're here to help! Call us at +17176484487 or email support@hoodfair.com. Business hours: Monday-Friday 9:00 AM - 5:00 PM EST, Saturday 10:00 AM - 3:00 PM EST. We respond to all inquiries promptly and are committed to resolving any issues quickly." }
   ], []);
 
   // Generate viewed count that persists during session

@@ -10,9 +10,9 @@ export default function AboutPage() {
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-[#2658A6] to-[#1a3d70] text-white py-16">
         <div className="container mx-auto px-4 max-w-4xl text-center">
-          <h1 className="text-5xl font-bold mb-6">About Revibee</h1>
+          <h1 className="text-5xl font-bold mb-6">About HoodFair</h1>
           <p className="text-xl text-blue-100 leading-relaxed max-w-3xl mx-auto">
-            Welcome to Revibee, the trusted destination for smart shoppers who want quality products at fair and transparent prices. We offer a curated selection of electronics, photography gear, fashion items, bicycles, tools, home equipment, and more. Our mission is simple. Make premium products accessible to everyone without inflated retail costs.
+            Welcome to HoodFair, the trusted destination for smart shoppers who want quality products at fair and transparent prices. We offer a curated selection of electronics, photography gear, fashion items, bicycles, tools, home equipment, and more. Our mission is simple. Make premium products accessible to everyone without inflated retail costs.
           </p>
         </div>
       </div>
@@ -301,7 +301,7 @@ export default function AboutPage() {
                 <Mail className="h-5 w-5 text-[#2658A6]" />
                 <div className="font-medium text-[#262626]">Email:</div>
               </div>
-              <div className="text-gray-600 ml-8">support@revibee.com</div>
+              <div className="text-gray-600 ml-8">support@hoodfair.com</div>
             </div>
             <div className="bg-gray-50 rounded-xl p-6">
               <div className="flex items-center gap-3 mb-3">

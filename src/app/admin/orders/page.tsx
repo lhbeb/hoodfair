@@ -391,7 +391,7 @@ export default function AdminOrdersPage() {
         <div className="mb-4 flex justify-end">
           <button
             onClick={() => setShowExportDialog(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#015256] text-white rounded-lg hover:bg-[#1a3d70] transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#2658A6] text-white rounded-lg hover:bg-[#1a3d70] transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" /></svg>
             Export Orders (CSV)
@@ -440,7 +440,7 @@ export default function AdminOrdersPage() {
 
                 <button
                   onClick={() => handleExport('all')}
-                  className="w-full text-left p-4 border-2 border-[#015256]/20 bg-[#015256]/5 rounded-xl hover:bg-[#015256]/10 hover:border-[#015256]/30 transition-colors"
+                  className="w-full text-left p-4 border-2 border-[#2658A6]/20 bg-[#2658A6]/5 rounded-xl hover:bg-[#2658A6]/10 hover:border-[#2658A6]/30 transition-colors"
                 >
                   <div className="flex items-center justify-between">
                     <div>
@@ -449,7 +449,7 @@ export default function AdminOrdersPage() {
                         Export all orders regardless of conversion status ({orders.length} orders)
                       </div>
                     </div>
-                    <Package className="h-6 w-6 text-[#015256] flex-shrink-0" />
+                    <Package className="h-6 w-6 text-[#2658A6] flex-shrink-0" />
                   </div>
                 </button>
               </div>
@@ -611,7 +611,7 @@ export default function AdminOrdersPage() {
                 >
                   <div className="flex items-center gap-4">
                     {/* Customer Avatar */}
-                    <div className="h-10 w-10 bg-gradient-to-br from-[#015256] to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                    <div className="h-10 w-10 bg-gradient-to-br from-[#2658A6] to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
                       {order.customer_name?.charAt(0)?.toUpperCase() || '?'}
                     </div>
 
@@ -770,7 +770,7 @@ export default function AdminOrdersPage() {
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-[#015256] hover:text-[#1a3d70] hover:bg-[#015256]/5 rounded-lg transition-colors"
+                              className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-[#2658A6] hover:text-[#1a3d70] hover:bg-[#2658A6]/5 rounded-lg transition-colors"
                               title="View product"
                             >
                               <Eye className="h-3 w-3" />
@@ -895,7 +895,7 @@ export default function AdminOrdersPage() {
                     onClick={() => setCurrentPage(pageNum)}
                     className={`min-w-[40px] h-10 rounded-lg font-medium transition-all ${
                       currentPage === pageNum
-                        ? 'bg-[#015256] text-white'
+                        ? 'bg-[#2658A6] text-white'
                         : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
                     }`}
                   >
