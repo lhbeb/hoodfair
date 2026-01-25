@@ -290,28 +290,28 @@ const Header = () => {
         <div className="hidden lg:block bg-white border-t border-gray-200">
           <div className="container mx-auto px-4">
             <nav className="flex items-center gap-8 py-3 font-heading">
-              <Link href="/#products" className="text-[#777777] hover:text-[#2356A5] font-medium text-sm transition-colors duration-300">
+              <Link href="/#products" className="text-[#262626] hover:text-[#2356A5] font-medium text-sm transition-colors duration-300">
                 All
               </Link>
-              <Link href="/electronics" className="text-[#777777] hover:text-[#2356A5] font-medium text-sm transition-colors duration-300">
+              <Link href="/electronics" className="text-[#262626] hover:text-[#2356A5] font-medium text-sm transition-colors duration-300">
                 Electronics
               </Link>
-              <Link href="/fashion" className="text-[#777777] hover:text-[#2356A5] font-medium text-sm transition-colors duration-300">
+              <Link href="/fashion" className="text-[#262626] hover:text-[#2356A5] font-medium text-sm transition-colors duration-300">
                 Fashion
               </Link>
-              <Link href="/entertainment" className="text-[#777777] hover:text-[#2356A5] font-medium text-sm transition-colors duration-300">
+              <Link href="/entertainment" className="text-[#262626] hover:text-[#2356A5] font-medium text-sm transition-colors duration-300">
                 Entertainment
               </Link>
-              <Link href="/hobbies-collectibles" className="text-[#777777] hover:text-[#2356A5] font-medium text-sm transition-colors duration-300">
+              <Link href="/hobbies-collectibles" className="text-[#262626] hover:text-[#2356A5] font-medium text-sm transition-colors duration-300">
                 Hobbies & Collectibles
               </Link>
-              <Link href="/#featured" className="text-[#777777] hover:text-[#2356A5] font-medium text-sm transition-colors duration-300">
+              <Link href="/#featured" className="text-[#262626] hover:text-[#2356A5] font-medium text-sm transition-colors duration-300">
                 Featured
               </Link>
-              <Link href="/track" className="text-[#777777] hover:text-[#2356A5] font-medium text-sm transition-colors duration-300">
+              <Link href="/track" className="text-[#262626] hover:text-[#2356A5] font-medium text-sm transition-colors duration-300">
                 Track Order
               </Link>
-              <Link href="/contact" className="text-[#777777] hover:text-[#2356A5] font-medium text-sm transition-colors duration-300">
+              <Link href="/contact" className="text-[#262626] hover:text-[#2356A5] font-medium text-sm transition-colors duration-300">
                 Contact us
               </Link>
             </nav>
@@ -323,10 +323,10 @@ const Header = () => {
           <div className="lg:hidden bg-white border-t border-gray-200 border-t border-gray-200">
             <div className="container mx-auto px-4 py-4">
               <nav className="flex flex-col font-heading">
-                <Link href="/track" className="text-center text-[#777777] hover:text-[#2356A5] font-medium transition-colors duration-300 pb-4 border-b border-gray-200" onClick={handleMobileMenuClose}>
+                <Link href="/track" className="text-center text-[#262626] hover:text-[#2356A5] font-medium transition-colors duration-300 pb-4 border-b border-gray-200" onClick={handleMobileMenuClose}>
                   Track Order
                 </Link>
-                <Link href="/contact" className="text-center text-[#777777] hover:text-[#2356A5] font-medium transition-colors duration-300 py-4 border-b border-gray-200" onClick={handleMobileMenuClose}>
+                <Link href="/contact" className="text-center text-[#262626] hover:text-[#2356A5] font-medium transition-colors duration-300 py-4 border-b border-gray-200" onClick={handleMobileMenuClose}>
                   Contact Us
                 </Link>
                 <Link
