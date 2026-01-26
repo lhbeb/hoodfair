@@ -34,8 +34,8 @@ export default function KofiCheckout({ checkoutLink, shippingData, onClose }: Ko
     }, []);
 
     return (
-        <div className="flex flex-col items-center justify-center bg-gradient-to-br from-[#e0e7ff] via-[#f8fafc] to-[#f0fdfa] px-2 pt-4 min-h-screen sm:pt-8 sm:pb-8">
-            <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl border border-gray-100 w-full max-w-5xl mx-auto transition-all duration-500">
+        <div className="flex flex-col items-center justify-center bg-gradient-to-br from-[#e0e7ff] via-[#f8fafc] to-[#f0fdfa] px-0 sm:px-2 pt-0 sm:pt-8 sm:pb-8 min-h-screen">
+            <div className="bg-white/95 backdrop-blur-lg rounded-none sm:rounded-3xl shadow-none sm:shadow-2xl border-0 sm:border border-gray-100 w-full max-w-5xl mx-auto transition-all duration-500">
 
                 {/* Header with Address Confirmation */}
                 <div className="p-6 sm:p-8 border-b border-gray-100">
@@ -72,26 +72,15 @@ export default function KofiCheckout({ checkoutLink, shippingData, onClose }: Ko
                             </div>
                         </div>
 
-                        {/* Email Section - Right */}
-                        {shippingData.email && (
-                            <div className="flex-1 bg-blue-50 border border-blue-100 rounded-2xl shadow-sm p-5 flex flex-col gap-2">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <Mail className="h-5 w-5 text-[#2658A6]" />
-                                    <span className="font-semibold text-[#2658A6] text-base">Email Address</span>
-                                </div>
-                                <div className="text-gray-800 text-base break-all">
-                                    {shippingData.email}
-                                </div>
-                            </div>
-                        )}
+
                     </div>
                 </div>
 
                 {/* Ko-fi Iframe Container */}
-                <div className="p-6 sm:p-8">
-                    <div className="relative w-full" style={{ minHeight: '1430px' }}>
+                <div className="p-0 sm:p-8">
+                    <div className="relative w-full overflow-hidden" style={{ minHeight: '1330px' }}>
                         {isLoading && (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-2xl">
+                            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white rounded-2xl">
                                 <div className="w-12 h-12 border-4 border-[#2658A6]/30 border-t-[#2658A6] rounded-full animate-spin mb-4"></div>
                                 <span className="text-base text-gray-700 font-medium">Loading payment form...</span>
                             </div>
@@ -99,11 +88,13 @@ export default function KofiCheckout({ checkoutLink, shippingData, onClose }: Ko
 
                         <iframe
                             src={checkoutLink}
-                            className={`w-full rounded-2xl border-2 border-gray-200 transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'
+                            className={`w-full rounded-none sm:rounded-2xl border-0 sm:border-2 border-gray-200 transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'
                                 }`}
                             style={{
-                                height: '1430px',
-                                minHeight: '1430px'
+                                height: '1640px', // Increased height to compensate for negative margin
+                                minHeight: '1640px',
+                                marginTop: '-210px', // Shift up to hide the top header/content
+                                marginBottom: '-100px' // Shift container boundary up to hide bottom footer
                             }}
                             title="Ko-fi Payment"
                             allow="payment"
@@ -117,31 +108,31 @@ export default function KofiCheckout({ checkoutLink, shippingData, onClose }: Ko
                     </div>
 
                     {/* Trust Badges */}
-                    <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-gray-600">
-                        <div className="flex items-center gap-2">
+                    <div className="mt-8 mb-8 sm:mt-10 flex flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
                             <span className="inline-flex items-center justify-center bg-gray-100 rounded-full p-1">
-                                <svg className="h-4 w-4 text-[#2658A6]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                <svg className="h-3 w-3 sm:h-4 sm:w-4 text-[#2658A6]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                     <rect width="18" height="12" x="3" y="8" rx="2" />
                                     <path d="M7 8V6a5 5 0 0 1 10 0v2" />
                                 </svg>
                             </span>
-                            <span>Secure Payment</span>
+                            <span className="whitespace-nowrap">Secure Payment</span>
                         </div>
-                        <div className="hidden sm:block text-gray-300">•</div>
-                        <div className="flex items-center gap-2">
+                        <div className="text-gray-300">•</div>
+                        <div className="flex items-center gap-1.5 sm:gap-2">
                             <span className="inline-flex items-center justify-center bg-gray-100 rounded-full p-1">
-                                <Check className="h-4 w-4 text-[#2658A6]" />
+                                <Check className="h-3 w-3 sm:h-4 sm:w-4 text-[#2658A6]" />
                             </span>
-                            <span>SSL Encrypted</span>
+                            <span className="whitespace-nowrap">SSL Encrypted</span>
                         </div>
-                        <div className="hidden sm:block text-gray-300">•</div>
-                        <div className="flex items-center gap-2">
+                        <div className="text-gray-300">•</div>
+                        <div className="flex items-center gap-1.5 sm:gap-2">
                             <span className="inline-flex items-center justify-center bg-gray-100 rounded-full p-1">
-                                <svg className="h-4 w-4 text-[#2658A6]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                <svg className="h-3 w-3 sm:h-4 sm:w-4 text-[#2658A6]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                                 </svg>
                             </span>
-                            <span>Protected by Ko-fi</span>
+                            <span className="whitespace-nowrap">Protected by Ko-fi</span>
                         </div>
                     </div>
                 </div>
