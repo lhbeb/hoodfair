@@ -125,15 +125,6 @@ export default function KofiCheckout({ checkoutLink, shippingData, onClose }: Ko
                             </span>
                             <span className="whitespace-nowrap">SSL Encrypted</span>
                         </div>
-                        <div className="text-gray-300">•</div>
-                        <div className="flex items-center gap-1.5 sm:gap-2">
-                            <span className="inline-flex items-center justify-center bg-gray-100 rounded-full p-1">
-                                <svg className="h-3 w-3 sm:h-4 sm:w-4 text-[#2658A6]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                                </svg>
-                            </span>
-                            <span className="whitespace-nowrap">Protected by Ko-fi</span>
-                        </div>
                     </div>
                 </div>
             </div>
