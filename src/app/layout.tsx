@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     siteName: "HoodFair",
     images: [
       {
-        url: "/g7x.webp",
+        url: "/g7x.png",
         width: 1200,
         height: 630,
         alt: "HoodFair - Online Marketplace for Everything",
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "HoodFair - Everything You Want, One Marketplace.",
     description: "Shop millions of products at HoodFair: electronics, fashion, home, collectibles, toys, beauty, gadgets, and more. Discover unbeatable deals, fast shipping, and a secure shopping experience—just like eBay, but happier!",
-    images: ["/g7x.webp"],
+    images: ["/g7x.png"],
   },
   robots: {
     index: true,
