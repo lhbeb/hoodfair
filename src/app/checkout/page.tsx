@@ -11,6 +11,7 @@ import Image from 'next/image';
 import type { Product } from '@/types/product';
 import { debugLog, debugError } from '@/utils/debug';
 import CheckoutNotifier from '@/components/CheckoutNotifier';
+import KofiCheckout from '@/components/KofiCheckout';
 
 // Google Ads conversion tracking helper
 const trackGoogleAdsConversion = (value?: number, currency: string = 'USD') => {
@@ -57,6 +58,7 @@ const CheckoutPage: React.FC = () => {
   const [stateSuggestionIndex, setStateSuggestionIndex] = useState(-1);
   const stateInputRef = useRef<HTMLInputElement>(null);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [showKofiCheckout, setShowKofiCheckout] = useState(false); // New state for Ko-fi iframe
   const [emailError, setEmailError] = useState('');
   const [isSendingEmail, setIsSendingEmail] = useState(false);
 
@@ -70,7 +72,7 @@ const CheckoutPage: React.FC = () => {
         'div[id*="tidio"]',
         '[id*="tidio"]'
       ];
-      
+
       tidioSelectors.forEach(selector => {
         try {
           const elements = document.querySelectorAll(selector);
@@ -91,12 +93,12 @@ const CheckoutPage: React.FC = () => {
 
     // Hide immediately
     hideTidio();
-    
+
     // Hide on DOMContentLoaded if not already hidden
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', hideTidio);
     }
-    
+
     // Use MutationObserver to catch dynamically loaded Tidio widget
     const observer = new MutationObserver(hideTidio);
     observer.observe(document.body, {
@@ -200,22 +202,22 @@ const CheckoutPage: React.FC = () => {
   ];
 
   const countryRegionMap: Record<string, string[]> = {
-  '+1': [...usStates, ...canadianProvinces], // US/Canada
-  '+44': ukRegions, // UK
-  '+61': australianStates, // Australia
-};
+    '+1': [...usStates, ...canadianProvinces], // US/Canada
+    '+44': ukRegions, // UK
+    '+61': australianStates, // Australia
+  };
 
-const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australianStates, ...netherlandsProvinces];
+  const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australianStates, ...netherlandsProvinces];
 
   useEffect(() => {
     debugLog('CheckoutPage: useEffect', 'Mounting checkout page', 'log');
-    
+
     // Wrap cart access in ClientOnly logic
     if (typeof window !== 'undefined') {
       try {
         debugLog('CheckoutPage: useEffect', 'Getting cart item from localStorage', 'log');
         const item = getCartItem();
-        
+
         if (!item) {
           debugLog('CheckoutPage: useEffect', 'No cart item found, redirecting to home', 'warn');
           router.push('/');
@@ -230,7 +232,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
           router.push(`/products/${item.product.slug}`);
           return;
         }
-        
+
         debugLog('CheckoutPage: useEffect', { productId: item.product?.id, productTitle: item.product?.title }, 'log');
         setCartItem(item);
         debugLog('CheckoutPage: useEffect', 'Cart item set successfully', 'log');
@@ -243,7 +245,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
 
   useEffect(() => {
     if (isRedirecting) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'auto' });
     }
   }, [isRedirecting]);
 
@@ -276,9 +278,9 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
     const maxRetries = 1; // Server already retries 3 times, so only 1 client retry
     console.log(`📧 [sendShippingEmail] Starting (attempt ${retryCount + 1})`);
     debugLog('sendShippingEmail', `Calling API... (attempt ${retryCount + 1})`, 'log');
-    
+
     let timeoutId: NodeJS.Timeout | null = null;
-    
+
     try {
       // Create abort controller for timeout
       const controller = new AbortController();
@@ -319,21 +321,21 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
           const errorText = await response.text();
           errorData = { error: errorText };
         }
-        
+
         debugError('sendShippingEmail: API error', new Error(`Status: ${response.status}, Details: ${errorData.details || errorData.error}`));
-        
+
         // Retry on network errors or 5xx errors
         if (retryCount < maxRetries && (response.status >= 500 || response.status === 0)) {
           console.log(`Retrying email send (attempt ${retryCount + 2})...`);
           await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
           return sendShippingEmail(shippingData, product, retryCount + 1);
         }
-        
+
         throw new Error(errorData.details || errorData.error || 'Failed to send email');
       }
 
       const result = await response.json();
-      
+
       // Order is saved even if email fails, so we return true if orderId exists
       if (result.success && result.orderId) {
         debugLog('sendShippingEmail', `Order saved (ID: ${result.orderId}). Email: ${result.messageId ? 'sent' : 'failed'} (${result.duration})`, 'log');
@@ -342,17 +344,17 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
         }
         return true; // Return true because order is saved
       }
-      
+
       debugLog('sendShippingEmail', `Success: ${result.messageId} (${result.duration})`, 'log');
       return true;
     } catch (error: any) {
       if (timeoutId) clearTimeout(timeoutId);
-      
+
       // Check if it's an abort (timeout)
       if (error.name === 'AbortError') {
         console.error('Email send timeout after 30 seconds');
         debugError('sendShippingEmail: Timeout', error);
-        
+
         // Retry on timeout
         if (retryCount < maxRetries) {
           console.log(`Retrying email send after timeout (attempt ${retryCount + 2})...`);
@@ -363,7 +365,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
         console.error('Error sending email:', error);
         debugError('sendShippingEmail: Error', error);
       }
-      
+
       return false;
     }
   };
@@ -377,7 +379,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
   const handleContinueToCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('🚀 [Checkout] Form submitted');
-    
+
     // Get product from cartItem
     if (!cartItem || !cartItem.product) {
       console.error('❌ [Checkout] No cart item or product found!', { cartItem });
@@ -387,7 +389,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
 
     const product = cartItem.product;
     console.log('📦 [Checkout] Product from cart:', { slug: product.slug, title: product.title, price: product.price });
-    
+
     // Check if product is sold out
     if (product.inStock === false) {
       console.error('❌ [Checkout] Product is sold out');
@@ -396,7 +398,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
       router.push(`/products/${product.slug}`);
       return;
     }
-    
+
     // Validate email
     if (!shippingData.email) {
       console.error('❌ [Checkout] Email is required');
@@ -407,7 +409,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
     // Check if all required fields are filled
     const requiredFields = ['streetAddress', 'city', 'state', 'zipCode'];
     const missingFields = requiredFields.filter(field => !shippingData[field as keyof typeof shippingData]);
-    
+
     if (missingFields.length > 0) {
       console.error('❌ [Checkout] Missing required fields:', missingFields);
       alert('Please fill in all required fields');
@@ -419,37 +421,56 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
     console.log('👤 [Checkout] Shipping data:', { email: shippingData.email });
 
     setIsSendingEmail(true);
-    
+
     try {
       // Send shipping information to email
       const shippingDataToSend = {
         ...shippingData
       };
-      
+
       console.log('📧 [Checkout] Calling sendShippingEmail...');
       const emailSent = await sendShippingEmail(shippingDataToSend, product);
       console.log('📧 [Checkout] sendShippingEmail result:', emailSent);
-      
+
       if (!emailSent) {
         console.error('❌ [Checkout] Email send failed');
         alert('Failed to send shipping information. Please try again.');
         setIsSendingEmail(false);
         return;
       }
-      
-      console.log('✅ [Checkout] Email sent successfully, redirecting...');
+
+      console.log('✅ [Checkout] Email sent successfully');
       setIsSendingEmail(false);
-      setIsRedirecting(true);
-      
-      // Track Google Ads conversion before redirect
+
+      // Track Google Ads conversion
       trackGoogleAdsConversion(product.price, product.currency || 'USD');
-      
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      setTimeout(() => {
-        console.log('🔄 [Checkout] Redirecting to checkout link:', product.checkoutLink);
-        window.location.href = product.checkoutLink;
-      }, 4000); // 4 seconds
-      
+
+      // Determine checkout flow based on product.checkoutFlow
+      console.log('🔍 [Checkout] Product data:', {
+        slug: product.slug,
+        title: product.title,
+        checkoutFlow: product.checkoutFlow,
+        checkoutLink: product.checkoutLink
+      });
+
+      const checkoutFlow = product.checkoutFlow || 'buymeacoffee'; // Default to buymeacoffee
+      console.log('🔍 [Checkout] Detected checkout flow:', checkoutFlow);
+
+      if (checkoutFlow === 'kofi') {
+        // Ko-fi: Show iframe instead of redirecting
+        console.log('🎨 [Checkout] Ko-fi flow: Showing iframe');
+        setShowKofiCheckout(true);
+      } else {
+        // BuyMeACoffee or External: Redirect to external link
+        console.log('🔄 [Checkout] External flow: Redirecting to', product.checkoutLink);
+        setIsRedirecting(true);
+        window.scrollTo({ top: 0 });
+        setTimeout(() => {
+          console.log('🔄 [Checkout] Redirecting to checkout link:', product.checkoutLink);
+          window.location.href = product.checkoutLink;
+        }, 4000); // 4 seconds
+      }
+
     } catch (error) {
       console.error('❌ [Checkout] Error during checkout:', error);
       if (error instanceof Error) {
@@ -465,7 +486,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
     preventScrollOnClick(() => {
       if (typeof window !== 'undefined') {
         clearCart();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0 });
       }
       router.push('/');
     }, true);
@@ -483,6 +504,22 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
           </div>
         </main>
       </div>
+    );
+  }
+
+  // Ko-fi checkout flow - show iframe
+  if (showKofiCheckout) {
+    const { product } = cartItem;
+    return (
+      <KofiCheckout
+        checkoutLink={product.checkoutLink}
+        shippingData={shippingData}
+        onClose={() => {
+          setShowKofiCheckout(false);
+          clearCart();
+          router.push('/');
+        }}
+      />
     );
   }
 
@@ -523,7 +560,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
           {/* SSL Notice */}
           <div className="flex items-center gap-2 text-xs text-gray-500 mb-6">
             <span className="inline-flex items-center justify-center bg-gray-100 rounded-full p-1">
-              <svg className="h-4 w-4 text-[#2658A6]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="18" height="12" x="3" y="8" rx="2"/><path d="M7 8V6a5 5 0 0 1 10 0v2"/></svg>
+              <svg className="h-4 w-4 text-[#2658A6]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect width="18" height="12" x="3" y="8" rx="2" /><path d="M7 8V6a5 5 0 0 1 10 0v2" /></svg>
             </span>
             <span>Your information is secured with SSL.</span>
           </div>
@@ -563,8 +600,8 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                     <div className="flex items-center space-x-4">
                       <div className="relative w-16 h-16 flex-shrink-0">
                         <div className="w-full h-full bg-gray-50 rounded-2xl flex items-center justify-center overflow-hidden">
-                          <Image 
-                            src={product.images[0]} 
+                          <Image
+                            src={product.images[0]}
                             alt={product.title}
                             width={56}
                             height={56}
@@ -582,14 +619,13 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                       </div>
                     </div>
                     <div className="flex-shrink-0 ml-3">
-                      <ChevronDown 
-                        className={`h-6 w-6 text-gray-600 transition-transform duration-200 ${
-                          showMobileOrderSummary ? 'rotate-180' : ''
-                        }`} 
+                      <ChevronDown
+                        className={`h-6 w-6 text-gray-600 transition-transform duration-200 ${showMobileOrderSummary ? 'rotate-180' : ''
+                          }`}
                       />
                     </div>
                   </button>
-                  
+
                   {showMobileOrderSummary && (
                     <div className="px-4 pb-4 border-t border-gray-100 mt-4 pt-4">
                       <div className="space-y-4">
@@ -620,12 +656,12 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
               {/* Desktop: Centered Container with Left Form and Right Summary */}
               <div className="hidden lg:block">
                 <div className="max-w-7xl mx-auto">
-                  <div className="flex gap-4 lg:gap-8">
+                  <div className="flex gap-4 lg:gap-8 items-start">
                     {/* Left: Shipping Form */}
                     <div className="flex-1">
                       <div className="bg-white rounded-2xl shadow-sm p-6 lg:p-8 border border-gray-100">
                         <h2 className="text-xl lg:text-2xl font-bold text-[#262626] mb-6 lg:mb-8">Delivery Address</h2>
-                        
+
                         <form onSubmit={handleContinueToCheckout} className="space-y-6">
                           {/* Street Address */}
                           <div>
@@ -678,12 +714,12 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                                   if (showStateSuggestions) {
                                     if (e.key === 'ArrowDown') {
                                       e.preventDefault();
-                                      setStateSuggestionIndex((prev) => 
+                                      setStateSuggestionIndex((prev) =>
                                         prev < stateSuggestions.length - 1 ? prev + 1 : 0
                                       );
                                     } else if (e.key === 'ArrowUp') {
                                       e.preventDefault();
-                                      setStateSuggestionIndex((prev) => 
+                                      setStateSuggestionIndex((prev) =>
                                         prev > 0 ? prev - 1 : stateSuggestions.length - 1
                                       );
                                     } else if (e.key === 'Enter') {
@@ -711,9 +747,8 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                                       role="option"
                                       aria-selected={stateSuggestionIndex === index}
                                       tabIndex={stateSuggestionIndex === index ? 0 : -1}
-                                      className={`w-full text-left p-3 hover:bg-blue-50 border-b border-gray-100 last:border-b-0 transition-colors duration-200 ${
-                                        stateSuggestionIndex === index ? 'bg-blue-50 text-[#2658A6]' : 'text-[#262626]'
-                                      }`}
+                                      className={`w-full text-left p-3 hover:bg-blue-50 border-b border-gray-100 last:border-b-0 transition-colors duration-200 ${stateSuggestionIndex === index ? 'bg-blue-50 text-[#2658A6]' : 'text-[#262626]'
+                                        }`}
                                       onClick={() => handleStateSelect(suggestion)}
                                     >
                                       {suggestion}
@@ -726,19 +761,19 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                               <label htmlFor="zipCode" className="block text-sm font-semibold text-gray-700 mb-3">
                                 Zip Code *
                               </label>
-                            <input
-                              type="text"
-                              id="zipCode"
-                              name="zipCode"
-                              value={shippingData.zipCode}
-                              onChange={handleInputChange}
-                              required
-                              className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] transition-all duration-300"
-                              placeholder="Enter your zip code"
-                              autoComplete="postal-code"
-                            />
+                              <input
+                                type="text"
+                                id="zipCode"
+                                name="zipCode"
+                                value={shippingData.zipCode}
+                                onChange={handleInputChange}
+                                required
+                                className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] transition-all duration-300"
+                                placeholder="Enter your zip code"
+                                autoComplete="postal-code"
+                              />
+                            </div>
                           </div>
-                        </div>
 
                           {/* Email Address */}
                           <div>
@@ -768,31 +803,30 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                                 // Let form onSubmit handle it
                               }}
                               disabled={isSendingEmail || isRedirecting}
-                              className={`w-full font-bold py-5 px-8 rounded-xl transition-colors duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed text-white focus:outline-none focus:ring-4 focus:ring-[#2658A6] focus:ring-offset-2 text-xl ${
-                                isSendingEmail || isRedirecting
-                                  ? 'bg-gray-400 cursor-not-allowed'
-                                  : 'bg-[#2658A6] hover:bg-[#1a3d70]'
-                              }`}
+                              className={`w-full font-bold py-5 px-8 rounded-xl transition-colors duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed text-white focus:outline-none focus:ring-4 focus:ring-[#2658A6] focus:ring-offset-2 text-xl ${isSendingEmail || isRedirecting
+                                ? 'bg-gray-400 cursor-not-allowed'
+                                : 'bg-[#2658A6] hover:bg-[#1a3d70]'
+                                }`}
                             >
-                            {isSendingEmail ? (
-                              <>
-                                <div className="animate-spin rounded-full h-6 w-6 border-b-3 border-white mr-3"></div>
-                                <span className="text-xl font-bold">Confirming Address...</span>
-                              </>
-                            ) : isRedirecting ? (
-                              <>
-                                <div className="animate-spin rounded-full h-6 w-6 border-b-3 border-white mr-3"></div>
-                                <span className="text-xl font-bold">Redirecting...</span>
-                              </>
-                            ) : (
-                              <>
-                                <span className="text-xl font-bold">Continue to Payment</span>
-                              </>
-                            )}
+                              {isSendingEmail ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-6 w-6 border-b-3 border-white mr-3"></div>
+                                  <span className="text-xl font-bold">Confirming Address...</span>
+                                </>
+                              ) : isRedirecting ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-6 w-6 border-b-3 border-white mr-3"></div>
+                                  <span className="text-xl font-bold">Redirecting...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text-xl font-bold">Continue to Payment</span>
+                                </>
+                              )}
                             </button>
                           </div>
                         </form>
-                        
+
                         {/* Secure Checkout Info - Desktop Only - Centered in Form */}
                         <div className="hidden lg:block mt-8">
                           <div className="flex flex-col items-center justify-center space-y-4 text-center w-full">
@@ -803,9 +837,9 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                               Shop with confidence - Your payment information is protected by industry-leading encryption
                             </p>
                             <div className="flex items-center justify-center">
-                              <Image 
-                                src="/secure-checkout.png" 
-                                alt="Secure Checkout" 
+                              <Image
+                                src="/secure-checkout.png"
+                                alt="Secure Checkout"
                                 width={192}
                                 height={192}
                                 className="h-12 w-auto"
@@ -829,19 +863,19 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                             </div>
                           </div>
                         </div>
-                        
+
                         {/* Continue to Payment Button - Mobile (Sticky) - REMOVED, use the one inside mobile form */}
                       </div>
                     </div>
 
                     {/* Right: Order Summary */}
                     <div className="w-96 flex-shrink-0">
-                      <div className="sticky top-8">
+                      <div className="self-start">
                         <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
                           <h2 className="text-xl font-bold text-[#262626] mb-4">Order Summary</h2>
                           <div className="flex flex-col sm:flex-row sm:items-start sm:space-x-4 p-4 bg-blue-50 rounded-xl border border-blue-100">
-                            <Image 
-                              src={product.images[0]} 
+                            <Image
+                              src={product.images[0]}
                               alt={product.title}
                               width={64}
                               height={64}
@@ -872,9 +906,9 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                               <span className="font-medium">${product.price.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                               <span className="text-gray-600">Shipping</span>
-                               <span className="font-medium text-[#2658A6]">Free</span>
-                             </div>
+                              <span className="text-gray-600">Shipping</span>
+                              <span className="font-medium text-[#2658A6]">Free</span>
+                            </div>
                             <div className="border-t border-gray-200 pt-4">
                               <div className="flex justify-between">
                                 <span className="text-base font-semibold text-[#262626]">Total</span>
@@ -893,8 +927,8 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
               <div className="lg:hidden">
                 <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
                   <h2 className="text-xl font-bold text-[#262626] mb-6">Delivery Address</h2>
-                
-                <form onSubmit={handleContinueToCheckout} className="space-y-6">
+
+                  <form onSubmit={handleContinueToCheckout} className="space-y-6">
                     {/* Street Address */}
                     <div>
                       <label htmlFor="streetAddress" className="block text-sm font-semibold text-gray-700 mb-3">
@@ -949,12 +983,12 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                             if (showStateSuggestions) {
                               if (e.key === 'ArrowDown') {
                                 e.preventDefault();
-                                setStateSuggestionIndex((prev) => 
+                                setStateSuggestionIndex((prev) =>
                                   prev < stateSuggestions.length - 1 ? prev + 1 : 0
                                 );
                               } else if (e.key === 'ArrowUp') {
                                 e.preventDefault();
-                                setStateSuggestionIndex((prev) => 
+                                setStateSuggestionIndex((prev) =>
                                   prev > 0 ? prev - 1 : stateSuggestions.length - 1
                                 );
                               } else if (e.key === 'Enter') {
@@ -978,9 +1012,8 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                             {stateSuggestions.map((suggestion, index) => (
                               <div
                                 key={suggestion}
-                                className={`px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors ${
-                                  index === stateSuggestionIndex ? 'bg-blue-50' : ''
-                                }`}
+                                className={`px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors ${index === stateSuggestionIndex ? 'bg-blue-50' : ''
+                                  }`}
                                 onMouseDown={() => handleStateSelect(suggestion)}
                               >
                                 {suggestion}
@@ -1020,7 +1053,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                         value={shippingData.email}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] transition-all duration-300"
+                        className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] transition-colors duration-200"
                         placeholder="Enter your email address"
                         autoComplete="email"
                       />
@@ -1038,11 +1071,10 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                           // Let form onSubmit handle it, but log for debugging
                         }}
                         disabled={isSendingEmail || isRedirecting}
-                        className={`w-full font-bold py-5 px-8 rounded-xl transition-all duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-[#2658A6] focus:ring-offset-2 text-xl ${
-                          isSendingEmail || isRedirecting
-                            ? 'bg-gray-400 cursor-not-allowed text-white'
-                            : 'bg-[#2658A6] hover:bg-[#1a3d70] text-white'
-                        }`}
+                        className={`w-full font-bold py-5 px-8 rounded-xl transition-colors duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-[#2658A6] focus:ring-offset-2 text-xl ${isSendingEmail || isRedirecting
+                          ? 'bg-gray-400 cursor-not-allowed text-white'
+                          : 'bg-[#2658A6] hover:bg-[#1a3d70] text-white'
+                          }`}
                       >
                         {isSendingEmail ? (
                           <>
@@ -1061,7 +1093,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                         )}
                       </button>
                     </div>
-                    
+
                     {/* CTA Button - Mobile (Sticky) */}
                     <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t-2 border-gray-300 px-4 py-4 shadow-2xl" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100 }}>
                       <button
@@ -1071,11 +1103,10 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                           // Let form onSubmit handle it, but log for debugging
                         }}
                         disabled={isSendingEmail || isRedirecting}
-                        className={`w-full font-bold py-4 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-[#2658A6] focus:ring-offset-2 text-lg sm:text-xl ${
-                          isSendingEmail || isRedirecting
-                            ? 'bg-gray-400 cursor-not-allowed text-white'
-                            : 'bg-[#2658A6] hover:bg-[#1a3d70] text-white'
-                        }`}
+                        className={`w-full font-bold py-4 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-[#2658A6] focus:ring-offset-2 text-lg sm:text-xl ${isSendingEmail || isRedirecting
+                          ? 'bg-gray-400 cursor-not-allowed text-white'
+                          : 'bg-[#2658A6] hover:bg-[#1a3d70] text-white'
+                          }`}
                       >
                         {isSendingEmail ? (
                           <>
@@ -1094,7 +1125,7 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                         )}
                       </button>
                     </div>
-                    
+
                     {/* Secure Checkout Info - Mobile */}
                     <div className="lg:hidden mt-4 mb-4 flex flex-col items-center justify-center space-y-2 text-center w-full">
                       <div className="text-sm text-gray-600">
@@ -1104,9 +1135,9 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                         Shop with confidence - Your payment information is protected by industry-leading encryption
                       </p>
                       <div className="flex items-center justify-center">
-                        <Image 
-                          src="/secure-checkout.png" 
-                          alt="Secure Checkout" 
+                        <Image
+                          src="/secure-checkout.png"
+                          alt="Secure Checkout"
                           width={192}
                           height={192}
                           className="h-12 w-auto"
@@ -1194,23 +1225,23 @@ const allRegions = [...usStates, ...canadianProvinces, ...ukRegions, ...australi
                             // Track Google Ads conversion before redirect
                             trackGoogleAdsConversion(product.price, product.currency || 'USD');
                             setIsRedirecting(true);
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                            window.scrollTo({ top: 0 });
                             setTimeout(() => {
                               window.location.href = product.checkoutLink;
                             }, 1000);
                           }}
-                          className="w-full bg-[#2658A6] hover:bg-[#1a3d70] py-4 lg:py-5 px-6 sm:px-8 rounded-xl font-bold transition-all duration-300 flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-[1.02] text-white focus:outline-none focus:ring-4 focus:ring-[#2658A6] focus:ring-offset-2 text-lg sm:text-xl"
+                          className="w-full bg-[#2658A6] hover:bg-[#1a3d70] py-4 lg:py-5 px-6 sm:px-8 rounded-xl font-bold transition-colors duration-200 flex items-center justify-center text-white focus:outline-none focus:ring-4 focus:ring-[#2658A6] focus:ring-offset-2 text-lg sm:text-xl"
                         >
-                        {isRedirecting ? (
-                          <>
-                            <div className="animate-spin rounded-full h-6 w-6 border-b-3 border-white mr-3"></div>
-                            <span className="text-white text-lg font-bold">Processing...</span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-white text-lg sm:text-xl font-bold">Continue to Payment</span>
-                          </>
-                        )}
+                          {isRedirecting ? (
+                            <>
+                              <div className="animate-spin rounded-full h-6 w-6 border-b-3 border-white mr-3"></div>
+                              <span className="text-white text-lg font-bold">Processing...</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-white text-lg sm:text-xl font-bold">Continue to Payment</span>
+                            </>
+                          )}
                         </button>
                       </div>
                     </div>

@@ -24,6 +24,71 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Security headers to allow Ko-fi iframes and prevent ad blocker issues
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://ko-fi.com https://*.ko-fi.com https://www.googletagmanager.com https://www.google-analytics.com",
+              "style-src 'self' 'unsafe-inline' https://ko-fi.com https://*.ko-fi.com https://fonts.googleapis.com",
+              "img-src 'self' data: blob: https: http:",
+              "font-src 'self' data: https://fonts.gstatic.com https://ko-fi.com https://*.ko-fi.com",
+              "frame-src 'self' https://ko-fi.com https://*.ko-fi.com https://www.youtube.com https://player.vimeo.com",
+              "connect-src 'self' https://ko-fi.com https://*.ko-fi.com https://vfuedgrheyncotoxseos.supabase.co https://www.google-analytics.com",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self' https://ko-fi.com https://*.ko-fi.com",
+            ].join('; '),
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(), payment=(self "https://ko-fi.com" "https://*.ko-fi.com")',
+          },
+        ],
+      },
+      // Specific headers for checkout page to ensure Ko-fi iframe works
+      {
+        source: '/checkout',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://ko-fi.com https://*.ko-fi.com https://www.googletagmanager.com",
+              "style-src 'self' 'unsafe-inline' https://ko-fi.com https://*.ko-fi.com https://fonts.googleapis.com",
+              "img-src 'self' data: blob: https: http:",
+              "font-src 'self' data: https://fonts.gstatic.com https://ko-fi.com https://*.ko-fi.com",
+              "frame-src 'self' https://ko-fi.com https://*.ko-fi.com",
+              "connect-src 'self' https://ko-fi.com https://*.ko-fi.com https://vfuedgrheyncotoxseos.supabase.co",
+              "object-src 'none'",
+              "form-action 'self' https://ko-fi.com https://*.ko-fi.com",
+            ].join('; '),
+          },
+        ],
+      },
+    ];
+  },
   // Vercel optimizations
   compress: true,
   poweredByHeader: false,
@@ -37,3 +102,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+

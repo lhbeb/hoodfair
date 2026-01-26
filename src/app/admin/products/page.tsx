@@ -4,8 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { 
-  Package, Search, Plus, Edit, Trash2, ExternalLink, 
+import {
+  Package, Search, Plus, Edit, Trash2, ExternalLink,
   Filter, Grid3X3, List, MoreVertical, Eye, X,
   ChevronLeft, ChevronRight, RefreshCw, AlertCircle, Star, PackageX, PackageCheck,
   Download, CheckSquare, Square
@@ -67,7 +67,7 @@ export default function AdminProductsPage() {
       const data = await response.json();
       setProducts(data);
       setFilteredProducts(data);
-      
+
       // Count featured products
       const featured = Array.isArray(data) ? data.filter((p: Product) => p.isFeatured || p.is_featured).length : 0;
       setFeaturedCount(featured);
@@ -111,7 +111,7 @@ export default function AdminProductsPage() {
     // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(p => 
+      filtered = filtered.filter(p =>
         p.title.toLowerCase().includes(query) ||
         p.slug.toLowerCase().includes(query) ||
         p.category?.toLowerCase().includes(query)
@@ -142,25 +142,25 @@ export default function AdminProductsPage() {
 
   const handleDelete = async (slug: string) => {
     if (!confirm('Are you sure you want to delete this product?')) return;
-    
+
     setDeletingId(slug);
     try {
       const token = localStorage.getItem('admin_token');
-      const response = await fetch(`/api/admin/products/${encodeURIComponent(slug)}`, { 
+      const response = await fetch(`/api/admin/products/${encodeURIComponent(slug)}`, {
         method: 'DELETE',
         headers: {
           ...(token && { 'Authorization': `Bearer ${token}` })
         }
       });
       if (!response.ok) throw new Error('Failed to delete product');
-      
+
       // Remove from selection if selected
       setSelectedProducts(prev => {
         const newSet = new Set(prev);
         newSet.delete(slug);
         return newSet;
       });
-      
+
       await fetchProducts();
     } catch (err) {
       setError('Failed to delete product');
@@ -173,7 +173,7 @@ export default function AdminProductsPage() {
     const product = products.find(p => p.slug === slug);
     const isCurrentlyFeatured = product?.isFeatured || product?.is_featured || false;
     const featureLimitReached = featuredCount >= FEATURE_LIMIT;
-    
+
     if (!isCurrentlyFeatured && featureLimitReached) {
       setError(`Maximum of ${FEATURE_LIMIT} featured products reached. Unfeature another product first.`);
       return;
@@ -198,19 +198,19 @@ export default function AdminProductsPage() {
       }
 
       const result = await response.json();
-      
+
       // Update local state
-      setProducts(prev => prev.map(p => 
-        p.slug === slug 
+      setProducts(prev => prev.map(p =>
+        p.slug === slug
           ? { ...p, isFeatured: result.isFeatured, is_featured: result.isFeatured }
           : p
       ));
-      setFilteredProducts(prev => prev.map(p => 
-        p.slug === slug 
+      setFilteredProducts(prev => prev.map(p =>
+        p.slug === slug
           ? { ...p, isFeatured: result.isFeatured, is_featured: result.isFeatured }
           : p
       ));
-      
+
       // Update featured count
       setFeaturedCount(prev => result.isFeatured ? prev + 1 : prev - 1);
     } catch (err: any) {
@@ -250,16 +250,16 @@ export default function AdminProductsPage() {
       }
 
       const result = await response.json();
-      
+
       // Update local state - the API returns inStock (camelCase)
       const newInStock = result.inStock !== undefined ? result.inStock : !isCurrentlyInStock;
-      setProducts(prev => prev.map(p => 
-        p.slug === slug 
+      setProducts(prev => prev.map(p =>
+        p.slug === slug
           ? { ...p, inStock: newInStock }
           : p
       ));
-      setFilteredProducts(prev => prev.map(p => 
-        p.slug === slug 
+      setFilteredProducts(prev => prev.map(p =>
+        p.slug === slug
           ? { ...p, inStock: newInStock }
           : p
       ));
@@ -334,7 +334,7 @@ export default function AdminProductsPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      
+
       // Get filename from Content-Disposition header or use default
       const contentDisposition = response.headers.get('Content-Disposition');
       let filename = 'products-export.zip';
@@ -344,7 +344,7 @@ export default function AdminProductsPage() {
           filename = filenameMatch[1];
         }
       }
-      
+
       a.download = filename;
       document.body.appendChild(a);
       a.click();
@@ -372,12 +372,12 @@ export default function AdminProductsPage() {
   }
 
   return (
-    <AdminLayout 
-      title="Products" 
+    <AdminLayout
+      title="Products"
       subtitle={`${products.length} products • ${products.filter(p => p.published).length} published • ${products.filter(p => !p.published).length} drafts • ${featuredCount}/${FEATURE_LIMIT} featured`}
     >
       {/* Error Alert */}
-        {error && (
+      {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center justify-between">
           <div className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5" />
@@ -394,31 +394,28 @@ export default function AdminProductsPage() {
         <div className="flex gap-2">
           <button
             onClick={() => setStatusFilter('all')}
-            className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-              statusFilter === 'all'
+            className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${statusFilter === 'all'
                 ? 'bg-[#2658A6] text-white shadow-sm'
                 : 'text-gray-600 hover:bg-gray-50'
-            }`}
+              }`}
           >
             All Products ({products.length})
           </button>
           <button
             onClick={() => setStatusFilter('published')}
-            className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-              statusFilter === 'published'
+            className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${statusFilter === 'published'
                 ? 'bg-[#2658A6] text-white shadow-sm'
                 : 'text-gray-600 hover:bg-gray-50'
-            }`}
+              }`}
           >
             Published ({products.filter(p => p.published).length})
           </button>
           <button
             onClick={() => setStatusFilter('draft')}
-            className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-              statusFilter === 'draft'
+            className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${statusFilter === 'draft'
                 ? 'bg-amber-600 text-white shadow-sm'
                 : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
-            }`}
+              }`}
           >
             Draft ({products.filter(p => !p.published).length})
           </button>
@@ -431,19 +428,19 @@ export default function AdminProductsPage() {
           {/* Search */}
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
+            <input
+              type="text"
               placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-transparent"
             />
-            </div>
+          </div>
 
           {/* Featured Filter */}
           <div className="flex items-center gap-2">
             <Filter className="h-5 w-5 text-gray-400" />
-                <select
+            <select
               value={featuredFilter}
               onChange={(e) => setFeaturedFilter(e.target.value as 'all' | 'featured' | 'not_featured')}
               className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-transparent text-sm font-medium"
@@ -451,13 +448,13 @@ export default function AdminProductsPage() {
               <option value="all">All Products</option>
               <option value="featured">⭐ Featured Only</option>
               <option value="not_featured">Not Featured</option>
-                </select>
-              </div>
+            </select>
+          </div>
 
           {/* Listed By Filter */}
           <div className="flex items-center gap-2">
             <Filter className="h-5 w-5 text-gray-400" />
-                <select
+            <select
               value={listedByFilter}
               onChange={(e) => setListedByFilter(e.target.value)}
               className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-transparent text-sm font-medium"
@@ -472,8 +469,8 @@ export default function AdminProductsPage() {
               <option value="janah">janah</option>
               <option value="youssef">youssef</option>
               <option value="none">Not Assigned</option>
-                </select>
-              </div>
+            </select>
+          </div>
 
           {/* View Toggle & Actions */}
           <div className="flex items-center gap-3">
@@ -484,12 +481,12 @@ export default function AdminProductsPage() {
               >
                 <Grid3X3 className="h-4 w-4 text-gray-600" />
               </button>
-                <button
+              <button
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-white shadow-sm' : 'hover:bg-gray-200'}`}
               >
                 <List className="h-4 w-4 text-gray-600" />
-                </button>
+              </button>
             </div>
 
             <button
@@ -523,9 +520,9 @@ export default function AdminProductsPage() {
               <Plus className="h-4 w-4" />
               <span className="font-medium">Add Product</span>
             </Link>
-                  </div>
-                </div>
-              </div>
+          </div>
+        </div>
+      </div>
 
       {/* Selection Controls */}
       {selectedProducts.size > 0 && (
@@ -599,11 +596,10 @@ export default function AdminProductsPage() {
                     e.stopPropagation();
                     handleToggleSelect(product.slug);
                   }}
-                  className={`p-1.5 rounded-lg bg-white/90 backdrop-blur-sm border-2 transition-all ${
-                    selectedProducts.has(product.slug)
+                  className={`p-1.5 rounded-lg bg-white/90 backdrop-blur-sm border-2 transition-all ${selectedProducts.has(product.slug)
                       ? 'border-[#2658A6] bg-[#2658A6]/5'
                       : 'border-gray-300 hover:border-gray-400'
-                  }`}
+                    }`}
                 >
                   {selectedProducts.has(product.slug) ? (
                     <CheckSquare className="h-4 w-4 text-[#2658A6]" />
@@ -657,11 +653,10 @@ export default function AdminProductsPage() {
                       handleToggleStock(product.slug);
                     }}
                     disabled={togglingStock === product.slug}
-                    className={`p-2 rounded-lg transition-colors ${
-                      product.inStock !== false
+                    className={`p-2 rounded-lg transition-colors ${product.inStock !== false
                         ? 'bg-green-500 hover:bg-[#2658A6]'
                         : 'bg-red-500 hover:bg-red-600'
-                    } disabled:opacity-50`}
+                      } disabled:opacity-50`}
                     title={product.inStock !== false ? 'Mark as sold out' : 'Mark as in stock'}
                   >
                     {togglingStock === product.slug ? (
@@ -678,11 +673,10 @@ export default function AdminProductsPage() {
                       handleToggleFeatured(product.slug);
                     }}
                     disabled={togglingFeatured === product.slug || (!(product.isFeatured || product.is_featured) && featuredCount >= FEATURE_LIMIT)}
-                    className={`p-2 rounded-lg transition-colors ${
-                      (product.isFeatured || product.is_featured)
+                    className={`p-2 rounded-lg transition-colors ${(product.isFeatured || product.is_featured)
                         ? 'bg-amber-500 hover:bg-amber-600'
                         : 'bg-white hover:bg-gray-100'
-                    } disabled:opacity-50`}
+                      } disabled:opacity-50`}
                     title={(product.isFeatured || product.is_featured) ? 'Remove from featured' : 'Add to featured'}
                   >
                     {togglingFeatured === product.slug ? (
@@ -694,7 +688,7 @@ export default function AdminProductsPage() {
                   <button
                     onClick={(e) => {
                       e.preventDefault();
-                      router.push(`/products/${product.slug}`);
+                      window.open(`/products/${product.slug}`, '_blank');
                     }}
                     className="p-2 bg-white rounded-lg hover:bg-gray-100 transition-colors"
                     title="View product"
@@ -760,8 +754,8 @@ export default function AdminProductsPage() {
                 <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase hidden lg:table-cell">Featured</th>
                 <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase hidden lg:table-cell">Stock</th>
                 <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Actions</th>
-                </tr>
-              </thead>
+              </tr>
+            </thead>
             <tbody className="divide-y divide-gray-100">
               {paginatedProducts.map((product) => (
                 <tr key={product.id} className="hover:bg-gray-50 transition-colors">
@@ -771,11 +765,10 @@ export default function AdminProductsPage() {
                         e.preventDefault();
                         handleToggleSelect(product.slug);
                       }}
-                      className={`p-1.5 rounded-lg border-2 transition-all ${
-                        selectedProducts.has(product.slug)
+                      className={`p-1.5 rounded-lg border-2 transition-all ${selectedProducts.has(product.slug)
                           ? 'border-[#2658A6] bg-[#2658A6]/5'
                           : 'border-gray-300 hover:border-gray-400'
-                      }`}
+                        }`}
                     >
                       {selectedProducts.has(product.slug) ? (
                         <CheckSquare className="h-4 w-4 text-[#2658A6]" />
@@ -788,19 +781,19 @@ export default function AdminProductsPage() {
                     <div className="flex items-start gap-3">
                       <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                         {product.images?.[0] ? (
-                            <Image
+                          <Image
                             src={product.images[0]}
-                              alt={product.title}
+                            alt={product.title}
                             width={48}
                             height={48}
                             className="object-cover w-full h-full"
-                            />
+                          />
                         ) : (
                           <div className="flex items-center justify-center h-full">
                             <Package className="h-5 w-5 text-gray-300" />
                           </div>
                         )}
-                            </div>
+                      </div>
                       <div className="min-w-0 flex-1">
                         <p className="font-medium text-[#262626] break-words leading-tight">{product.title}</p>
                         <p className="text-xs text-gray-400 truncate mt-1">{product.slug}</p>
@@ -824,9 +817,9 @@ export default function AdminProductsPage() {
                             </span>
                           )}
                         </div>
-                          </div>
-                        </div>
-                      </td>
+                      </div>
+                    </div>
+                  </td>
                   <td className="px-4 py-3 hidden md:table-cell">
                     {product.published ? (
                       <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
@@ -842,16 +835,16 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <span className="font-semibold text-[#262626]">${product.price.toFixed(2)}</span>
-                      </td>
+                  </td>
                   <td className="px-4 py-3 hidden lg:table-cell">
                     <span className="text-sm text-gray-700">{product.listedBy || '—'}</span>
                   </td>
                   <td className="px-4 py-3 hidden xl:table-cell">
                     {product.checkoutLink ? (
-                        <a
-                          href={product.checkoutLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                      <a
+                        href={product.checkoutLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 text-sm text-[#2658A6] hover:text-[#1a3d70] hover:underline font-medium"
                         onClick={(e) => e.stopPropagation()}
                       >
@@ -861,19 +854,18 @@ export default function AdminProductsPage() {
                     ) : (
                       <span className="text-sm text-gray-400">-</span>
                     )}
-                      </td>
+                  </td>
                   <td className="px-4 py-3 text-center hidden lg:table-cell">
-                          <button
+                    <button
                       onClick={(e) => {
                         e.preventDefault();
                         handleToggleFeatured(product.slug);
                       }}
                       disabled={togglingFeatured === product.slug || (!(product.isFeatured || product.is_featured) && featuredCount >= FEATURE_LIMIT)}
-                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${
-                        (product.isFeatured || product.is_featured)
+                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${(product.isFeatured || product.is_featured)
                           ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      } disabled:opacity-50`}
+                        } disabled:opacity-50`}
                       title={(product.isFeatured || product.is_featured) ? 'Remove from featured' : 'Add to featured'}
                     >
                       {togglingFeatured === product.slug ? (
@@ -882,7 +874,7 @@ export default function AdminProductsPage() {
                         <Star className={`h-3 w-3 ${(product.isFeatured || product.is_featured) ? 'fill-amber-700' : ''}`} />
                       )}
                       {(product.isFeatured || product.is_featured) ? 'Featured' : 'Feature'}
-                          </button>
+                    </button>
                   </td>
                   <td className="px-4 py-3 text-center hidden lg:table-cell">
                     <button
@@ -891,11 +883,10 @@ export default function AdminProductsPage() {
                         handleToggleStock(product.slug);
                       }}
                       disabled={togglingStock === product.slug}
-                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${
-                        product.inStock !== false
+                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${product.inStock !== false
                           ? 'bg-green-100 text-green-700 hover:bg-green-200'
                           : 'bg-red-100 text-red-700 hover:bg-red-200'
-                      } disabled:opacity-50`}
+                        } disabled:opacity-50`}
                       title={product.inStock !== false ? 'Mark as sold out' : 'Mark as in stock'}
                     >
                       {togglingStock === product.slug ? (
@@ -912,53 +903,52 @@ export default function AdminProductsPage() {
                     <div className="flex items-center justify-end gap-1 relative">
                       {/* Desktop: Show all action buttons */}
                       <div className="hidden xl:flex items-center gap-1">
-                          <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          router.push(`/products/${product.slug}`);
-                        }}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                        title="View product"
-                      >
-                        <Eye className="h-4 w-4 text-gray-500" />
-                          </button>
-                          <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleToggleFeatured(product.slug);
-                        }}
-                        disabled={togglingFeatured === product.slug || (!(product.isFeatured || product.is_featured) && featuredCount >= FEATURE_LIMIT)}
-                        className={`p-2 rounded-lg transition-colors disabled:opacity-50 ${
-                          (product.isFeatured || product.is_featured)
-                            ? 'hover:bg-amber-50'
-                            : 'hover:bg-gray-100'
-                        }`}
-                        title={(product.isFeatured || product.is_featured) ? 'Unfeature product' : 'Feature product'}
-                      >
-                        {togglingFeatured === product.slug ? (
-                          <RefreshCw className="h-4 w-4 text-amber-600 animate-spin" />
-                        ) : (
-                          <Star className={`h-4 w-4 ${(product.isFeatured || product.is_featured) ? 'text-amber-500 fill-amber-500' : 'text-gray-500'}`} />
-                        )}
-                          </button>
-                          <Link
-                            href={`/admin/products/${product.slug}/edit`}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                          >
-                        <Edit className="h-4 w-4 text-gray-500" />
-                          </Link>
-                          <button
-                            onClick={() => handleDelete(product.slug)}
-                        disabled={deletingId === product.slug}
-                        className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        {deletingId === product.slug ? (
-                          <RefreshCw className="h-4 w-4 text-red-600 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4 text-red-600" />
-                        )}
-                          </button>
-                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            window.open(`/products/${product.slug}`, '_blank');
+                          }}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          title="View product"
+                        >
+                          <Eye className="h-4 w-4 text-gray-500" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleToggleFeatured(product.slug);
+                          }}
+                          disabled={togglingFeatured === product.slug || (!(product.isFeatured || product.is_featured) && featuredCount >= FEATURE_LIMIT)}
+                          className={`p-2 rounded-lg transition-colors disabled:opacity-50 ${(product.isFeatured || product.is_featured)
+                              ? 'hover:bg-amber-50'
+                              : 'hover:bg-gray-100'
+                            }`}
+                          title={(product.isFeatured || product.is_featured) ? 'Unfeature product' : 'Feature product'}
+                        >
+                          {togglingFeatured === product.slug ? (
+                            <RefreshCw className="h-4 w-4 text-amber-600 animate-spin" />
+                          ) : (
+                            <Star className={`h-4 w-4 ${(product.isFeatured || product.is_featured) ? 'text-amber-500 fill-amber-500' : 'text-gray-500'}`} />
+                          )}
+                        </button>
+                        <Link
+                          href={`/admin/products/${product.slug}/edit`}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                          <Edit className="h-4 w-4 text-gray-500" />
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(product.slug)}
+                          disabled={deletingId === product.slug}
+                          className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          {deletingId === product.slug ? (
+                            <RefreshCw className="h-4 w-4 text-red-600 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4 text-red-600" />
+                          )}
+                        </button>
+                      </div>
 
                       {/* Mobile/Tablet: Show three-dot menu */}
                       <div className="xl:hidden relative">
@@ -980,7 +970,7 @@ export default function AdminProductsPage() {
                             <button
                               onClick={(e) => {
                                 e.preventDefault();
-                                router.push(`/products/${product.slug}`);
+                                window.open(`/products/${product.slug}`, '_blank');
                                 setOpenDropdown(null);
                               }}
                               className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
@@ -988,7 +978,7 @@ export default function AdminProductsPage() {
                               <Eye className="h-4 w-4 text-gray-400" />
                               <span>View Product</span>
                             </button>
-                            
+
                             <button
                               onClick={(e) => {
                                 e.preventDefault();
@@ -1055,36 +1045,36 @@ export default function AdminProductsPage() {
                         )}
                       </div>
                     </div>
-                      </td>
-                    </tr>
+                  </td>
+                </tr>
               ))}
-              </tbody>
-            </table>
-          </div>
+            </tbody>
+          </table>
+        </div>
       )}
 
-          {/* Pagination */}
+      {/* Pagination */}
       {totalPages > 1 && (
         <div className="mt-6 flex items-center justify-center gap-2">
-                  <button
+          <button
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
+            disabled={currentPage === 1}
             className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
+          >
             <ChevronLeft className="h-5 w-5" />
-                  </button>
-                  
+          </button>
+
           <span className="px-4 py-2 text-sm text-gray-600">
             Page {currentPage} of {totalPages}
           </span>
 
-                        <button
+          <button
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
+            disabled={currentPage === totalPages}
             className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
+          >
             <ChevronRight className="h-5 w-5" />
-                  </button>
+          </button>
         </div>
       )}
     </AdminLayout>

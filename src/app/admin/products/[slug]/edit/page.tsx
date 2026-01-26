@@ -3,9 +3,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { 
+import {
   ArrowLeft, Save, Plus, X, Loader2, Package, DollarSign,
-  Tag, Star, Image as ImageIcon, Search, CheckCircle, AlertCircle, 
+  Tag, Star, Image as ImageIcon, Search, CheckCircle, AlertCircle,
   ChevronDown, Trash2, Eye, Globe, Twitter, Info, User, MapPin,
   Calendar, ThumbsUp, EyeOff
 } from 'lucide-react';
@@ -33,15 +33,15 @@ interface Review {
 }
 
 // Reusable Section Component
-function Section({ 
-  id, 
-  icon: Icon, 
-  title, 
+function Section({
+  id,
+  icon: Icon,
+  title,
   description,
   children,
   defaultOpen = true,
   badge
-}: { 
+}: {
   id: string;
   icon: React.ElementType;
   title: string;
@@ -73,7 +73,7 @@ function Section({
         </div>
         <ChevronDown className={`h-5 w-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
-      
+
       {isOpen && (
         <div className="px-5 pb-5 pt-2 border-t border-gray-100">
           {children}
@@ -84,13 +84,13 @@ function Section({
 }
 
 // Input Field Component
-function Field({ 
-  label, 
-  required, 
+function Field({
+  label,
+  required,
   hint,
-  children 
-}: { 
-  label: string; 
+  children
+}: {
+  label: string;
   required?: boolean;
   hint?: string;
   children: React.ReactNode;
@@ -125,6 +125,7 @@ export default function EditProductPage() {
   const [formData, setFormData] = useState({
     slug: '', title: '', description: '', price: '', original_price: '',
     brand: '', category: '', condition: '', payee_email: '', checkout_link: '',
+    checkout_flow: 'buymeacoffee' as 'buymeacoffee' | 'kofi' | 'external',
     currency: 'USD', images: '', rating: '0', review_count: '0',
     in_stock: true, is_featured: false, published: false, listed_by: '',
     collections: [] as string[],
@@ -154,7 +155,7 @@ export default function EditProductPage() {
       }
       const data = await response.json();
       setProduct(data);
-      
+
       setFormData({
         slug: data.slug || '',
         title: data.title || '',
@@ -166,6 +167,7 @@ export default function EditProductPage() {
         condition: data.condition || '',
         payee_email: data.payeeEmail || data.payee_email || '',
         checkout_link: data.checkoutLink || data.checkout_link || '',
+        checkout_flow: data.checkoutFlow || data.checkout_flow || 'buymeacoffee',
         currency: data.currency || 'USD',
         images: Array.isArray(data.images) ? data.images.join(', ') : data.images || '',
         rating: data.rating?.toString() || '0',
@@ -267,8 +269,8 @@ export default function EditProductPage() {
 
       const processedReviews = reviews.map(r => ({
         ...r,
-        images: typeof r.images === 'string' 
-          ? r.images.split(',').map(s => s.trim()).filter(Boolean) 
+        images: typeof r.images === 'string'
+          ? r.images.split(',').map(s => s.trim()).filter(Boolean)
           : r.images || []
       }));
 
@@ -293,6 +295,7 @@ export default function EditProductPage() {
           condition: formData.condition || '',
           payee_email: formData.payee_email?.trim() || '',
           checkout_link: formData.checkout_link || '',
+          checkout_flow: formData.checkout_flow,
           currency: formData.currency || 'USD',
           images: [...new Set(finalImages)],
           rating: parseFloat(formData.rating) || 0,
@@ -313,7 +316,7 @@ export default function EditProductPage() {
       }
 
       const updatedProduct = await response.json();
-      
+
       // Update local product state with the response
       if (updatedProduct) {
         setProduct(updatedProduct);
@@ -327,7 +330,7 @@ export default function EditProductPage() {
 
       setSuccess('Product saved!');
       setHasChanges(false);
-      
+
       if (finalSlug !== slug) {
         setTimeout(() => router.push(`/admin/products/${finalSlug}/edit`), 1000);
       } else {
@@ -345,8 +348,8 @@ export default function EditProductPage() {
     if (index !== undefined) {
       setEditingReview({ index, data: { ...reviews[index] } });
     } else {
-      setEditingReview({ 
-        index: -1, 
+      setEditingReview({
+        index: -1,
         data: { id: `r-${Date.now()}`, author: '', rating: 5, date: new Date().toISOString().split('T')[0], title: '', content: '', verified: true }
       });
     }
@@ -355,7 +358,7 @@ export default function EditProductPage() {
 
   const saveReview = () => {
     if (!editingReview?.data.author || !editingReview?.data.content) return;
-    
+
     const review = editingReview.data as Review;
     if (editingReview.index === -1) {
       setReviews([...reviews, review]);
@@ -370,7 +373,7 @@ export default function EditProductPage() {
 
   const deleteReview = (index: number) => {
     if (confirm('Delete this review?')) {
-    setReviews(reviews.filter((_, i) => i !== index));
+      setReviews(reviews.filter((_, i) => i !== index));
       setHasChanges(true);
     }
   };
@@ -383,8 +386,8 @@ export default function EditProductPage() {
         <div className="text-center py-16">
           <Package className="h-12 w-12 text-gray-300 mx-auto mb-4" />
           <p className="text-gray-600 mb-4">Product not found</p>
-              <Link href="/admin/products" className="text-[#2658A6] hover:underline">← Back to products</Link>
-      </div>
+          <Link href="/admin/products" className="text-[#2658A6] hover:underline">← Back to products</Link>
+        </div>
       </AdminLayout>
     );
   }
@@ -393,7 +396,7 @@ export default function EditProductPage() {
     ? Math.round((1 - parseFloat(formData.price || '0') / parseFloat(formData.original_price)) * 100)
     : null;
 
-    return (
+  return (
     <AdminLayout>
       {/* Compact Sticky Header */}
       <div className="sticky top-0 z-50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm mb-6">
@@ -405,7 +408,7 @@ export default function EditProductPage() {
             <div className="min-w-0">
               <h1 className="font-semibold text-[#262626] truncate">{formData.title || 'Untitled Product'}</h1>
               <p className="text-xs text-gray-400">Editing • /{formData.slug}</p>
-      </div>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -415,7 +418,7 @@ export default function EditProductPage() {
                 Unsaved
               </span>
             )}
-            
+
             {/* Publish/Unpublish Toggle */}
             <button
               type="button"
@@ -423,11 +426,10 @@ export default function EditProductPage() {
                 setFormData(prev => ({ ...prev, published: !prev.published }));
                 setHasChanges(true);
               }}
-              className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-xl transition-colors ${
-                formData.published
-                  ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
+              className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-xl transition-colors ${formData.published
+                ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
             >
               {formData.published ? (
                 <>
@@ -441,7 +443,7 @@ export default function EditProductPage() {
                 </>
               )}
             </button>
-            
+
             <Link
               href={`/products/${slug}`}
               target="_blank"
@@ -470,24 +472,24 @@ export default function EditProductPage() {
           <button onClick={() => { setError(''); setSuccess(''); }} className="ml-auto p-1 hover:bg-white/50 rounded">
             <X className="h-4 w-4" />
           </button>
-            </div>
-          )}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4 max-w-3xl">
-        
+
         {/* ═══════════════════════════════════════════════════════════════
             SECTION 1: BASIC INFO
         ═══════════════════════════════════════════════════════════════ */}
         <Section id="basic" icon={Package} title="Basic Information" description="Title, description, and product details">
           <div className="space-y-4">
             <Field label="Product Title" required>
-                  <input
-                    type="text"
+              <input
+                type="text"
                 value={formData.title}
                 onChange={(e) => updateField('title', e.target.value)}
                 placeholder="Enter product title"
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all"
-                    required
+                required
               />
             </Field>
 
@@ -547,7 +549,7 @@ export default function EditProductPage() {
                   <option value="Fair">Fair</option>
                 </select>
               </Field>
-              </div>
+            </div>
 
             <Field label="Listed by" required>
               <select
@@ -598,9 +600,9 @@ export default function EditProductPage() {
             {/* Toggle Switches */}
             <div className="flex flex-wrap gap-6 pt-4 border-t border-gray-100">
               <label className={`inline-flex items-center gap-3 cursor-pointer ${featuredCount >= FEATURE_LIMIT && !formData.is_featured ? 'opacity-50' : ''}`}>
-                  <input
-                    type="checkbox"
-                    checked={formData.is_featured}
+                <input
+                  type="checkbox"
+                  checked={formData.is_featured}
                   onChange={(e) => updateField('is_featured', e.target.checked)}
                   disabled={featuredCount >= FEATURE_LIMIT && !formData.is_featured}
                   className="sr-only peer"
@@ -610,9 +612,9 @@ export default function EditProductPage() {
                 </div>
                 <span className="text-sm text-gray-700">Featured</span>
                 <span className="text-xs text-gray-400">({featuredCount}/{FEATURE_LIMIT})</span>
-                </label>
-              </div>
+              </label>
             </div>
+          </div>
         </Section>
 
         {/* ═══════════════════════════════════════════════════════════════
@@ -631,10 +633,10 @@ export default function EditProductPage() {
                     value={formData.price}
                     onChange={(e) => updateField('price', e.target.value)}
                     placeholder="0.00"
-                required
+                    required
                     className="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all"
-              />
-            </div>
+                  />
+                </div>
               </Field>
 
               <Field label="Original Price" hint="For discount display">
@@ -648,8 +650,8 @@ export default function EditProductPage() {
                     onChange={(e) => updateField('original_price', e.target.value)}
                     placeholder="0.00"
                     className="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all"
-                />
-              </div>
+                  />
+                </div>
               </Field>
 
               <Field label="Currency">
@@ -673,7 +675,7 @@ export default function EditProductPage() {
                 <span className="text-green-600">
                   (Save ${(parseFloat(formData.original_price) - parseFloat(formData.price)).toFixed(2)})
                 </span>
-            </div>
+              </div>
             )}
 
             <div className="pt-4 border-t border-gray-100">
@@ -686,8 +688,33 @@ export default function EditProductPage() {
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all"
                 />
               </Field>
-              </div>
+
+              <Field label="Checkout Flow" required hint="Select how customers will complete their purchase">
+                <select
+                  value={formData.checkout_flow}
+                  onChange={(e) => updateField('checkout_flow', e.target.value as 'buymeacoffee' | 'kofi' | 'external')}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all bg-white"
+                  required
+                >
+                  <option value="buymeacoffee">BuyMeACoffee (External - Redirects to payment link)</option>
+                  <option value="kofi">Ko-fi (Iframe - Embedded on your site)</option>
+                </select>
+                <div className="mt-2 p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                  <p className="text-xs text-blue-800">
+                    {formData.checkout_flow === 'kofi' ? (
+                      <>
+                        <strong>Ko-fi (Iframe):</strong> Customer stays on your site. Payment form loads in an embedded iframe after address confirmation.
+                      </>
+                    ) : (
+                      <>
+                        <strong>BuyMeACoffee (External):</strong> Customer is redirected to external checkout link after address confirmation.
+                      </>
+                    )}
+                  </p>
+                </div>
+              </Field>
             </div>
+          </div>
         </Section>
 
         {/* ═══════════════════════════════════════════════════════════════
@@ -710,10 +737,10 @@ export default function EditProductPage() {
           {/* Rating override */}
           <div className="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-gray-100">
             <Field label="Display Rating" hint="0-5 stars">
-                      <input
-                        type="number"
+              <input
+                type="number"
                 min="0"
-                        max="5"
+                max="5"
                 step="0.1"
                 value={formData.rating}
                 onChange={(e) => updateField('rating', e.target.value)}
@@ -721,15 +748,15 @@ export default function EditProductPage() {
               />
             </Field>
             <Field label="Review Count" hint="Displayed review count">
-                      <input
-                        type="number"
-                        min="0"
+              <input
+                type="number"
+                min="0"
                 value={formData.review_count}
                 onChange={(e) => updateField('review_count', e.target.value)}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all"
               />
             </Field>
-                    </div>
+          </div>
         </Section>
 
         {/* ═══════════════════════════════════════════════════════════════
@@ -741,8 +768,8 @@ export default function EditProductPage() {
             <div className="space-y-4">
               <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Search Engine</h4>
               <Field label="Meta Title" hint={`${(formData.metaTitle || formData.title).length}/60 characters`}>
-                    <input
-                      type="text"
+                <input
+                  type="text"
                   value={formData.metaTitle}
                   onChange={(e) => updateField('metaTitle', e.target.value)}
                   placeholder={formData.title || 'Page title'}
@@ -750,7 +777,7 @@ export default function EditProductPage() {
                 />
               </Field>
               <Field label="Meta Description" hint={`${formData.metaDescription.length}/160 characters`}>
-                    <textarea
+                <textarea
                   value={formData.metaDescription}
                   onChange={(e) => updateField('metaDescription', e.target.value)}
                   placeholder="Brief description for search results"
@@ -759,15 +786,15 @@ export default function EditProductPage() {
                 />
               </Field>
               <Field label="Keywords" hint="Comma separated">
-                    <input
-                      type="text"
+                <input
+                  type="text"
                   value={formData.metaKeywords}
                   onChange={(e) => updateField('metaKeywords', e.target.value)}
                   placeholder="keyword1, keyword2, keyword3"
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all"
                 />
               </Field>
-                  </div>
+            </div>
 
             {/* Open Graph */}
             <div className="space-y-4 pt-4 border-t border-gray-100">
@@ -781,11 +808,11 @@ export default function EditProductPage() {
                 <Field label="OG Image URL">
                   <input type="url" value={formData.metaOgImage} onChange={(e) => updateField('metaOgImage', e.target.value)} placeholder="https://..." className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none" />
                 </Field>
-                  </div>
+              </div>
               <Field label="OG Description">
                 <textarea value={formData.metaOgDescription} onChange={(e) => updateField('metaOgDescription', e.target.value)} rows={2} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none resize-none" />
               </Field>
-                  </div>
+            </div>
 
             {/* Twitter */}
             <div className="space-y-4 pt-4 border-t border-gray-100">
@@ -799,7 +826,7 @@ export default function EditProductPage() {
                 <Field label="Twitter Image URL">
                   <input type="url" value={formData.metaTwitterImage} onChange={(e) => updateField('metaTwitterImage', e.target.value)} placeholder="https://..." className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none" />
                 </Field>
-                </div>
+              </div>
               <Field label="Twitter Description">
                 <textarea value={formData.metaTwitterDescription} onChange={(e) => updateField('metaTwitterDescription', e.target.value)} rows={2} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none resize-none" />
               </Field>
@@ -818,37 +845,37 @@ export default function EditProductPage() {
                 <p>No reviews yet</p>
               </div>
             ) : (
-                <div className="space-y-3">
+              <div className="space-y-3">
                 {reviews.map((review, i) => (
                   <div key={review.id || i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl group">
                     <div className="w-9 h-9 bg-gradient-to-br from-[#2658A6] to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0">
                       {review.author?.charAt(0)?.toUpperCase()}
-                          </div>
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-[#262626] text-sm">{review.author}</span>
                         <div className="flex">
-                          {[1,2,3,4,5].map(s => (
+                          {[1, 2, 3, 4, 5].map(s => (
                             <Star key={s} className={`h-3 w-3 ${s <= review.rating ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}`} />
                           ))}
-                          </div>
-                        {review.verified && <CheckCircle className="h-3 w-3 text-green-500" />}
                         </div>
+                        {review.verified && <CheckCircle className="h-3 w-3 text-green-500" />}
+                      </div>
                       <p className="text-sm text-gray-600 mt-1 line-clamp-2">{review.content}</p>
                     </div>
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button type="button" onClick={() => openReviewModal(i)} className="p-1.5 hover:bg-white rounded-lg">
                         <Info className="h-4 w-4 text-gray-400" />
-                          </button>
+                      </button>
                       <button type="button" onClick={() => deleteReview(i)} className="p-1.5 hover:bg-red-50 rounded-lg">
                         <Trash2 className="h-4 w-4 text-red-400" />
-                          </button>
-                      </div>
+                      </button>
                     </div>
-                  ))}
-                </div>
-              )}
-            
+                  </div>
+                ))}
+              </div>
+            )}
+
             <button
               type="button"
               onClick={() => openReviewModal()}
@@ -857,7 +884,7 @@ export default function EditProductPage() {
               <Plus className="h-4 w-4" />
               Add Review
             </button>
-            </div>
+          </div>
         </Section>
 
       </form>
@@ -871,12 +898,12 @@ export default function EditProductPage() {
               <button onClick={() => setShowReviewModal(false)} className="p-1 hover:bg-gray-100 rounded-lg">
                 <X className="h-5 w-5 text-gray-400" />
               </button>
-              </div>
+            </div>
             <div className="p-5 space-y-4 max-h-[60vh] overflow-y-auto">
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Author" required>
-                <input
-                  type="text"
+                  <input
+                    type="text"
                     value={editingReview.data.author || ''}
                     onChange={(e) => setEditingReview({ ...editingReview, data: { ...editingReview.data, author: e.target.value } })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2658A6] outline-none"
@@ -888,7 +915,7 @@ export default function EditProductPage() {
                     onChange={(e) => setEditingReview({ ...editingReview, data: { ...editingReview.data, rating: parseInt(e.target.value) } })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2658A6] outline-none bg-white"
                   >
-                    {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} Stars</option>)}
+                    {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{n} Stars</option>)}
                   </select>
                 </Field>
               </div>
@@ -910,8 +937,8 @@ export default function EditProductPage() {
               </Field>
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Location">
-                <input
-                  type="text"
+                  <input
+                    type="text"
                     value={editingReview.data.location || ''}
                     onChange={(e) => setEditingReview({ ...editingReview, data: { ...editingReview.data, location: e.target.value } })}
                     placeholder="City, State"
@@ -919,7 +946,7 @@ export default function EditProductPage() {
                   />
                 </Field>
                 <Field label="Date">
-                <input
+                  <input
                     type="date"
                     value={editingReview.data.date || ''}
                     onChange={(e) => setEditingReview({ ...editingReview, data: { ...editingReview.data, date: e.target.value } })}
@@ -936,7 +963,7 @@ export default function EditProductPage() {
                 />
                 <span className="text-sm text-gray-700">Verified Purchase</span>
               </label>
-              </div>
+            </div>
             <div className="p-5 border-t border-gray-100 flex justify-end gap-3">
               <button type="button" onClick={() => setShowReviewModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
                 Cancel
@@ -945,8 +972,8 @@ export default function EditProductPage() {
                 Save
               </button>
             </div>
+          </div>
         </div>
-      </div>
       )}
     </AdminLayout>
   );

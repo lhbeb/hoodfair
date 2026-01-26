@@ -77,7 +77,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`scroll-smooth ${roboto.variable}`}>
+    <html lang="en" className={`${roboto.variable}`}>
       <head>
         <link rel="icon" href="/favicon.png" type="image/png" />
         <link rel="preload" href="/logosvg.svg" as="image" type="image/svg+xml" />

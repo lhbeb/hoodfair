@@ -87,6 +87,12 @@ const Header = () => {
   // PRESERVED EXACTLY
   useEffect(() => {
     const handleScroll = () => {
+      // Don't make header sticky on checkout page
+      if (pathname === '/checkout') {
+        setIsSticky(false);
+        return;
+      }
+
       if (typeof window !== 'undefined') {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         const promotionalBarHeight = 40;
@@ -103,7 +109,7 @@ const Header = () => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [pathname]);
 
   // PRESERVED EXACTLY
   const handleCartClick = () => {

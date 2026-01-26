@@ -11,12 +11,12 @@ export const CART_STORAGE_KEY = 'hoodfair_cart';
 
 export function addToCart(product: Product): void {
   debugCart('addToCart called', { product: product ? { id: product.id, slug: product.slug, title: product.title } : null });
-  
+
   if (typeof window === 'undefined') {
     debugError('addToCart: window undefined', new Error('localStorage is not available'));
     return;
   }
-  
+
   if (!product) {
     debugError('addToCart: product is null', new Error('Cannot add to cart: product is null or undefined'));
     return;
@@ -24,7 +24,7 @@ export function addToCart(product: Product): void {
 
   try {
     debugCart('addToCart: creating clean product', { productId: product.id });
-    
+
     // Create a clean serializable product object
     const cleanProduct: Product = {
       id: product.id || '',
@@ -39,6 +39,7 @@ export function addToCart(product: Product): void {
       payeeEmail: product.payeeEmail || '',
       currency: product.currency || 'USD',
       checkoutLink: product.checkoutLink || '',
+      checkoutFlow: product.checkoutFlow || 'buymeacoffee', // Preserve checkout flow
       rating: typeof product.rating === 'number' ? product.rating : 0,
       reviewCount: typeof product.reviewCount === 'number' ? product.reviewCount : 0,
       reviews: Array.isArray(product.reviews) ? product.reviews : [],
@@ -53,9 +54,9 @@ export function addToCart(product: Product): void {
       quantity: 1,
       addedAt: new Date().toISOString()
     };
-    
+
     debugCart('addToCart: cart item created', { cartItem });
-    
+
     // Test serialization before storing
     let serialized: string;
     try {
@@ -65,7 +66,7 @@ export function addToCart(product: Product): void {
       debugError('addToCart: serialization failed', serializeError);
       throw serializeError;
     }
-    
+
     try {
       localStorage.setItem(CART_STORAGE_KEY, serialized);
       debugCart('addToCart: stored in localStorage', { key: CART_STORAGE_KEY });
@@ -73,7 +74,7 @@ export function addToCart(product: Product): void {
       debugError('addToCart: localStorage.setItem failed', storageError);
       throw storageError;
     }
-    
+
     // Dispatch custom event to notify other components
     try {
       if (typeof window !== 'undefined') {
@@ -84,7 +85,7 @@ export function addToCart(product: Product): void {
       debugError('addToCart: event dispatch failed', eventError);
       // Don't throw - event dispatch is not critical
     }
-    
+
     debugCart('addToCart: SUCCESS', { productId: cleanProduct.id });
   } catch (error) {
     debugError('addToCart: CRITICAL ERROR', error);

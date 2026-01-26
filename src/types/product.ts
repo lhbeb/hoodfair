@@ -30,6 +30,7 @@ export interface Product {
   payeeEmail: string;
   currency: string;
   checkoutLink: string;
+  checkoutFlow?: 'buymeacoffee' | 'kofi' | 'external'; // Checkout flow type
   reviews?: Review[];
   meta?: {
     title?: string;

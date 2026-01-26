@@ -24,6 +24,7 @@ function transformProduct(row: any): Product {
     payeeEmail: row.payee_email || '',
     currency: row.currency || 'USD',
     checkoutLink: row.checkout_link,
+    checkoutFlow: row.checkout_flow || 'buymeacoffee', // Default to buymeacoffee for backward compatibility
     reviews: row.reviews || [],
     meta: meta,
     published: published, // Default to true unless explicitly set to false
@@ -51,7 +52,7 @@ export async function getProducts(includeDrafts: boolean = false): Promise<Produ
     }
 
     const products = (data || []).map(transformProduct);
-    
+
     // Filter out drafts unless explicitly requested (for admin views)
     if (!includeDrafts) {
       // Only return published products (published !== false)
@@ -96,7 +97,7 @@ export async function getProductBySlug(slug: string, includeDrafts: boolean = fa
     }
 
     const product = transformProduct(data);
-    
+
     // Filter out drafts unless explicitly requested (for admin views)
     if (!includeDrafts && product.published === false) {
       return null; // Don't return draft products to public
@@ -127,7 +128,7 @@ export async function getProductsByCategory(category: string): Promise<Product[]
     }
 
     const products = (data || []).map(transformProduct);
-    
+
     // Filter out drafts - only return published products
     return products.filter(p => p.published !== false);
   } catch (error) {
@@ -146,14 +147,14 @@ export async function getProductsByCollection(collection: string): Promise<Produ
     // Fetch all products and filter by collection tag
     // This is reliable and works correctly with array columns
     const allProducts = await getProducts();
-    
+
     // Filter products that have the collection tag in their collections array
     const filteredProducts = allProducts.filter(product => {
       const collections = product.collections || [];
       // Case-insensitive comparison for robustness
       return collections.some(c => c.toLowerCase() === collection.toLowerCase());
     });
-    
+
     return filteredProducts;
   } catch (error) {
     console.error('Error loading products by collection:', error);
@@ -167,11 +168,11 @@ export async function getProductsByCollection(collection: string): Promise<Produ
 export async function searchProducts(query: string): Promise<Product[]> {
   try {
     const searchTerm = query.toLowerCase().trim();
-    
+
     if (!searchTerm) {
       return [];
     }
-    
+
     const { data, error } = await supabaseAdmin
       .from('products')
       .select('*')
@@ -184,7 +185,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
     }
 
     const products = (data || []).map(transformProduct);
-    
+
     // Filter out drafts - only return published products
     return products.filter(p => p.published !== false);
   } catch (error) {
@@ -212,7 +213,7 @@ export async function getFeaturedProducts(): Promise<Product[]> {
     }
 
     const products = (data || []).map(transformProduct);
-    
+
     // Filter out drafts - only return published products
     return products.filter(p => p.published !== false);
   } catch (error) {
@@ -236,6 +237,7 @@ export async function createProduct(productData: {
   brand: string;
   payee_email?: string;
   checkout_link: string;
+  checkout_flow?: 'buymeacoffee' | 'kofi' | 'external';
   currency?: string;
   rating?: number;
   review_count?: number;
@@ -252,10 +254,10 @@ export async function createProduct(productData: {
   try {
     // Use id if provided, otherwise use slug
     const productId = productData.id || productData.slug;
-    
+
     // Handle both review_count and reviewCount
     const reviewCount = productData.review_count || productData.reviewCount || 0;
-    
+
     // Handle both in_stock and inStock
     const inStock = productData.in_stock !== undefined ? productData.in_stock : (productData.inStock !== undefined ? productData.inStock : true);
 
@@ -273,6 +275,7 @@ export async function createProduct(productData: {
         brand: productData.brand,
         payee_email: productData.payee_email || '',
         checkout_link: productData.checkout_link,
+        checkout_flow: productData.checkout_flow || 'buymeacoffee',
         currency: productData.currency || 'USD',
         rating: productData.rating || 0,
         review_count: reviewCount,
@@ -314,6 +317,7 @@ export async function updateProduct(
     brand?: string;
     payee_email?: string;
     checkout_link?: string;
+    checkout_flow?: 'buymeacoffee' | 'kofi' | 'external';
     currency?: string;
     rating?: number;
     review_count?: number;
@@ -364,9 +368,10 @@ export async function updateProduct(
     if (updates.brand !== undefined && hasValue(updates.brand)) updateData.brand = updates.brand;
     if (updates.payee_email !== undefined && hasValue(updates.payee_email)) updateData.payee_email = updates.payee_email;
     if (updates.checkout_link !== undefined && hasValue(updates.checkout_link)) updateData.checkout_link = updates.checkout_link;
+    if (updates.checkout_flow !== undefined && hasValue(updates.checkout_flow)) updateData.checkout_flow = updates.checkout_flow;
     if (updates.currency !== undefined && hasValue(updates.currency)) updateData.currency = updates.currency;
     if (updates.rating !== undefined && updates.rating !== null && !isNaN(updates.rating)) updateData.rating = updates.rating;
-    
+
     // Handle both review_count and reviewCount
     if (updates.review_count !== undefined && updates.review_count !== null && !isNaN(updates.review_count)) {
       updateData.review_count = updates.review_count;
@@ -374,13 +379,13 @@ export async function updateProduct(
     if (updates.reviewCount !== undefined && updates.reviewCount !== null && !isNaN(updates.reviewCount)) {
       updateData.review_count = updates.reviewCount;
     }
-    
+
     if (updates.reviews !== undefined) updateData.reviews = updates.reviews;
     // Meta should already be merged in the API route, so just use it directly
     if (updates.meta !== undefined && updates.meta !== null && typeof updates.meta === 'object') {
       updateData.meta = updates.meta;
     }
-    
+
     // Handle both in_stock and inStock (booleans can be false, so check for undefined)
     if (updates.in_stock !== undefined) updateData.in_stock = updates.in_stock;
     if (updates.inStock !== undefined) updateData.in_stock = updates.inStock;
@@ -388,10 +393,10 @@ export async function updateProduct(
     // Handle both is_featured and isFeatured (booleans can be false, so check for undefined)
     if (updates.is_featured !== undefined) updateData.is_featured = updates.is_featured;
     if (updates.isFeatured !== undefined) updateData.is_featured = updates.isFeatured;
-    
+
     // Handle listed_by
     if (updates.listed_by !== undefined && hasValue(updates.listed_by)) updateData.listed_by = updates.listed_by;
-    
+
     // Handle collections (array, can be empty)
     if (updates.collections !== undefined) updateData.collections = updates.collections;
 
@@ -421,23 +426,23 @@ export async function updateProduct(
       .from('products')
       .select('slug, in_stock')
       .eq('slug', slug);
-    
-    console.log('🔍 Product check result:', { 
-      found: checkData?.length || 0, 
+
+    console.log('🔍 Product check result:', {
+      found: checkData?.length || 0,
       error: checkError?.message,
       data: checkData?.[0]
     });
-    
+
     if (!checkData || checkData.length === 0) {
       console.error('❌ Product not found with slug:', slug);
-      
+
       // List some products to verify database connection
       const { data: sampleProducts } = await supabaseAdmin
         .from('products')
         .select('slug')
         .limit(5);
       console.log('📋 Sample products in database:', sampleProducts?.map(p => p.slug));
-      
+
       return null;
     }
 
@@ -458,14 +463,14 @@ export async function updateProduct(
         slug: slug
       });
       console.error('❌ [UPDATE-PRODUCT] Update data:', JSON.stringify(updateData, null, 2));
-      
+
       // Check if it's an RLS policy issue
       if (error.code === 'PGRST116' || error.message.includes('0 rows') || error.message.includes('Cannot coerce')) {
         console.error('❌ [UPDATE-PRODUCT] RLS POLICY ISSUE DETECTED!');
         console.error('❌ [UPDATE-PRODUCT] The products table likely has RLS enabled but no UPDATE policy.');
         console.error('❌ [UPDATE-PRODUCT] Run this SQL: CREATE POLICY "Allow all updates for service role" ON products FOR UPDATE USING (true) WITH CHECK (true);');
       }
-      
+
       return null;
     }
 
@@ -477,14 +482,14 @@ export async function updateProduct(
       console.error('   2. The product slug does not match any rows');
       console.error('   3. A required column is missing in the database');
       console.error('❌ [UPDATE-PRODUCT] Verify RLS policies exist: SELECT * FROM pg_policies WHERE tablename = \'products\';');
-      
+
       // Verify product still exists
       const { data: verifyProduct } = await supabaseAdmin
         .from('products')
         .select('slug, in_stock')
         .eq('slug', slug);
       console.log('🔍 [UPDATE-PRODUCT] Verification query result:', verifyProduct);
-      
+
       return null;
     }
 

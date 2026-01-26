@@ -3,9 +3,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
+import {
   ArrowLeft, Save, Plus, X, Loader2, Package, DollarSign,
-  Tag, Star, Image as ImageIcon, Search, CheckCircle, AlertCircle, 
+  Tag, Star, Image as ImageIcon, Search, CheckCircle, AlertCircle,
   ChevronDown, Trash2, Eye, Globe, Twitter, Info, EyeOff
 } from 'lucide-react';
 import ImageUploader, { ImageUploaderRef, UploadStatus } from '@/components/admin/ImageUploader';
@@ -31,15 +31,15 @@ interface Review {
 }
 
 // Reusable Section Component
-function Section({ 
-  id, 
-  icon: Icon, 
-  title, 
+function Section({
+  id,
+  icon: Icon,
+  title,
   description,
   children,
   defaultOpen = true,
   badge
-}: { 
+}: {
   id: string;
   icon: React.ElementType;
   title: string;
@@ -71,7 +71,7 @@ function Section({
         </div>
         <ChevronDown className={`h-5 w-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
-      
+
       {isOpen && (
         <div className="px-5 pb-5 pt-2 border-t border-gray-100">
           {children}
@@ -82,13 +82,13 @@ function Section({
 }
 
 // Input Field Component
-function Field({ 
-  label, 
-  required, 
+function Field({
+  label,
+  required,
   hint,
-  children 
-}: { 
-  label: string; 
+  children
+}: {
+  label: string;
   required?: boolean;
   hint?: string;
   children: React.ReactNode;
@@ -124,6 +124,7 @@ export default function NewProductPage() {
     category: '',
     condition: '',
     checkout_link: '',
+    checkout_flow: 'buymeacoffee' as 'buymeacoffee' | 'kofi' | 'external', // Checkout flow type
     currency: 'USD',
     images: '',
     rating: '0',
@@ -279,6 +280,7 @@ export default function NewProductPage() {
         condition: formData.condition,
         payee_email: '',
         checkout_link: formData.checkout_link,
+        checkout_flow: formData.checkout_flow,
         currency: formData.currency,
         images: uniqueImages,
         rating: parseFloat(formData.rating),
@@ -329,8 +331,8 @@ export default function NewProductPage() {
     if (index !== undefined) {
       setEditingReview({ index, data: { ...reviews[index] } });
     } else {
-      setEditingReview({ 
-        index: -1, 
+      setEditingReview({
+        index: -1,
         data: { id: `r-${Date.now()}`, author: '', rating: 5, date: new Date().toISOString().split('T')[0], title: '', content: '', verified: true }
       });
     }
@@ -339,7 +341,7 @@ export default function NewProductPage() {
 
   const saveReview = () => {
     if (!editingReview?.data.author || !editingReview?.data.content) return;
-    
+
     const review = editingReview.data as Review;
     if (editingReview.index === -1) {
       setReviews([...reviews, review]);
@@ -375,18 +377,17 @@ export default function NewProductPage() {
               <h1 className="font-semibold text-[#262626] truncate">{formData.title || 'New Product'}</h1>
               <p className="text-xs text-gray-400">Creating new product</p>
             </div>
-            </div>
+          </div>
 
           <div className="flex items-center gap-2">
             {/* Publish/Unpublish Toggle */}
             <button
               type="button"
               onClick={() => updateField('published', !formData.published)}
-              className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-xl transition-colors ${
-                formData.published
-                  ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
+              className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-xl transition-colors ${formData.published
+                ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
             >
               {formData.published ? (
                 <>
@@ -400,7 +401,7 @@ export default function NewProductPage() {
                 </>
               )}
             </button>
-            
+
             {/* Preview Button - only show if product has a slug */}
             {formData.slug && (
               <Link
@@ -412,7 +413,7 @@ export default function NewProductPage() {
                 <Eye className="h-5 w-5 text-gray-500" />
               </Link>
             )}
-            
+
             {/* Save as Draft Button */}
             <button
               onClick={(e) => handleSubmit(e, true)}
@@ -423,7 +424,7 @@ export default function NewProductPage() {
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               {loading ? 'Saving...' : 'Save as Draft'}
             </button>
-            
+
             {/* Create Product Button */}
             <button
               onClick={(e) => handleSubmit(e, false)}
@@ -436,7 +437,7 @@ export default function NewProductPage() {
             </button>
           </div>
         </div>
-              </div>
+      </div>
 
       {/* Alerts */}
       {(error || success) && (
@@ -446,20 +447,20 @@ export default function NewProductPage() {
           <button onClick={() => { setError(''); setSuccess(''); }} className="ml-auto p-1 hover:bg-white/50 rounded">
             <X className="h-4 w-4" />
           </button>
-              </div>
+        </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4 max-w-3xl">
-        
+
         {/* ═══════════════════════════════════════════════════════════════
             SECTION 1: BASIC INFO
         ═══════════════════════════════════════════════════════════════ */}
         <Section id="basic" icon={Package} title="Basic Information" description="Title, description, and product details">
           <div className="space-y-4">
             <Field label="Product Title" required>
-                <input
-                  type="text"
-                  value={formData.title}
+              <input
+                type="text"
+                value={formData.title}
                 onChange={(e) => updateField('title', e.target.value)}
                 placeholder="Enter product title"
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all"
@@ -523,7 +524,7 @@ export default function NewProductPage() {
                   <option value="Fair">Fair</option>
                 </select>
               </Field>
-              </div>
+            </div>
 
             <Field label="Listed by" required>
               <select
@@ -591,11 +592,11 @@ export default function NewProductPage() {
                 />
                 <div className="relative w-10 h-6 bg-gray-200 rounded-full peer-checked:bg-amber-500 transition-colors">
                   <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow peer-checked:translate-x-4 transition-transform" />
-              </div>
+                </div>
                 <span className="text-sm text-gray-700">Featured</span>
                 <span className="text-xs text-gray-400">({featuredCount}/{FEATURE_LIMIT})</span>
-                </label>
-              </div>
+              </label>
+            </div>
           </div>
         </Section>
 
@@ -608,32 +609,32 @@ export default function NewProductPage() {
               <Field label="Price" required>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
-                <input
-                  type="number"
+                  <input
+                    type="number"
                     step="0.01"
-                  min="0"
+                    min="0"
                     value={formData.price}
                     onChange={(e) => updateField('price', e.target.value)}
                     placeholder="0.00"
                     required
                     className="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all"
-                />
-              </div>
+                  />
+                </div>
               </Field>
 
               <Field label="Original Price" hint="For discount display">
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
-                <input
-                  type="number"
+                  <input
+                    type="number"
                     step="0.01"
-                  min="0"
+                    min="0"
                     value={formData.original_price}
                     onChange={(e) => updateField('original_price', e.target.value)}
                     placeholder="0.00"
                     className="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all"
-                />
-              </div>
+                  />
+                </div>
               </Field>
 
               <Field label="Currency">
@@ -667,27 +668,52 @@ export default function NewProductPage() {
                   value={formData.checkout_link}
                   onChange={(e) => updateField('checkout_link', e.target.value)}
                   placeholder="https://..."
-                required
+                  required
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all"
                 />
               </Field>
+
+              <Field label="Checkout Flow" required hint="Select how customers will complete their purchase">
+                <select
+                  value={formData.checkout_flow}
+                  onChange={(e) => updateField('checkout_flow', e.target.value as 'buymeacoffee' | 'kofi' | 'external')}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all bg-white"
+                  required
+                >
+                  <option value="buymeacoffee">BuyMeACoffee (External - Redirects to payment link)</option>
+                  <option value="kofi">Ko-fi (Iframe - Embedded on your site)</option>
+                </select>
+                <div className="mt-2 p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                  <p className="text-xs text-blue-800">
+                    {formData.checkout_flow === 'kofi' ? (
+                      <>
+                        <strong>Ko-fi (Iframe):</strong> Customer stays on your site. Payment form loads in an embedded iframe after address confirmation.
+                      </>
+                    ) : (
+                      <>
+                        <strong>BuyMeACoffee (External):</strong> Customer is redirected to external checkout link after address confirmation.
+                      </>
+                    )}
+                  </p>
+                </div>
+              </Field>
             </div>
-              </div>
+          </div>
         </Section>
-              
+
         {/* ═══════════════════════════════════════════════════════════════
             SECTION 3: IMAGES
         ═══════════════════════════════════════════════════════════════ */}
         <Section id="media" icon={ImageIcon} title="Images" description="Upload product photos">
-              {formData.slug ? (
-                <>
-                    <ImageUploader
-                      ref={imageUploaderRef}
-                      productSlug={formData.slug}
+          {formData.slug ? (
+            <>
+              <ImageUploader
+                ref={imageUploaderRef}
+                productSlug={formData.slug}
                 currentImages={formData.images.split(',').map(s => s.trim()).filter(Boolean)}
                 onImagesUpdate={(urls) => updateField('images', urls.join(', '))}
-                    onUploadStatusChange={setUploadStatus}
-                    />
+                onUploadStatusChange={setUploadStatus}
+              />
               {uploadStatus.message && (
                 <p className={`mt-3 text-sm ${uploadStatus.uploading ? 'text-[#2658A6]' : 'text-gray-500'}`}>
                   {uploadStatus.message}
@@ -717,14 +743,14 @@ export default function NewProductPage() {
                   />
                 </Field>
               </div>
-                </>
-              ) : (
+            </>
+          ) : (
             <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
-                  <p className="text-sm text-yellow-800">
-                    Please enter a product slug first to enable image upload.
-                  </p>
-                </div>
-              )}
+              <p className="text-sm text-yellow-800">
+                Please enter a product slug first to enable image upload.
+              </p>
+            </div>
+          )}
         </Section>
 
         {/* ═══════════════════════════════════════════════════════════════
@@ -736,7 +762,7 @@ export default function NewProductPage() {
             <div className="space-y-4">
               <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Search Engine</h4>
               <Field label="Meta Title" hint={`${(formData.metaTitle || formData.title).length}/60 characters`}>
-              <input
+                <input
                   type="text"
                   value={formData.metaTitle}
                   onChange={(e) => updateField('metaTitle', e.target.value)}
@@ -754,15 +780,15 @@ export default function NewProductPage() {
                 />
               </Field>
               <Field label="Keywords" hint="Comma separated">
-                      <input
-                        type="text"
+                <input
+                  type="text"
                   value={formData.metaKeywords}
                   onChange={(e) => updateField('metaKeywords', e.target.value)}
                   placeholder="keyword1, keyword2, keyword3"
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all"
                 />
               </Field>
-                    </div>
+            </div>
 
             {/* Open Graph */}
             <div className="space-y-4 pt-4 border-t border-gray-100">
@@ -776,11 +802,11 @@ export default function NewProductPage() {
                 <Field label="OG Image URL">
                   <input type="url" value={formData.metaOgImage} onChange={(e) => updateField('metaOgImage', e.target.value)} placeholder="https://..." className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none" />
                 </Field>
-                    </div>
+              </div>
               <Field label="OG Description">
                 <textarea value={formData.metaOgDescription} onChange={(e) => updateField('metaOgDescription', e.target.value)} rows={2} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none resize-none" />
               </Field>
-                    </div>
+            </div>
 
             {/* Twitter */}
             <div className="space-y-4 pt-4 border-t border-gray-100">
@@ -794,12 +820,12 @@ export default function NewProductPage() {
                 <Field label="Twitter Image URL">
                   <input type="url" value={formData.metaTwitterImage} onChange={(e) => updateField('metaTwitterImage', e.target.value)} placeholder="https://..." className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none" />
                 </Field>
-                    </div>
+              </div>
               <Field label="Twitter Description">
                 <textarea value={formData.metaTwitterDescription} onChange={(e) => updateField('metaTwitterDescription', e.target.value)} rows={2} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none resize-none" />
               </Field>
-                    </div>
-                    </div>
+            </div>
+          </div>
         </Section>
 
         {/* ═══════════════════════════════════════════════════════════════
@@ -811,7 +837,7 @@ export default function NewProductPage() {
               <div className="text-center py-8 text-gray-400">
                 <Star className="h-10 w-10 mx-auto mb-2 opacity-50" />
                 <p>No reviews yet</p>
-                    </div>
+              </div>
             ) : (
               <div className="space-y-3">
                 {reviews.map((review, i) => (
@@ -823,36 +849,36 @@ export default function NewProductPage() {
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-[#262626] text-sm">{review.author}</span>
                         <div className="flex">
-                          {[1,2,3,4,5].map(s => (
+                          {[1, 2, 3, 4, 5].map(s => (
                             <Star key={s} className={`h-3 w-3 ${s <= review.rating ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}`} />
                           ))}
-                    </div>
+                        </div>
                         {review.verified && <CheckCircle className="h-3 w-3 text-green-500" />}
-                  </div>
+                      </div>
                       <p className="text-sm text-gray-600 mt-1 line-clamp-2">{review.content}</p>
-                  </div>
+                    </div>
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button type="button" onClick={() => openReviewModal(i)} className="p-1.5 hover:bg-white rounded-lg">
                         <Info className="h-4 w-4 text-gray-400" />
-                    </button>
+                      </button>
                       <button type="button" onClick={() => deleteReview(i)} className="p-1.5 hover:bg-red-50 rounded-lg">
                         <Trash2 className="h-4 w-4 text-red-400" />
-                    </button>
-                  </div>
-                  </div>
-                ))}
-                </div>
-              )}
-
-                      <button
-                        type="button"
-              onClick={() => openReviewModal()}
-              className="w-full py-2.5 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:border-[#2658A6]/30 hover:text-[#2658A6] transition-colors flex items-center justify-center gap-2"
-                      >
-              <Plus className="h-4 w-4" />
-              Add Review
                       </button>
                     </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => openReviewModal()}
+              className="w-full py-2.5 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:border-[#2658A6]/30 hover:text-[#2658A6] transition-colors flex items-center justify-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add Review
+            </button>
+          </div>
         </Section>
 
       </form>
@@ -866,12 +892,12 @@ export default function NewProductPage() {
               <button onClick={() => setShowReviewModal(false)} className="p-1 hover:bg-gray-100 rounded-lg">
                 <X className="h-5 w-5 text-gray-400" />
               </button>
-              </div>
+            </div>
             <div className="p-5 space-y-4 max-h-[60vh] overflow-y-auto">
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Author" required>
-                <input
-                  type="text"
+                  <input
+                    type="text"
                     value={editingReview.data.author || ''}
                     onChange={(e) => setEditingReview({ ...editingReview, data: { ...editingReview.data, author: e.target.value } })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2658A6] outline-none"
@@ -883,20 +909,20 @@ export default function NewProductPage() {
                     onChange={(e) => setEditingReview({ ...editingReview, data: { ...editingReview.data, rating: parseInt(e.target.value) } })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2658A6] outline-none bg-white"
                   >
-                    {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} Stars</option>)}
+                    {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{n} Stars</option>)}
                   </select>
                 </Field>
               </div>
               <Field label="Title">
-                  <input
-                    type="text"
+                <input
+                  type="text"
                   value={editingReview.data.title || ''}
                   onChange={(e) => setEditingReview({ ...editingReview, data: { ...editingReview.data, title: e.target.value } })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2658A6] outline-none"
                 />
               </Field>
               <Field label="Content" required>
-                  <textarea
+                <textarea
                   value={editingReview.data.content || ''}
                   onChange={(e) => setEditingReview({ ...editingReview, data: { ...editingReview.data, content: e.target.value } })}
                   rows={3}
@@ -921,7 +947,7 @@ export default function NewProductPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2658A6] outline-none"
                   />
                 </Field>
-                </div>
+              </div>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -940,7 +966,7 @@ export default function NewProductPage() {
                 Save
               </button>
             </div>
-        </div>
+          </div>
         </div>
       )}
     </AdminLayout>
