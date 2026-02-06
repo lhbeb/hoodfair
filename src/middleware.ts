@@ -21,9 +21,21 @@ export async function middleware(request: NextRequest) {
     }
 
     const token = request.cookies.get('admin_token')?.value;
+    const refreshToken = request.cookies.get('admin_refresh_token')?.value;
 
     if (!token) {
-      // No token, redirect to login
+      // Check if we have a refresh token - if so, let the page handle the refresh
+      // This prevents race condition issues during login
+      if (refreshToken) {
+        console.log('🔄 [MIDDLEWARE] No access token but refresh token exists, allowing through for client-side refresh');
+        const response = NextResponse.next();
+        response.headers.set('x-pathname', pathname);
+        response.headers.set('x-needs-refresh', 'true');
+        return response;
+      }
+
+      // No tokens at all, redirect to login
+      console.log('🚫 [MIDDLEWARE] No tokens found, redirecting to login');
       return NextResponse.redirect(new URL('/admin/login', request.url));
     }
 
@@ -32,9 +44,21 @@ export async function middleware(request: NextRequest) {
       const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
 
       if (error || !user) {
-        // Invalid token, redirect to login
+        // Token might be expired, check if we have refresh token
+        if (refreshToken) {
+          console.log('🔄 [MIDDLEWARE] Access token invalid but refresh token exists, allowing through for client-side refresh');
+          const response = NextResponse.next();
+          response.headers.set('x-pathname', pathname);
+          response.headers.set('x-needs-refresh', 'true');
+          return response;
+        }
+
+        // Invalid token and no refresh token, redirect to login
+        console.log('🚫 [MIDDLEWARE] Invalid token and no refresh token, redirecting to login');
         const response = NextResponse.redirect(new URL('/admin/login', request.url));
         response.cookies.delete('admin_token');
+        response.cookies.delete('admin_refresh_token');
+        response.cookies.delete('admin_token_expires');
         return response;
       }
 
@@ -42,8 +66,11 @@ export async function middleware(request: NextRequest) {
       const adminStatus = await isAdmin(user.email || '');
       if (!adminStatus) {
         // Not an admin, redirect to login
+        console.log('🚫 [MIDDLEWARE] User is not admin, redirecting to login');
         const response = NextResponse.redirect(new URL('/admin/login', request.url));
         response.cookies.delete('admin_token');
+        response.cookies.delete('admin_refresh_token');
+        response.cookies.delete('admin_token_expires');
         return response;
       }
 
@@ -52,9 +79,22 @@ export async function middleware(request: NextRequest) {
       response.headers.set('x-pathname', pathname);
       return response;
     } catch (error) {
-      // Error verifying token, redirect to login
+      console.error('❌ [MIDDLEWARE] Error verifying token:', error);
+
+      // On error, check if we have refresh token before redirecting
+      if (refreshToken) {
+        console.log('🔄 [MIDDLEWARE] Error but refresh token exists, allowing through');
+        const response = NextResponse.next();
+        response.headers.set('x-pathname', pathname);
+        response.headers.set('x-needs-refresh', 'true');
+        return response;
+      }
+
+      // Error verifying token and no refresh, redirect to login
       const response = NextResponse.redirect(new URL('/admin/login', request.url));
       response.cookies.delete('admin_token');
+      response.cookies.delete('admin_refresh_token');
+      response.cookies.delete('admin_token_expires');
       return response;
     }
   }

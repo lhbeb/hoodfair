@@ -25,7 +25,12 @@ export default function AdminNav({ title }: AdminNavProps) {
   const prevPage = currentIndex > 0 ? ADMIN_PAGES[currentIndex - 1] : null;
   const nextPage = currentIndex < ADMIN_PAGES.length - 1 ? ADMIN_PAGES[currentIndex + 1] : null;
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST', credentials: 'include' });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
     localStorage.removeItem('admin_token');
     router.push('/admin/login');
   };
@@ -87,16 +92,15 @@ export default function AdminNav({ title }: AdminNavProps) {
             {ADMIN_PAGES.map((page) => {
               const Icon = page.icon;
               const isActive = pathname === page.path;
-              
+
               return (
                 <Link
                   key={page.path}
                   href={page.path}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
-                    isActive
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${isActive
                       ? 'bg-white text-[#0046be] shadow-md'
                       : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
-                  }`}
+                    }`}
                 >
                   <Icon className="h-4 w-4" />
                   <span className="hidden sm:inline">{page.name}</span>
@@ -120,11 +124,10 @@ export default function AdminNav({ title }: AdminNavProps) {
           {ADMIN_PAGES.map((page, index) => (
             <div
               key={page.path}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                pathname === page.path
+              className={`h-2 rounded-full transition-all duration-300 ${pathname === page.path
                   ? 'w-8 bg-white'
                   : 'w-2 bg-white/30 hover:bg-white/50 cursor-pointer'
-              }`}
+                }`}
               onClick={() => router.push(page.path)}
               title={page.name}
             />

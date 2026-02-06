@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { lockScroll, unlockScroll } from '@/utils/scrollUtils';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 interface NavItem {
   name: string;
@@ -43,6 +44,9 @@ export default function AdminSidebar() {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  // Auto-refresh token before expiry
+  useAdminAuth();
   const [ordersCount, setOrdersCount] = useState<number>(0);
 
   useEffect(() => {
@@ -122,7 +126,14 @@ export default function AdminSidebar() {
   }, [mobileMenuOpen]);
 
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      // Call logout API to clear cookies
+      await fetch('/api/admin/logout', { method: 'POST', credentials: 'include' });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+    // Clear localStorage
     localStorage.removeItem('admin_token');
     router.push('/admin/login');
   };

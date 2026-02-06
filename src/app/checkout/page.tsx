@@ -12,6 +12,7 @@ import type { Product } from '@/types/product';
 import { debugLog, debugError } from '@/utils/debug';
 import CheckoutNotifier from '@/components/CheckoutNotifier';
 import KofiCheckout from '@/components/KofiCheckout';
+import StripeCheckout from '@/components/StripeCheckout';
 
 // Google Ads conversion tracking helper
 const trackGoogleAdsConversion = (value?: number, currency: string = 'USD') => {
@@ -59,6 +60,7 @@ const CheckoutPage: React.FC = () => {
   const stateInputRef = useRef<HTMLInputElement>(null);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [showKofiCheckout, setShowKofiCheckout] = useState(false); // New state for Ko-fi iframe
+  const [showStripeCheckout, setShowStripeCheckout] = useState(false); // New state for Stripe checkout
   const [emailError, setEmailError] = useState('');
   const [isSendingEmail, setIsSendingEmail] = useState(false);
 
@@ -460,6 +462,10 @@ const CheckoutPage: React.FC = () => {
         // Ko-fi: Show iframe instead of redirecting
         console.log('🎨 [Checkout] Ko-fi flow: Showing iframe');
         setShowKofiCheckout(true);
+      } else if (checkoutFlow === 'stripe') {
+        // Stripe: Show Stripe checkout component
+        console.log('💳 [Checkout] Stripe flow: Showing Stripe checkout');
+        setShowStripeCheckout(true);
       } else {
         // BuyMeACoffee or External: Redirect to external link
         console.log('🔄 [Checkout] External flow: Redirecting to', product.checkoutLink);
@@ -516,6 +522,29 @@ const CheckoutPage: React.FC = () => {
         shippingData={shippingData}
         onClose={() => {
           setShowKofiCheckout(false);
+          clearCart();
+          router.push('/');
+        }}
+      />
+    );
+  }
+
+  // Stripe checkout flow - show Stripe checkout
+  if (showStripeCheckout) {
+    const { product } = cartItem;
+    return (
+      <StripeCheckout
+        product={{
+          id: product.id,
+          slug: product.slug,
+          title: product.title,
+          price: product.price,
+          currency: product.currency,
+          images: product.images,
+        }}
+        shippingData={shippingData}
+        onClose={() => {
+          setShowStripeCheckout(false);
           clearCart();
           router.push('/');
         }}

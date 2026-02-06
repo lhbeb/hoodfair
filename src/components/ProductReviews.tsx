@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Star, ThumbsUp, CheckCircle2, ChevronDown, X, ZoomIn } from 'lucide-react';
 import type { Review } from '@/types/product';
+import { lockScroll, unlockScroll } from '@/utils/scrollUtils';
 
 interface ProductReviewsProps {
   reviews: Review[];
@@ -11,15 +12,15 @@ interface ProductReviewsProps {
   totalReviews: number;
 }
 
-const ProductReviews: React.FC<ProductReviewsProps> = ({ 
-  reviews = [], 
-  averageRating = 0, 
-  totalReviews = 0 
+const ProductReviews: React.FC<ProductReviewsProps> = ({
+  reviews = [],
+  averageRating = 0,
+  totalReviews = 0
 }) => {
   const [sortBy, setSortBy] = useState('recent');
   const [helpfulClicks, setHelpfulClicks] = useState<Record<string, boolean>>({});
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  
+
   // Placeholder avatar for reviews without custom avatars
   const placeholderAvatar = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face&auto=format&q=80";
 
@@ -77,42 +78,24 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
 
   const openImageModal = (imageSrc: string) => {
     setSelectedImage(imageSrc);
-    if (typeof document !== 'undefined') {
-      document.body.style.overflow = 'hidden';
-    }
   };
 
   const closeImageModal = () => {
     setSelectedImage(null);
-    if (typeof document !== 'undefined') {
-      document.body.style.overflow = 'unset';
-    }
   };
 
-  // Cleanup body overflow on component unmount
+  // Centralized scroll lock for modal - prevents race conditions
   useEffect(() => {
-    return () => {
-      if (typeof document !== 'undefined') {
-        document.body.style.overflow = 'unset';
-      }
-    };
-  }, []);
+    if (typeof window === 'undefined') return;
 
-  // Handle body overflow when modal state changes
-  useEffect(() => {
-    if (typeof document !== 'undefined') {
-      if (selectedImage) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = 'unset';
-      }
+    if (selectedImage) {
+      lockScroll();
+    } else {
+      unlockScroll();
     }
 
-    // Cleanup function for this effect
     return () => {
-      if (typeof document !== 'undefined') {
-        document.body.style.overflow = 'unset';
-      }
+      unlockScroll();
     };
   }, [selectedImage]);
 
@@ -147,7 +130,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                 <div>
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
-                      <Star 
+                      <Star
                         key={i}
                         className={`h-5 w-5 ${i < Math.floor(averageRating) ? 'text-[#2658A6] fill-[#2658A6]' : 'text-gray-300'}`}
                       />
@@ -164,8 +147,8 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                 <div key={rating} className="flex items-center gap-2 mb-2">
                   <span className="text-sm text-gray-600 w-8">{rating}★</span>
                   <div className="flex-grow bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-[#2658A6] rounded-full h-2" 
+                    <div
+                      className="bg-[#2658A6] rounded-full h-2"
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
@@ -203,8 +186,8 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
           {sortedReviews.map((review, index) => (
             <div key={`${review.id}-${index}`} className="p-6">
               <div className="flex items-start gap-4">
-                <Image 
-                  src={review.avatar || placeholderAvatar} 
+                <Image
+                  src={review.avatar || placeholderAvatar}
                   alt={review.author}
                   width={48}
                   height={48}
@@ -232,7 +215,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
 
                   <div className="flex mb-2">
                     {[...Array(5)].map((_, i) => (
-                      <Star 
+                      <Star
                         key={i}
                         className={`h-4 w-4 ${i < review.rating ? 'text-[#2658A6] fill-[#2658A6]' : 'text-gray-300'}`}
                       />
@@ -246,15 +229,15 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                   {review.images && review.images.length > 0 && (
                     <div className="mb-4">
                       <div className="flex flex-wrap gap-2">
-                        {review.images.map((image, index) => (
+                        {review.images.map((image, imgIndex) => (
                           <button
-                            key={index}
+                            key={imgIndex}
                             onClick={() => openImageModal(image)}
                             className="relative group overflow-hidden rounded-lg border border-gray-200 hover:border-[#2658A6] transition-colors duration-200"
                           >
                             <Image
                               src={image}
-                              alt={`Review image ${index + 1} by ${review.author}`}
+                              alt={`Review image ${imgIndex + 1} by ${review.author}`}
                               width={80}
                               height={80}
                               className="w-20 h-20 object-cover group-hover:scale-105 transition-transform duration-200"
@@ -273,13 +256,12 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
 
                   {review.helpful !== undefined && (
                     <div className="mt-4">
-                      <button 
+                      <button
                         onClick={() => handleHelpfulClick(review.id)}
-                        className={`flex items-center text-sm px-3 py-1.5 rounded-md transition-colors duration-200 ${
-                          helpfulClicks[review.id] 
-                            ? 'bg-[#2658A6] text-white' 
+                        className={`flex items-center text-sm px-3 py-1.5 rounded-md transition-colors duration-200 ${helpfulClicks[review.id]
+                            ? 'bg-[#2658A6] text-white'
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
+                          }`}
                       >
                         <ThumbsUp className="h-4 w-4 mr-1" />
                         <span>
@@ -297,7 +279,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
 
       {/* Image Modal */}
       {selectedImage && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center"
           onClick={closeImageModal}
           style={{ overflow: 'hidden' }}
@@ -324,4 +306,4 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
   );
 };
 
-export default ProductReviews; 
+export default ProductReviews;

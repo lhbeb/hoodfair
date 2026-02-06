@@ -77,10 +77,20 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
   }, [product]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      document.body.style.overflow = showZoom ? 'hidden' : 'unset';
-      return () => { document.body.style.overflow = 'unset'; };
+    if (typeof window === 'undefined') return;
+
+    // Import scroll utils dynamically to avoid SSR issues
+    const { lockScroll, unlockScroll } = require('@/utils/scrollUtils');
+
+    if (showZoom) {
+      lockScroll();
+    } else {
+      unlockScroll();
     }
+
+    return () => {
+      unlockScroll();
+    };
   }, [showZoom]);
 
   const handleAddToCart = async () => {
@@ -388,7 +398,7 @@ export default function ProductPageClient({ product: initialProduct }: ProductPa
               )}
             </div>
 
-            <div className="lg:h-[calc(100vh-4rem)] lg:overflow-y-auto lg:pr-4 scrollbar-hide">
+            <div className="lg:max-h-[calc(100dvh-4rem)] lg:overflow-y-auto lg:pr-4 scrollbar-hide nested-scroll">
               <h1 className="text-3xl font-medium text-[#262626]">{title}</h1>
               <div className="mt-2 text-gray-600">{condition}</div>
               {product && product.inStock === false && product.checkoutLink === '#' && (

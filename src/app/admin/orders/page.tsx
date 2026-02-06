@@ -84,7 +84,7 @@ export default function AdminOrdersPage() {
         const productTitle = order.product_title?.toLowerCase() || '';
         const productSlug = order.product_slug?.toLowerCase() || '';
         const address = `${order.shipping_address} ${order.shipping_city} ${order.shipping_state}`.toLowerCase();
-        
+
         return (
           customerName.includes(query) ||
           customerEmail.includes(query) ||
@@ -123,7 +123,12 @@ export default function AdminOrdersPage() {
 
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST', credentials: 'include' });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
     localStorage.removeItem('admin_token');
     router.push('/admin/login');
   };
@@ -141,42 +146,42 @@ export default function AdminOrdersPage() {
       }
 
       const result = await response.json();
-      
+
       // If email was sent successfully, update the order state immediately
       if (result.success) {
         // Use the updated order from API response if available, otherwise use optimistic update
         const updatedOrder = result.order;
-        
+
         if (updatedOrder) {
           // Update with actual data from database
-          setOrders(prevOrders => 
-            prevOrders.map(order => 
+          setOrders(prevOrders =>
+            prevOrders.map(order =>
               order.id === orderId ? updatedOrder : order
             )
           );
-          setFilteredOrders(prevFiltered => 
-            prevFiltered.map(order => 
+          setFilteredOrders(prevFiltered =>
+            prevFiltered.map(order =>
               order.id === orderId ? updatedOrder : order
             )
           );
         } else {
           // Fallback: optimistic update
-          setOrders(prevOrders => 
-            prevOrders.map(order => 
-              order.id === orderId 
+          setOrders(prevOrders =>
+            prevOrders.map(order =>
+              order.id === orderId
                 ? { ...order, email_sent: true, email_error: null, email_retry_count: 0 }
                 : order
             )
           );
-          setFilteredOrders(prevFiltered => 
-            prevFiltered.map(order => 
-              order.id === orderId 
+          setFilteredOrders(prevFiltered =>
+            prevFiltered.map(order =>
+              order.id === orderId
                 ? { ...order, email_sent: true, email_error: null, email_retry_count: 0 }
                 : order
             )
           );
         }
-        
+
         // Small delay to ensure database update has propagated, then refresh
         setTimeout(() => {
           fetchOrders();
@@ -211,7 +216,7 @@ export default function AdminOrdersPage() {
 
       const result = await response.json();
       alert(`Retry completed: ${result.sent} sent, ${result.failed} failed`);
-      
+
       // Refresh orders
       await fetchOrders();
       setError('');
@@ -293,7 +298,7 @@ export default function AdminOrdersPage() {
 
   const handleExport = (conversionType: 'all' | 'converted' | 'not_converted') => {
     setShowExportDialog(false);
-    
+
     let url = '/api/admin/orders/export';
     if (conversionType === 'converted') {
       url += '?conversion=converted';
@@ -307,7 +312,7 @@ export default function AdminOrdersPage() {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        
+
         // Set filename based on conversion type
         let filename = 'orders.csv';
         if (conversionType === 'converted') {
@@ -315,7 +320,7 @@ export default function AdminOrdersPage() {
         } else if (conversionType === 'not_converted') {
           filename = 'orders-not-converted.csv';
         }
-        
+
         a.download = filename;
         document.body.appendChild(a);
         a.click();
@@ -379,541 +384,538 @@ export default function AdminOrdersPage() {
   const convertedRevenue = orders.filter(o => o.is_converted).reduce((sum, o) => sum + (o.product_price || 0), 0);
 
   return (
-    <AdminLayout 
-      title="Orders" 
+    <AdminLayout
+      title="Orders"
       subtitle={`${orders.length} total orders • $${totalRevenue.toFixed(2)} revenue`}
     >
-        {error && (
-          <div className="mb-4 p-4 bg-red-50 text-red-800 rounded-lg">{error}</div>
-        )}
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 text-red-800 rounded-lg">{error}</div>
+      )}
 
-        {/* Export Orders Button */}
-        <div className="mb-4 flex justify-end">
-          <button
-            onClick={() => setShowExportDialog(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#2658A6] text-white rounded-lg hover:bg-[#1a3d70] transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" /></svg>
-            Export Orders (CSV)
-          </button>
-        </div>
+      {/* Export Orders Button */}
+      <div className="mb-4 flex justify-end">
+        <button
+          onClick={() => setShowExportDialog(true)}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#2658A6] text-white rounded-lg hover:bg-[#1a3d70] transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" /></svg>
+          Export Orders (CSV)
+        </button>
+      </div>
 
-        {/* Export Dialog */}
-        {showExportDialog && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
-              <h3 className="text-xl font-bold text-[#262626] mb-2">Export Orders</h3>
-              <p className="text-sm text-gray-600 mb-6">
-                Choose which orders you want to export:
-              </p>
-              
-              <div className="space-y-3 mb-6">
-                <button
-                  onClick={() => handleExport('converted')}
-                  className="w-full text-left p-4 border-2 border-green-200 bg-green-50 rounded-xl hover:bg-green-100 hover:border-green-300 transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-[#262626]">Converted Orders</div>
-                      <div className="text-sm text-gray-600 mt-1">
-                        Export only orders marked as converted ({convertedOrders} orders)
-                      </div>
+      {/* Export Dialog */}
+      {showExportDialog && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-[#262626] mb-2">Export Orders</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Choose which orders you want to export:
+            </p>
+
+            <div className="space-y-3 mb-6">
+              <button
+                onClick={() => handleExport('converted')}
+                className="w-full text-left p-4 border-2 border-green-200 bg-green-50 rounded-xl hover:bg-green-100 hover:border-green-300 transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-semibold text-[#262626]">Converted Orders</div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      Export only orders marked as converted ({convertedOrders} orders)
                     </div>
-                    <CheckCircle2 className="h-6 w-6 text-green-600 flex-shrink-0" />
                   </div>
-                </button>
-
-                <button
-                  onClick={() => handleExport('not_converted')}
-                  className="w-full text-left p-4 border-2 border-gray-200 bg-white rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-[#262626]">Non-Converted Orders</div>
-                      <div className="text-sm text-gray-600 mt-1">
-                        Export orders that are not yet converted ({orders.length - convertedOrders} orders)
-                      </div>
-                    </div>
-                    <Package className="h-6 w-6 text-gray-600 flex-shrink-0" />
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => handleExport('all')}
-                  className="w-full text-left p-4 border-2 border-[#2658A6]/20 bg-[#2658A6]/5 rounded-xl hover:bg-[#2658A6]/10 hover:border-[#2658A6]/30 transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-[#262626]">All Orders</div>
-                      <div className="text-sm text-gray-600 mt-1">
-                        Export all orders regardless of conversion status ({orders.length} orders)
-                      </div>
-                    </div>
-                    <Package className="h-6 w-6 text-[#2658A6] flex-shrink-0" />
-                  </div>
-                </button>
-              </div>
+                  <CheckCircle2 className="h-6 w-6 text-green-600 flex-shrink-0" />
+                </div>
+              </button>
 
               <button
-                onClick={() => setShowExportDialog(false)}
-                className="w-full px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                onClick={() => handleExport('not_converted')}
+                className="w-full text-left p-4 border-2 border-gray-200 bg-white rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-colors"
               >
-                Cancel
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-semibold text-[#262626]">Non-Converted Orders</div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      Export orders that are not yet converted ({orders.length - convertedOrders} orders)
+                    </div>
+                  </div>
+                  <Package className="h-6 w-6 text-gray-600 flex-shrink-0" />
+                </div>
+              </button>
+
+              <button
+                onClick={() => handleExport('all')}
+                className="w-full text-left p-4 border-2 border-[#2658A6]/20 bg-[#2658A6]/5 rounded-xl hover:bg-[#2658A6]/10 hover:border-[#2658A6]/30 transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-semibold text-[#262626]">All Orders</div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      Export all orders regardless of conversion status ({orders.length} orders)
+                    </div>
+                  </div>
+                  <Package className="h-6 w-6 text-[#2658A6] flex-shrink-0" />
+                </div>
               </button>
             </div>
-          </div>
-        )}
 
-        {/* Stats Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="text-sm text-gray-600 mb-1">Total Orders</div>
-            <div className="text-2xl font-bold text-[#262626]">{orders.length}</div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4 border-2 border-green-500">
-            <div className="text-sm text-gray-600 mb-1">Converted Orders</div>
-            <div className="text-2xl font-bold text-green-600">
-              {convertedOrders}
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="text-sm text-gray-600 mb-1">Emails Sent</div>
-            <div className="text-2xl font-bold text-green-600">
-              {emailsSent}
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="text-sm text-gray-600 mb-1">Emails Failed</div>
-            <div className="text-2xl font-bold text-red-600">
-              {emailsFailed}
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4 border-2 border-green-500">
-            <div className="text-sm text-gray-600 mb-1">Converted Revenue</div>
-            <div className="text-2xl font-bold text-green-600">
-              ${convertedRevenue.toFixed(2)}
-            </div>
+            <button
+              onClick={() => setShowExportDialog(false)}
+              className="w-full px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+            >
+              Cancel
+            </button>
           </div>
         </div>
+      )}
 
-        {/* Retry Failed Emails Button */}
-        {orders.filter(o => !o.email_sent).length > 0 && (
-          <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-yellow-600" />
-                <div>
-                  <div className="font-semibold text-yellow-900">
-                    {orders.filter(o => !o.email_sent).length} order(s) with failed emails
-                  </div>
-                  <div className="text-sm text-yellow-700">
-                    These emails will retry automatically, or you can retry them manually now
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={handleRetryAllFailed}
-                disabled={retryingAll}
-                className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <RefreshCw className={`h-4 w-4 ${retryingAll ? 'animate-spin' : ''}`} />
-                {retryingAll ? 'Retrying...' : 'Retry All Failed Emails'}
-              </button>
-            </div>
+      {/* Stats Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="text-sm text-gray-600 mb-1">Total Orders</div>
+          <div className="text-2xl font-bold text-[#262626]">{orders.length}</div>
+        </div>
+        <div className="bg-white rounded-lg shadow p-4 border-2 border-green-500">
+          <div className="text-sm text-gray-600 mb-1">Converted Orders</div>
+          <div className="text-2xl font-bold text-green-600">
+            {convertedOrders}
           </div>
-        )}
+        </div>
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="text-sm text-gray-600 mb-1">Emails Sent</div>
+          <div className="text-2xl font-bold text-green-600">
+            {emailsSent}
+          </div>
+        </div>
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="text-sm text-gray-600 mb-1">Emails Failed</div>
+          <div className="text-2xl font-bold text-red-600">
+            {emailsFailed}
+          </div>
+        </div>
+        <div className="bg-white rounded-lg shadow p-4 border-2 border-green-500">
+          <div className="text-sm text-gray-600 mb-1">Converted Revenue</div>
+          <div className="text-2xl font-bold text-green-600">
+            ${convertedRevenue.toFixed(2)}
+          </div>
+        </div>
+      </div>
 
-        {/* Search and Filter Bar */}
-        <div className="bg-white rounded-lg shadow p-4 mb-4">
-          <div className="space-y-4">
-            {/* Search Bar */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search by customer name, email, product, or address..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0046be] focus:border-[#0046be] outline-none"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  title="Clear search"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              )}
-            </div>
-
-            {/* Filters */}
-            <div className="flex items-center gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-gray-700">Email Status:</label>
-                <select
-                  value={emailFilter}
-                  onChange={(e) => setEmailFilter(e.target.value as 'all' | 'sent' | 'failed')}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0046be] focus:border-[#0046be] outline-none bg-white"
-                >
-                  <option value="all">All Orders</option>
-                  <option value="sent">Email Sent ✅</option>
-                  <option value="failed">Email Failed ❌</option>
-                </select>
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-gray-700">Conversion:</label>
-                <select
-                  value={conversionFilter}
-                  onChange={(e) => setConversionFilter(e.target.value as 'all' | 'converted' | 'not_converted')}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0046be] focus:border-[#0046be] outline-none bg-white"
-                >
-                  <option value="all">All Orders</option>
-                  <option value="converted">Converted ✅</option>
-                  <option value="not_converted">Not Converted</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Filter Status */}
-            {(searchQuery || emailFilter !== 'all' || conversionFilter !== 'all') && (
-              <div className="pt-2 border-t border-gray-200">
-                <div className="text-sm text-gray-600">
-                  Showing <strong>{filteredOrders.length}</strong> of <strong>{orders.length}</strong> order{orders.length !== 1 ? 's' : ''}
+      {/* Retry Failed Emails Button */}
+      {orders.filter(o => !o.email_sent).length > 0 && (
+        <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-yellow-600" />
+              <div>
+                <div className="font-semibold text-yellow-900">
+                  {orders.filter(o => !o.email_sent).length} order(s) with failed emails
+                </div>
+                <div className="text-sm text-yellow-700">
+                  These emails will retry automatically, or you can retry them manually now
                 </div>
               </div>
+            </div>
+            <button
+              onClick={handleRetryAllFailed}
+              disabled={retryingAll}
+              className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <RefreshCw className={`h-4 w-4 ${retryingAll ? 'animate-spin' : ''}`} />
+              {retryingAll ? 'Retrying...' : 'Retry All Failed Emails'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Search and Filter Bar */}
+      <div className="bg-white rounded-lg shadow p-4 mb-4">
+        <div className="space-y-4">
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by customer name, email, product, or address..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0046be] focus:border-[#0046be] outline-none"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                title="Clear search"
+              >
+                <X className="h-5 w-5" />
+              </button>
             )}
           </div>
-        </div>
 
-        {/* Orders List - Card-based layout */}
-        {paginatedOrders.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
-            <Package className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-[#262626] mb-1">No orders found</h3>
-            <p className="text-gray-500">Try adjusting your search or filters</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {paginatedOrders.map((order) => (
-              <div
-                key={order.id}
-                className={`rounded-2xl shadow-sm border transition-all ${
-                  order.is_converted 
-                    ? 'border-green-300 bg-green-50' 
-                    : 'bg-white border-gray-100 hover:border-gray-200'
-                }`}
+          {/* Filters */}
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">Email Status:</label>
+              <select
+                value={emailFilter}
+                onChange={(e) => setEmailFilter(e.target.value as 'all' | 'sent' | 'failed')}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0046be] focus:border-[#0046be] outline-none bg-white"
               >
-                {/* Order Header - Always Visible */}
-                <div 
-                  className="p-4 cursor-pointer"
-                  onClick={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}
-                >
-                  <div className="flex items-center gap-4">
-                    {/* Customer Avatar */}
-                    <div className="h-10 w-10 bg-gradient-to-br from-[#2658A6] to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
-                      {order.customer_name?.charAt(0)?.toUpperCase() || '?'}
-                    </div>
+                <option value="all">All Orders</option>
+                <option value="sent">Email Sent ✅</option>
+                <option value="failed">Email Failed ❌</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">Conversion:</label>
+              <select
+                value={conversionFilter}
+                onChange={(e) => setConversionFilter(e.target.value as 'all' | 'converted' | 'not_converted')}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0046be] focus:border-[#0046be] outline-none bg-white"
+              >
+                <option value="all">All Orders</option>
+                <option value="converted">Converted ✅</option>
+                <option value="not_converted">Not Converted</option>
+              </select>
+            </div>
+          </div>
 
-                    {/* Main Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-semibold text-[#262626] truncate">
-                          {order.customer_name}
-                        </h3>
-                        {order.is_converted && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full">
-                            <CheckCircle2 className="h-3 w-3" />
-                            Converted
-                          </span>
-                        )}
-                        {order.email_sent ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
-                            <MailCheck className="h-3 w-3" />
-                            Sent
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 text-xs font-medium rounded-full">
-                            <MailX className="h-3 w-3" />
-                            Failed
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <p className="text-sm text-gray-500 truncate flex-1">
-                          {order.product_title}
-                        </p>
-                        <Link
-                          href={`/products/${order.product_slug}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
-                          title="View product"
-                        >
-                          <Eye className="h-4 w-4 text-gray-500" />
-                        </Link>
-                      </div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs text-gray-400">Uploader:</span>
-                        <span className="text-xs font-medium text-gray-600">{order.product_listed_by || '—'}</span>
-                      </div>
-                    </div>
+          {/* Filter Status */}
+          {(searchQuery || emailFilter !== 'all' || conversionFilter !== 'all') && (
+            <div className="pt-2 border-t border-gray-200">
+              <div className="text-sm text-gray-600">
+                Showing <strong>{filteredOrders.length}</strong> of <strong>{orders.length}</strong> order{orders.length !== 1 ? 's' : ''}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
-                    {/* Price & Date */}
-                    <div className="text-right flex-shrink-0">
-                      <p className="font-bold text-[#262626]">${order.product_price.toFixed(2)}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">{formatDate(order.created_at)}</p>
-                    </div>
-
-                    {/* Expand Icon */}
-                    <ChevronRight 
-                      className={`h-5 w-5 text-gray-400 transition-transform ${
-                        expandedOrderId === order.id ? 'rotate-90' : ''
-                      }`} 
-                    />
+      {/* Orders List - Card-based layout */}
+      {paginatedOrders.length === 0 ? (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
+          <Package className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-[#262626] mb-1">No orders found</h3>
+          <p className="text-gray-500">Try adjusting your search or filters</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {paginatedOrders.map((order) => (
+            <div
+              key={order.id}
+              className={`rounded-2xl shadow-sm border transition-all ${order.is_converted
+                  ? 'border-green-300 bg-green-50'
+                  : 'bg-white border-gray-100 hover:border-gray-200'
+                }`}
+            >
+              {/* Order Header - Always Visible */}
+              <div
+                className="p-4 cursor-pointer"
+                onClick={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}
+              >
+                <div className="flex items-center gap-4">
+                  {/* Customer Avatar */}
+                  <div className="h-10 w-10 bg-gradient-to-br from-[#2658A6] to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                    {order.customer_name?.charAt(0)?.toUpperCase() || '?'}
                   </div>
+
+                  {/* Main Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-semibold text-[#262626] truncate">
+                        {order.customer_name}
+                      </h3>
+                      {order.is_converted && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                          <CheckCircle2 className="h-3 w-3" />
+                          Converted
+                        </span>
+                      )}
+                      {order.email_sent ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
+                          <MailCheck className="h-3 w-3" />
+                          Sent
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 text-xs font-medium rounded-full">
+                          <MailX className="h-3 w-3" />
+                          Failed
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <p className="text-sm text-gray-500 truncate flex-1">
+                        {order.product_title}
+                      </p>
+                      <Link
+                        href={`/products/${order.product_slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                        title="View product"
+                      >
+                        <Eye className="h-4 w-4 text-gray-500" />
+                      </Link>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-gray-400">Uploader:</span>
+                      <span className="text-xs font-medium text-gray-600">{order.product_listed_by || '—'}</span>
+                    </div>
+                  </div>
+
+                  {/* Price & Date */}
+                  <div className="text-right flex-shrink-0">
+                    <p className="font-bold text-[#262626]">${order.product_price.toFixed(2)}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{formatDate(order.created_at)}</p>
+                  </div>
+
+                  {/* Expand Icon */}
+                  <ChevronRight
+                    className={`h-5 w-5 text-gray-400 transition-transform ${expandedOrderId === order.id ? 'rotate-90' : ''
+                      }`}
+                  />
                 </div>
+              </div>
 
-                {/* Expanded Details */}
-                {expandedOrderId === order.id && (
-                  <div className={`px-4 pb-4 border-t ${order.is_converted ? 'border-green-200' : 'border-gray-100'}`}>
-                    <div className="pt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {/* Customer Details */}
-                      <div>
-                        <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                          Customer
-                        </h4>
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-gray-400" />
-                            <span className="text-sm text-gray-700">{order.customer_name}</span>
-                          </div>
-                          <div className="flex items-center gap-2 group">
-                            <Mail className="h-4 w-4 text-gray-400" />
-                            <span className="text-sm text-gray-700 truncate">{order.customer_email}</span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCopyToClipboard(order.customer_email, `email-${order.id}`);
-                              }}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              {copiedField === `email-${order.id}` ? (
-                                <CheckCircle2 className="h-4 w-4 text-green-500" />
-                              ) : (
-                                <Copy className="h-4 w-4 text-gray-400 hover:text-gray-600" />
-                              )}
-                            </button>
-                          </div>
-                          {order.customer_phone && (
-                            <div className="flex items-center gap-2 group">
-                              <Phone className="h-4 w-4 text-gray-400" />
-                              <span className="text-sm text-gray-700">{order.customer_phone}</span>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleCopyToClipboard(order.customer_phone!, `phone-${order.id}`);
-                                }}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity"
-                              >
-                                {copiedField === `phone-${order.id}` ? (
-                                  <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                ) : (
-                                  <Copy className="h-4 w-4 text-gray-400 hover:text-gray-600" />
-                                )}
-                              </button>
-                            </div>
-                          )}
+              {/* Expanded Details */}
+              {expandedOrderId === order.id && (
+                <div className={`px-4 pb-4 border-t ${order.is_converted ? 'border-green-200' : 'border-gray-100'}`}>
+                  <div className="pt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Customer Details */}
+                    <div>
+                      <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                        Customer
+                      </h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-gray-400" />
+                          <span className="text-sm text-gray-700">{order.customer_name}</span>
                         </div>
-                      </div>
-
-                      {/* Shipping Address */}
-                      <div>
-                        <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                          Shipping Address
-                        </h4>
-                        <div className="flex items-start gap-2 group">
-                          <MapPin className="h-4 w-4 text-gray-400 mt-0.5" />
-                          <div className="text-sm text-gray-700">
-                            <p>{order.shipping_address}</p>
-                            <p>{order.shipping_city}, {order.shipping_state} {order.shipping_zip}</p>
-                          </div>
+                        <div className="flex items-center gap-2 group">
+                          <Mail className="h-4 w-4 text-gray-400" />
+                          <span className="text-sm text-gray-700 truncate">{order.customer_email}</span>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              const address = `${order.shipping_address}, ${order.shipping_city}, ${order.shipping_state} ${order.shipping_zip}`;
-                              handleCopyToClipboard(address, `address-${order.id}`);
+                              handleCopyToClipboard(order.customer_email, `email-${order.id}`);
                             }}
                             className="opacity-0 group-hover:opacity-100 transition-opacity"
                           >
-                            {copiedField === `address-${order.id}` ? (
+                            {copiedField === `email-${order.id}` ? (
                               <CheckCircle2 className="h-4 w-4 text-green-500" />
                             ) : (
                               <Copy className="h-4 w-4 text-gray-400 hover:text-gray-600" />
                             )}
                           </button>
                         </div>
-                      </div>
-
-                      {/* Order Details */}
-                      <div>
-                        <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                          Order Details
-                        </h4>
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <Package className="h-4 w-4 text-gray-400" />
-                            <span className="text-sm text-gray-700 flex-1">{order.product_title}</span>
-                            <Link
-                              href={`/products/${order.product_slug}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-[#2658A6] hover:text-[#1a3d70] hover:bg-[#2658A6]/5 rounded-lg transition-colors"
-                              title="View product"
+                        {order.customer_phone && (
+                          <div className="flex items-center gap-2 group">
+                            <Phone className="h-4 w-4 text-gray-400" />
+                            <span className="text-sm text-gray-700">{order.customer_phone}</span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopyToClipboard(order.customer_phone!, `phone-${order.id}`);
+                              }}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity"
                             >
-                              <Eye className="h-3 w-3" />
-                              View Product
-                            </Link>
+                              {copiedField === `phone-${order.id}` ? (
+                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                              ) : (
+                                <Copy className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                              )}
+                            </button>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <DollarSign className="h-4 w-4 text-gray-400" />
-                            <span className="text-sm font-medium text-[#262626]">${order.product_price.toFixed(2)}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-gray-400" />
-                            <span className="text-sm text-gray-700">
-                              <span className="font-medium">Uploader:</span> {order.product_listed_by || '—'}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-gray-400" />
-                            <span className="text-sm text-gray-700">{formatFullDate(order.created_at)}</span>
-                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Shipping Address */}
+                    <div>
+                      <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                        Shipping Address
+                      </h4>
+                      <div className="flex items-start gap-2 group">
+                        <MapPin className="h-4 w-4 text-gray-400 mt-0.5" />
+                        <div className="text-sm text-gray-700">
+                          <p>{order.shipping_address}</p>
+                          <p>{order.shipping_city}, {order.shipping_state} {order.shipping_zip}</p>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const address = `${order.shipping_address}, ${order.shipping_city}, ${order.shipping_state} ${order.shipping_zip}`;
+                            handleCopyToClipboard(address, `address-${order.id}`);
+                          }}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          {copiedField === `address-${order.id}` ? (
+                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <Copy className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Order Details */}
+                    <div>
+                      <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                        Order Details
+                      </h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <Package className="h-4 w-4 text-gray-400" />
+                          <span className="text-sm text-gray-700 flex-1">{order.product_title}</span>
+                          <Link
+                            href={`/products/${order.product_slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-[#2658A6] hover:text-[#1a3d70] hover:bg-[#2658A6]/5 rounded-lg transition-colors"
+                            title="View product"
+                          >
+                            <Eye className="h-3 w-3" />
+                            View Product
+                          </Link>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="h-4 w-4 text-gray-400" />
+                          <span className="text-sm font-medium text-[#262626]">${order.product_price.toFixed(2)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-gray-400" />
+                          <span className="text-sm text-gray-700">
+                            <span className="font-medium">Uploader:</span> {order.product_listed_by || '—'}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-gray-400" />
+                          <span className="text-sm text-gray-700">{formatFullDate(order.created_at)}</span>
                         </div>
                       </div>
                     </div>
+                  </div>
 
-                    {/* Email Error */}
-                    {!order.email_sent && order.email_error && (
-                      <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl">
-                        <p className="text-sm text-red-700">
-                          <span className="font-medium">Email Error:</span> {order.email_error}
-                        </p>
-                      </div>
-                    )}
+                  {/* Email Error */}
+                  {!order.email_sent && order.email_error && (
+                    <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl">
+                      <p className="text-sm text-red-700">
+                        <span className="font-medium">Email Error:</span> {order.email_error}
+                      </p>
+                    </div>
+                  )}
 
-                    {/* Actions */}
-                    <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
-                      {!order.email_sent && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRetryEmail(order.id);
-                          }}
-                          disabled={retryingOrderId === order.id}
-                          className="inline-flex items-center gap-2 px-3 py-2 bg-orange-100 text-orange-700 rounded-lg text-sm font-medium hover:bg-orange-200 disabled:opacity-50 transition-all"
-                        >
-                          {retryingOrderId === order.id ? (
-                            <RefreshCw className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Mail className="h-4 w-4" />
-                          )}
-                          Retry Email
-                        </button>
-                      )}
-
-                      {!order.is_converted && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleMarkAsConverted(order.id);
-                          }}
-                          disabled={markingConverted === order.id}
-                          className="inline-flex items-center gap-2 px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200 disabled:opacity-50 transition-all"
-                        >
-                          {markingConverted === order.id ? (
-                            <RefreshCw className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <CheckCircle2 className="h-4 w-4" />
-                          )}
-                          Mark Converted
-                        </button>
-                      )}
-
+                  {/* Actions */}
+                  <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
+                    {!order.email_sent && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDeleteOrder(order.id);
+                          handleRetryEmail(order.id);
                         }}
-                        disabled={deletingOrderId === order.id}
-                        className="inline-flex items-center gap-2 px-3 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200 disabled:opacity-50 transition-all"
+                        disabled={retryingOrderId === order.id}
+                        className="inline-flex items-center gap-2 px-3 py-2 bg-orange-100 text-orange-700 rounded-lg text-sm font-medium hover:bg-orange-200 disabled:opacity-50 transition-all"
                       >
-                        {deletingOrderId === order.id ? (
+                        {retryingOrderId === order.id ? (
                           <RefreshCw className="h-4 w-4 animate-spin" />
                         ) : (
-                          <Trash2 className="h-4 w-4" />
+                          <Mail className="h-4 w-4" />
                         )}
-                        Delete
+                        Retry Email
                       </button>
-                    </div>
+                    )}
+
+                    {!order.is_converted && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMarkAsConverted(order.id);
+                        }}
+                        disabled={markingConverted === order.id}
+                        className="inline-flex items-center gap-2 px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200 disabled:opacity-50 transition-all"
+                      >
+                        {markingConverted === order.id ? (
+                          <RefreshCw className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <CheckCircle2 className="h-4 w-4" />
+                        )}
+                        Mark Converted
+                      </button>
+                    )}
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteOrder(order.id);
+                      }}
+                      disabled={deletingOrderId === order.id}
+                      className="inline-flex items-center gap-2 px-3 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200 disabled:opacity-50 transition-all"
+                    >
+                      {deletingOrderId === order.id ? (
+                        <RefreshCw className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                      Delete
+                    </button>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="mt-6 flex items-center justify-center gap-2">
-            <button
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-
-            <div className="flex items-center gap-1">
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNum: number;
-                if (totalPages <= 5) {
-                  pageNum = i + 1;
-                } else if (currentPage <= 3) {
-                  pageNum = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
-                } else {
-                  pageNum = currentPage - 2 + i;
-                }
-
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={`min-w-[40px] h-10 rounded-lg font-medium transition-all ${
-                      currentPage === pageNum
-                        ? 'bg-[#2658A6] text-white'
-                        : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
+                </div>
+              )}
             </div>
+          ))}
+        </div>
+      )}
 
-            <button
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-              className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex items-center justify-center gap-2">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+
+          <div className="flex items-center gap-1">
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              let pageNum: number;
+              if (totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (currentPage <= 3) {
+                pageNum = i + 1;
+              } else if (currentPage >= totalPages - 2) {
+                pageNum = totalPages - 4 + i;
+              } else {
+                pageNum = currentPage - 2 + i;
+              }
+
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={`min-w-[40px] h-10 rounded-lg font-medium transition-all ${currentPage === pageNum
+                      ? 'bg-[#2658A6] text-white'
+                      : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                    }`}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
           </div>
-        )}
+
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
+      )}
     </AdminLayout>
   );
 }

@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^4.6.2",
+    "@stripe/react-stripe-js": "^5.6.0",
+    "@stripe/stripe-js": "^8.7.0",
     "@supabase/supabase-js": "^2.78.0",
     "@types/nodemailer": "^6.4.17",
     "adm-zip": "^0.5.16",
@@ -27,7 +29,8 @@
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "react-loading-indicators": "^1.0.1",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "stripe": "^20.3.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

@@ -124,7 +124,7 @@ export default function NewProductPage() {
     category: '',
     condition: '',
     checkout_link: '',
-    checkout_flow: 'buymeacoffee' as 'buymeacoffee' | 'kofi' | 'external', // Checkout flow type
+    checkout_flow: 'buymeacoffee' as 'buymeacoffee' | 'kofi' | 'external' | 'stripe', // Checkout flow type
     currency: 'USD',
     images: '',
     rating: '0',
@@ -676,18 +676,28 @@ export default function NewProductPage() {
               <Field label="Checkout Flow" required hint="Select how customers will complete their purchase">
                 <select
                   value={formData.checkout_flow}
-                  onChange={(e) => updateField('checkout_flow', e.target.value as 'buymeacoffee' | 'kofi' | 'external')}
+                  onChange={(e) => updateField('checkout_flow', e.target.value as 'buymeacoffee' | 'kofi' | 'external' | 'stripe')}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all bg-white"
                   required
                 >
                   <option value="buymeacoffee">BuyMeACoffee (External - Redirects to payment link)</option>
                   <option value="kofi">Ko-fi (Iframe - Embedded on your site)</option>
+                  <option value="stripe">Stripe (Stripe Checkout - Professional payment processing)</option>
+                  <option value="external">External (Custom payment provider)</option>
                 </select>
                 <div className="mt-2 p-3 bg-blue-50 border border-blue-100 rounded-lg">
                   <p className="text-xs text-blue-800">
                     {formData.checkout_flow === 'kofi' ? (
                       <>
                         <strong>Ko-fi (Iframe):</strong> Customer stays on your site. Payment form loads in an embedded iframe after address confirmation.
+                      </>
+                    ) : formData.checkout_flow === 'stripe' ? (
+                      <>
+                        <strong>Stripe:</strong> Customer is redirected to Stripe's secure checkout page. Requires Stripe API keys in environment variables.
+                      </>
+                    ) : formData.checkout_flow === 'external' ? (
+                      <>
+                        <strong>External:</strong> Customer is redirected to your custom payment provider after address confirmation.
                       </>
                     ) : (
                       <>

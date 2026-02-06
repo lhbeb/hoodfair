@@ -46,18 +46,41 @@ export async function POST(request: NextRequest) {
     // Create response with token
     const response = NextResponse.json({
       token: data.session.access_token,
+      refreshToken: data.session.refresh_token,
+      expiresAt: data.session.expires_at,
       user: {
         email: data.user.email,
         id: data.user.id,
       },
     });
 
-    // Set secure HTTP-only cookie
+    // Set secure HTTP-only cookie for access token
+    // Access token expires in 1 hour but we set longer cookie max age
+    // because we'll refresh it automatically
     response.cookies.set('admin_token', data.session.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+      path: '/',
+    });
+
+    // Store refresh token for session persistence
+    // Refresh tokens are valid for much longer (typically 60 days in Supabase)
+    response.cookies.set('admin_refresh_token', data.session.refresh_token || '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 60, // 60 days
+      path: '/',
+    });
+
+    // Store token expiry time for client-side refresh logic
+    response.cookies.set('admin_token_expires', String(data.session.expires_at || ''), {
+      httpOnly: false, // Allow client to read this
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 60, // 60 days
       path: '/',
     });
 
