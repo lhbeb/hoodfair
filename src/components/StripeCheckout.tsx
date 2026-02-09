@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Check, MapPin, Mail, CreditCard, Loader2 } from 'lucide-react';
+import { Check, MapPin, Mail, CreditCard, Loader2, ChevronDown } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { stripeConfig } from '@/config/stripe';
 
 interface StripeCheckoutProps {
     product: {
@@ -24,8 +25,8 @@ interface StripeCheckoutProps {
     onClose?: () => void;
 }
 
-// Initialize Stripe with public key from environment
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
+// Initialize Stripe with public key from config
+const stripePromise = loadStripe(stripeConfig.publishableKey);
 
 // Payment Form Component (inside Elements provider)
 function PaymentForm({ product, shippingData, onClose }: StripeCheckoutProps) {
@@ -95,7 +96,7 @@ function PaymentForm({ product, shippingData, onClose }: StripeCheckoutProps) {
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             {/* Payment Element */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-6">
                 <h3 className="text-lg font-semibold text-[#262626] mb-4 flex items-center gap-2">
                     <CreditCard className="h-5 w-5 text-[#2658A6]" />
                     Payment Details
@@ -147,13 +148,6 @@ function PaymentForm({ product, shippingData, onClose }: StripeCheckoutProps) {
                     </span>
                     <span className="whitespace-nowrap">SSL Encrypted</span>
                 </div>
-                <div className="text-gray-300">•</div>
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                    <span className="inline-flex items-center justify-center bg-gray-100 rounded-full p-1">
-                        <CreditCard className="h-3 w-3 sm:h-4 sm:w-4 text-[#2658A6]" />
-                    </span>
-                    <span className="whitespace-nowrap">Powered by Stripe</span>
-                </div>
             </div>
         </form>
     );
@@ -164,6 +158,7 @@ export default function StripeCheckout({ product, shippingData, onClose }: Strip
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showMobileOrderSummary, setShowMobileOrderSummary] = useState(false);
 
     useEffect(() => {
         // Scroll to top when component mounts
@@ -224,76 +219,137 @@ export default function StripeCheckout({ product, shippingData, onClose }: Strip
         <div className="flex flex-col items-center justify-center bg-gradient-to-br from-[#e0e7ff] via-[#f8fafc] to-[#f0fdfa] px-0 sm:px-2 pt-0 sm:pt-8 sm:pb-8 min-h-screen">
             <div className="bg-white/95 backdrop-blur-lg rounded-none sm:rounded-3xl shadow-none sm:shadow-2xl border-0 sm:border border-gray-100 w-full max-w-5xl mx-auto transition-all duration-500">
 
-                {/* Header with Address Confirmation */}
-                <div className="p-6 sm:p-8 border-b border-gray-100">
-                    <div className="flex items-center justify-center mb-4">
-                        <div className="flex flex-col items-center flex-1">
-                            <div className="flex flex-col items-center mb-2">
-                                <span className="inline-flex items-center justify-center bg-blue-100 rounded-full p-2 mb-2">
-                                    <Check className="h-7 w-7 text-[#2658A6]" />
-                                </span>
-                                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#262626] tracking-tight text-center">
-                                    Complete Your Payment
-                                </h2>
+                {/* 1. ORDER SUMMARY - First (What they're buying) */}
+                {/* Mobile: Collapsible Order Summary */}
+                <div className="lg:hidden border-b border-gray-100">
+                    <button
+                        onClick={() => setShowMobileOrderSummary(!showMobileOrderSummary)}
+                        className="w-full p-4 sm:p-6 flex items-center justify-between text-left focus:outline-none focus:ring-2 focus:ring-gray-300"
+                    >
+                        <div className="flex items-center space-x-4">
+                            <div className="relative w-16 h-16 flex-shrink-0">
+                                <div className="w-full h-full bg-gray-50 rounded-2xl flex items-center justify-center overflow-hidden">
+                                    {product.images && product.images[0] && (
+                                        <img
+                                            src={product.images[0]}
+                                            alt={product.title}
+                                            className="w-14 h-14 object-cover rounded-lg transition-transform duration-200 hover:scale-105"
+                                        />
+                                    )}
+                                </div>
+                                <div className="absolute -top-1 -right-1 w-5 h-5 bg-gray-600 rounded-full flex items-center justify-center shadow-sm">
+                                    <span className="text-white text-xs font-bold">1</span>
+                                </div>
                             </div>
-                            <p className="text-base sm:text-lg text-gray-700 text-center">
-                                Your order will be shipped to the address below
-                            </p>
+                            <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-[#262626] text-base line-clamp-1 mb-1">{product.title}</h3>
+                                <p className="text-[#2658A6] font-bold text-xl mb-1">${product.price.toFixed(2)}</p>
+                                <p className="text-gray-400 text-xs leading-tight">Tap To View/Hide Summary</p>
+                            </div>
                         </div>
-                    </div>
+                        <div className="flex-shrink-0 ml-3">
+                            <ChevronDown
+                                className={`h-6 w-6 text-gray-600 transition-transform duration-200 ${showMobileOrderSummary ? 'rotate-180' : ''}`}
+                            />
+                        </div>
+                    </button>
 
-                    {/* Address Card */}
-                    <div className="w-full flex flex-col lg:flex-row gap-4">
-                        {/* Address Section */}
-                        <div className="flex-1 bg-blue-50 border border-blue-100 rounded-2xl shadow-sm p-5 flex flex-col gap-2">
-                            <div className="flex items-center gap-2 mb-1">
-                                <MapPin className="h-5 w-5 text-[#2658A6]" />
-                                <span className="font-semibold text-[#2658A6] text-base">Delivery Address</span>
-                            </div>
-                            <div className="text-gray-800 text-base whitespace-pre-line leading-relaxed">
-                                {shippingData.streetAddress && <div>{shippingData.streetAddress}</div>}
-                                {shippingData.city && <div>{shippingData.city}</div>}
-                                {shippingData.state || shippingData.zipCode ? (
-                                    <div>{shippingData.state}{shippingData.state && shippingData.zipCode ? ', ' : ''}{shippingData.zipCode}</div>
-                                ) : null}
-                            </div>
-                        </div>
-
-                        {/* Email Section */}
-                        <div className="flex-1 bg-green-50 border border-green-100 rounded-2xl shadow-sm p-5 flex flex-col gap-2">
-                            <div className="flex items-center gap-2 mb-1">
-                                <Mail className="h-5 w-5 text-green-600" />
-                                <span className="font-semibold text-green-600 text-base">Email Address</span>
-                            </div>
-                            <div className="text-gray-800 text-base">
-                                {shippingData.email}
+                    {showMobileOrderSummary && (
+                        <div className="px-4 sm:px-6 pb-4 sm:pb-6 border-t border-gray-100 pt-4">
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-gray-600">Quantity</span>
+                                    <span className="font-medium">1</span>
+                                </div>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-gray-600">Subtotal</span>
+                                    <span className="font-medium">${product.price.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-gray-600">Shipping</span>
+                                    <span className="font-medium text-[#2658A6]">Free</span>
+                                </div>
+                                <div className="border-t border-gray-200 pt-3">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-base font-semibold text-[#262626]">Total</span>
+                                        <span className="text-lg font-bold text-[#2658A6]">${product.price.toFixed(2)}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
 
-                {/* Product Summary */}
-                <div className="p-6 sm:p-8 border-b border-gray-100">
-                    <h3 className="text-lg font-semibold text-[#262626] mb-4">Order Summary</h3>
-                    <div className="flex items-center gap-4">
+                {/* Desktop: Order Summary (Always Visible) */}
+                <div className="hidden lg:block p-4 sm:p-6 border-b border-gray-100">
+                    <h2 className="text-xl font-bold text-[#262626] mb-4">Order Summary</h2>
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:space-x-4 p-4 bg-blue-50 rounded-xl border border-blue-100">
                         {product.images && product.images[0] && (
                             <img
                                 src={product.images[0]}
                                 alt={product.title}
-                                className="w-20 h-20 object-cover rounded-lg"
+                                className="w-16 h-16 object-cover rounded-lg shadow-sm mb-2 sm:mb-0"
                             />
                         )}
-                        <div className="flex-1">
-                            <h4 className="font-semibold text-[#262626]">{product.title}</h4>
-                            <p className="text-2xl font-bold text-[#2658A6] mt-1">
-                                ${product.price.toFixed(2)} {product.currency}
-                            </p>
+                        <div className="flex-grow flex flex-col justify-between">
+                            <h3 className="font-semibold text-[#262626] line-clamp-2 text-base mb-1">{product.title}</h3>
+                            <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
+                                <span className="bg-white px-2 py-0.5 rounded-full inline-block">New</span>
+                                <span>Qty: 1</span>
+                            </div>
+                            <div className="flex items-center justify-between mt-1">
+                                <span className="font-bold text-lg text-[#2658A6]">${product.price.toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-6 space-y-4">
+                        <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Subtotal</span>
+                            <span className="font-medium">${product.price.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Shipping</span>
+                            <span className="font-medium text-[#2658A6]">Free</span>
+                        </div>
+                        <div className="border-t border-gray-200 pt-4">
+                            <div className="flex justify-between">
+                                <span className="text-base font-semibold text-[#262626]">Total</span>
+                                <span className="text-lg font-bold text-[#2658A6]">${product.price.toFixed(2)}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
+                {/* 2. SHIPPING ADDRESS + EMAIL - Second (Where it's going) */}
+                <div className="p-4 sm:p-6 border-b border-gray-100">
+                    <div className="bg-blue-50 border border-blue-100 rounded-2xl shadow-sm p-4 sm:p-5">
+                        <div className="flex items-center gap-2 mb-3">
+                            <MapPin className="h-5 w-5 text-[#2658A6]" />
+                            <span className="font-semibold text-[#2658A6] text-base">Shipping Details</span>
+                        </div>
+
+                        {/* Address */}
+                        <div className="text-gray-800 text-sm sm:text-base leading-relaxed mb-3">
+                            {shippingData.streetAddress && <div>{shippingData.streetAddress}</div>}
+                            {shippingData.city && <div>{shippingData.city}</div>}
+                            {shippingData.state || shippingData.zipCode ? (
+                                <div>{shippingData.state}{shippingData.state && shippingData.zipCode ? ', ' : ''}{shippingData.zipCode}</div>
+                            ) : null}
+                        </div>
+
+                        {/* Email */}
+                        {shippingData.email && (
+                            <div className="flex items-center gap-2 pt-3 border-t border-blue-200">
+                                <Mail className="h-4 w-4 text-[#2658A6]" />
+                                <span className="text-[#2658A6] text-sm sm:text-base">{shippingData.email}</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
                 {/* Payment Form */}
-                <div className="p-6 sm:p-8">
+                <div className="p-4 sm:p-8">
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-12">
                             <Loader2 className="h-12 w-12 text-[#2658A6] animate-spin mb-4" />

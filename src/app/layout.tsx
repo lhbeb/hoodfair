@@ -157,7 +157,9 @@ export default function RootLayout({
               <main className="flex-grow">
                 {children}
               </main>
-              <InstagramSection />
+              <Suspense fallback={null}>
+                <InstagramSection />
+              </Suspense>
               <NewsletterSection />
               <Footer />
             </div>

@@ -1,4 +1,4 @@
-# 🎉 Stripe Embedded Payment - Implementation Complete!
+ # 🎉 Stripe Embedded Payment - Implementation Complete!
 
 ## ✅ What Changed
 

@@ -41,6 +41,7 @@ export default function AdminProductsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
   const [featuredFilter, setFeaturedFilter] = useState<'all' | 'featured' | 'not_featured'>('all');
+  const [stockFilter, setStockFilter] = useState<'all' | 'in_stock' | 'sold_out'>('all');
   const [listedByFilter, setListedByFilter] = useState<string>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [currentPage, setCurrentPage] = useState(1);
@@ -125,6 +126,13 @@ export default function AdminProductsPage() {
       filtered = filtered.filter(p => !(p.isFeatured || p.is_featured));
     }
 
+    // Apply stock filter
+    if (stockFilter === 'in_stock') {
+      filtered = filtered.filter(p => p.inStock !== false);
+    } else if (stockFilter === 'sold_out') {
+      filtered = filtered.filter(p => p.inStock === false);
+    }
+
     // Apply listed_by filter
     if (listedByFilter !== 'all') {
       if (listedByFilter === 'none') {
@@ -138,7 +146,7 @@ export default function AdminProductsPage() {
 
     setFilteredProducts(filtered);
     setCurrentPage(1);
-  }, [searchQuery, statusFilter, featuredFilter, listedByFilter, products]);
+  }, [searchQuery, statusFilter, featuredFilter, stockFilter, listedByFilter, products]);
 
   const handleDelete = async (slug: string) => {
     if (!confirm('Are you sure you want to delete this product?')) return;
@@ -374,7 +382,7 @@ export default function AdminProductsPage() {
   return (
     <AdminLayout
       title="Products"
-      subtitle={`${products.length} products • ${products.filter(p => p.published).length} published • ${products.filter(p => !p.published).length} drafts • ${featuredCount}/${FEATURE_LIMIT} featured`}
+      subtitle={`${products.length} products • ${products.filter(p => p.published).length} published • ${products.filter(p => !p.published).length} drafts • ${featuredCount}/${FEATURE_LIMIT} featured • ${products.filter(p => p.inStock === false).length} sold out`}
     >
       {/* Error Alert */}
       {error && (
@@ -395,8 +403,8 @@ export default function AdminProductsPage() {
           <button
             onClick={() => setStatusFilter('all')}
             className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${statusFilter === 'all'
-                ? 'bg-[#2658A6] text-white shadow-sm'
-                : 'text-gray-600 hover:bg-gray-50'
+              ? 'bg-[#2658A6] text-white shadow-sm'
+              : 'text-gray-600 hover:bg-gray-50'
               }`}
           >
             All Products ({products.length})
@@ -404,8 +412,8 @@ export default function AdminProductsPage() {
           <button
             onClick={() => setStatusFilter('published')}
             className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${statusFilter === 'published'
-                ? 'bg-[#2658A6] text-white shadow-sm'
-                : 'text-gray-600 hover:bg-gray-50'
+              ? 'bg-[#2658A6] text-white shadow-sm'
+              : 'text-gray-600 hover:bg-gray-50'
               }`}
           >
             Published ({products.filter(p => p.published).length})
@@ -413,8 +421,8 @@ export default function AdminProductsPage() {
           <button
             onClick={() => setStatusFilter('draft')}
             className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${statusFilter === 'draft'
-                ? 'bg-amber-600 text-white shadow-sm'
-                : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
+              ? 'bg-amber-600 text-white shadow-sm'
+              : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
               }`}
           >
             Draft ({products.filter(p => !p.published).length})
@@ -448,6 +456,20 @@ export default function AdminProductsPage() {
               <option value="all">All Products</option>
               <option value="featured">⭐ Featured Only</option>
               <option value="not_featured">Not Featured</option>
+            </select>
+          </div>
+
+          {/* Stock Filter */}
+          <div className="flex items-center gap-2">
+            <Filter className="h-5 w-5 text-gray-400" />
+            <select
+              value={stockFilter}
+              onChange={(e) => setStockFilter(e.target.value as 'all' | 'in_stock' | 'sold_out')}
+              className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-transparent text-sm font-medium"
+            >
+              <option value="all">All Stock Status</option>
+              <option value="in_stock">✅ In Stock</option>
+              <option value="sold_out">❌ Sold Out</option>
             </select>
           </div>
 
@@ -554,13 +576,15 @@ export default function AdminProductsPage() {
       )}
 
       {/* Filter Status */}
-      {(searchQuery || statusFilter !== 'all' || featuredFilter !== 'all' || listedByFilter !== 'all') && (
+      {(searchQuery || statusFilter !== 'all' || featuredFilter !== 'all' || stockFilter !== 'all' || listedByFilter !== 'all') && (
         <div className="mb-4 px-4 py-2 bg-[#2658A6]/5 border border-[#2658A6]/20 rounded-xl">
           <div className="text-sm text-[#1a3d70]">
             Showing <strong>{filteredProducts.length}</strong> of <strong>{products.length}</strong> product{products.length !== 1 ? 's' : ''}
             {statusFilter === 'published' && ` (${products.filter(p => p.published).length} published)`}
             {statusFilter === 'draft' && ` (${products.filter(p => !p.published).length} drafts)`}
             {featuredFilter === 'featured' && ` (${featuredCount} featured)`}
+            {stockFilter === 'in_stock' && ` (in stock only)`}
+            {stockFilter === 'sold_out' && ` (sold out only)`}
             {listedByFilter !== 'all' && listedByFilter !== 'none' && ` (listed by: ${listedByFilter})`}
             {listedByFilter === 'none' && ` (not assigned)`}
           </div>
@@ -585,7 +609,7 @@ export default function AdminProductsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {paginatedProducts.map((product) => (
             <div
-              key={product.id}
+              key={product.slug}
               className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-md hover:border-gray-200 transition-all relative"
             >
               {/* Selection Checkbox */}
@@ -597,8 +621,8 @@ export default function AdminProductsPage() {
                     handleToggleSelect(product.slug);
                   }}
                   className={`p-1.5 rounded-lg bg-white/90 backdrop-blur-sm border-2 transition-all ${selectedProducts.has(product.slug)
-                      ? 'border-[#2658A6] bg-[#2658A6]/5'
-                      : 'border-gray-300 hover:border-gray-400'
+                    ? 'border-[#2658A6] bg-[#2658A6]/5'
+                    : 'border-gray-300 hover:border-gray-400'
                     }`}
                 >
                   {selectedProducts.has(product.slug) ? (
@@ -613,10 +637,12 @@ export default function AdminProductsPage() {
               <div className="relative aspect-square bg-gray-100">
                 {product.images?.[0] ? (
                   <Image
+                    key={`grid-${product.slug}-${product.images[0]}`}
                     src={product.images[0]}
                     alt={product.title}
                     fill
                     className="object-cover"
+                    priority={false}
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full">
@@ -654,8 +680,8 @@ export default function AdminProductsPage() {
                     }}
                     disabled={togglingStock === product.slug}
                     className={`p-2 rounded-lg transition-colors ${product.inStock !== false
-                        ? 'bg-green-500 hover:bg-[#2658A6]'
-                        : 'bg-red-500 hover:bg-red-600'
+                      ? 'bg-green-500 hover:bg-[#2658A6]'
+                      : 'bg-red-500 hover:bg-red-600'
                       } disabled:opacity-50`}
                     title={product.inStock !== false ? 'Mark as sold out' : 'Mark as in stock'}
                   >
@@ -674,8 +700,8 @@ export default function AdminProductsPage() {
                     }}
                     disabled={togglingFeatured === product.slug || (!(product.isFeatured || product.is_featured) && featuredCount >= FEATURE_LIMIT)}
                     className={`p-2 rounded-lg transition-colors ${(product.isFeatured || product.is_featured)
-                        ? 'bg-amber-500 hover:bg-amber-600'
-                        : 'bg-white hover:bg-gray-100'
+                      ? 'bg-amber-500 hover:bg-amber-600'
+                      : 'bg-white hover:bg-gray-100'
                       } disabled:opacity-50`}
                     title={(product.isFeatured || product.is_featured) ? 'Remove from featured' : 'Add to featured'}
                   >
@@ -758,7 +784,7 @@ export default function AdminProductsPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {paginatedProducts.map((product) => (
-                <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={product.slug} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3">
                     <button
                       onClick={(e) => {
@@ -766,8 +792,8 @@ export default function AdminProductsPage() {
                         handleToggleSelect(product.slug);
                       }}
                       className={`p-1.5 rounded-lg border-2 transition-all ${selectedProducts.has(product.slug)
-                          ? 'border-[#2658A6] bg-[#2658A6]/5'
-                          : 'border-gray-300 hover:border-gray-400'
+                        ? 'border-[#2658A6] bg-[#2658A6]/5'
+                        : 'border-gray-300 hover:border-gray-400'
                         }`}
                     >
                       {selectedProducts.has(product.slug) ? (
@@ -782,11 +808,13 @@ export default function AdminProductsPage() {
                       <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                         {product.images?.[0] ? (
                           <Image
+                            key={`list-${product.slug}-${product.images[0]}`}
                             src={product.images[0]}
                             alt={product.title}
                             width={48}
                             height={48}
                             className="object-cover w-full h-full"
+                            priority={false}
                           />
                         ) : (
                           <div className="flex items-center justify-center h-full">
@@ -863,8 +891,8 @@ export default function AdminProductsPage() {
                       }}
                       disabled={togglingFeatured === product.slug || (!(product.isFeatured || product.is_featured) && featuredCount >= FEATURE_LIMIT)}
                       className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${(product.isFeatured || product.is_featured)
-                          ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         } disabled:opacity-50`}
                       title={(product.isFeatured || product.is_featured) ? 'Remove from featured' : 'Add to featured'}
                     >
@@ -884,8 +912,8 @@ export default function AdminProductsPage() {
                       }}
                       disabled={togglingStock === product.slug}
                       className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${product.inStock !== false
-                          ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                          : 'bg-red-100 text-red-700 hover:bg-red-200'
+                        ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                        : 'bg-red-100 text-red-700 hover:bg-red-200'
                         } disabled:opacity-50`}
                       title={product.inStock !== false ? 'Mark as sold out' : 'Mark as in stock'}
                     >
@@ -920,8 +948,8 @@ export default function AdminProductsPage() {
                           }}
                           disabled={togglingFeatured === product.slug || (!(product.isFeatured || product.is_featured) && featuredCount >= FEATURE_LIMIT)}
                           className={`p-2 rounded-lg transition-colors disabled:opacity-50 ${(product.isFeatured || product.is_featured)
-                              ? 'hover:bg-amber-50'
-                              : 'hover:bg-gray-100'
+                            ? 'hover:bg-amber-50'
+                            : 'hover:bg-gray-100'
                             }`}
                           title={(product.isFeatured || product.is_featured) ? 'Unfeature product' : 'Feature product'}
                         >
