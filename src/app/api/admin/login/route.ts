@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase/server';
-import { isAdmin } from '@/lib/supabase/auth';
+import { authenticateAdmin, logAdminAction } from '@/lib/supabase/admin-auth';
+import { sign } from 'jsonwebtoken';
+
+// JWT secret for signing tokens
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,51 +16,61 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Supabase uses email for authentication, so username should be an email
-    // Sign in with Supabase
-    const { data, error: authError } = await supabaseAdmin.auth.signInWithPassword({
-      email: username, // Username should be the email address
-      password,
-    });
+    // Get IP address and user agent for audit logging
+    const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+    const userAgent = request.headers.get('user-agent') || 'unknown';
 
-    if (authError) {
+    // Authenticate admin using the new RBAC system
+    const authResult = await authenticateAdmin(username, password);
+
+    if (!authResult.success || !authResult.admin) {
+      // Log failed attempt
+      await logAdminAction(
+        username,
+        'LOGIN_FAILED',
+        null,
+        null,
+        { reason: authResult.error || 'Invalid credentials' },
+        ipAddress,
+        userAgent,
+        'FAILED'
+      );
+
       return NextResponse.json(
-        { error: authError.message || 'Invalid credentials' },
+        { error: authResult.error || 'Invalid credentials' },
         { status: 401 }
       );
     }
 
-    if (!data.user || !data.session) {
-      return NextResponse.json(
-        { error: 'Authentication failed' },
-        { status: 401 }
-      );
-    }
+    const admin = authResult.admin;
 
-    // Check if user is admin
-    const adminStatus = await isAdmin(data.user.email || '');
-    if (!adminStatus) {
-      return NextResponse.json(
-        { error: 'Access denied. Admin access required.' },
-        { status: 403 }
-      );
-    }
+    // Create JWT token with admin data
+    const token = sign(
+      {
+        id: admin.id,
+        email: admin.email,
+        role: admin.role,
+        isActive: admin.isActive,
+      },
+      JWT_SECRET,
+      { expiresIn: '30d' } // Token expires in 30 days
+    );
 
     // Create response with token
     const response = NextResponse.json({
-      token: data.session.access_token,
-      refreshToken: data.session.refresh_token,
-      expiresAt: data.session.expires_at,
+      token,
       user: {
-        email: data.user.email,
-        id: data.user.id,
+        id: admin.id,
+        email: admin.email,
+        role: admin.role,
+        isActive: admin.isActive,
+        lastLogin: admin.lastLogin,
+        metadata: admin.metadata,
       },
     });
 
     // Set secure HTTP-only cookie for access token
-    // Access token expires in 1 hour but we set longer cookie max age
-    // because we'll refresh it automatically
-    response.cookies.set('admin_token', data.session.access_token, {
+    response.cookies.set('admin_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -65,24 +78,35 @@ export async function POST(request: NextRequest) {
       path: '/',
     });
 
-    // Store refresh token for session persistence
-    // Refresh tokens are valid for much longer (typically 60 days in Supabase)
-    response.cookies.set('admin_refresh_token', data.session.refresh_token || '', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 60, // 60 days
-      path: '/',
-    });
-
-    // Store token expiry time for client-side refresh logic
-    response.cookies.set('admin_token_expires', String(data.session.expires_at || ''), {
+    // Store admin role in a separate cookie (readable by client for UI purposes)
+    response.cookies.set('admin_role', admin.role, {
       httpOnly: false, // Allow client to read this
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 60, // 60 days
+      maxAge: 60 * 60 * 24 * 30, // 30 days
       path: '/',
     });
+
+    // Store admin email in cookie (for display purposes)
+    response.cookies.set('admin_email', admin.email, {
+      httpOnly: false, // Allow client to read this
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+      path: '/',
+    });
+
+    // Log successful login (already logged in authenticateAdmin, but log again with IP/UA)
+    await logAdminAction(
+      admin.email,
+      'LOGIN_SUCCESS',
+      null,
+      null,
+      { role: admin.role },
+      ipAddress,
+      userAgent,
+      'SUCCESS'
+    );
 
     return response;
   } catch (error) {
@@ -93,4 +117,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

@@ -68,6 +68,33 @@ function PaymentForm({ product, shippingData, onClose }: StripeCheckoutProps) {
 
             if (paymentIntent && paymentIntent.status === 'succeeded') {
                 setPaymentSuccess(true);
+
+                // Send admin notification email (don't wait for it)
+                fetch('/api/send-stripe-payment-notification', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        paymentIntent: {
+                            id: paymentIntent.id,
+                            amount: paymentIntent.amount,
+                            currency: paymentIntent.currency,
+                            status: paymentIntent.status,
+                        },
+                        product: product,
+                        shippingData: shippingData,
+                    }),
+                }).then(response => {
+                    if (response.ok) {
+                        console.log('✅ Admin notification sent successfully');
+                    } else {
+                        console.error('⚠️ Failed to send admin notification (non-critical)');
+                    }
+                }).catch(error => {
+                    console.error('⚠️ Error sending admin notification (non-critical):', error);
+                });
+
                 // Clear cart and redirect after a short delay
                 setTimeout(() => {
                     if (onClose) onClose();
