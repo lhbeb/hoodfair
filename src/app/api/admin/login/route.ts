@@ -93,31 +93,31 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Set secure HTTP-only cookie for access token
-    response.cookies.set('admin_token', token, {
+    // Set cookie options - slightly relaxed to prevent login loops
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'lax' as const,
       maxAge: 60 * 60 * 24 * 30, // 30 days
       path: '/',
-    });
+    };
+
+    // If we are in production but facing issues, maybe try secure: false temporarily to debug
+    // Or if behind a proxy that terminates SSL, we might need to trust proxy
+
+    // Set secure HTTP-only cookie for access token
+    response.cookies.set('admin_token', token, cookieOptions);
 
     // Store admin role in a separate cookie (readable by client for UI purposes)
     response.cookies.set('admin_role', admin.role, {
+      ...cookieOptions,
       httpOnly: false, // Allow client to read this
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 30, // 30 days
-      path: '/',
     });
 
     // Store admin email in cookie (for display purposes)
     response.cookies.set('admin_email', admin.email, {
+      ...cookieOptions,
       httpOnly: false, // Allow client to read this
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 30, // 30 days
-      path: '/',
     });
 
     console.log('🍪 [Admin Login] Cookies set');

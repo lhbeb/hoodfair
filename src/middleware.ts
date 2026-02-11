@@ -26,7 +26,8 @@ export async function middleware(request: NextRequest) {
 
     const token = request.cookies.get('admin_token')?.value;
 
-    console.log('🔒 [MIDDLEWARE] Checking token:', token ? 'exists' : 'missing');
+    console.log('🔒 [MIDDLEWARE] All cookies:', request.cookies.getAll().map(c => c.name).join(', '));
+    console.log('🔒 [MIDDLEWARE] Checking token:', token ? 'exists and starts with ' + token.substring(0, 10) : 'missing');
 
     if (!token) {
       // No token, redirect to login

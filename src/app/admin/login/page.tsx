@@ -70,6 +70,16 @@ export default function AdminLoginPage() {
       if (data.token) {
         localStorage.setItem('admin_token', data.token);
         console.log('✅ [Client] Token stored in localStorage');
+
+        // FALLBACK: Manually set cookie on client side
+        // This is crucial for fixing login loops where Set-Cookie is blocked
+        const maxAge = 60 * 60 * 24 * 30; // 30 days
+        document.cookie = `admin_token=${data.token}; path=/; max-age=${maxAge}; samesite=lax; secure`;
+        if (data.user) {
+          document.cookie = `admin_role=${data.user.role}; path=/; max-age=${maxAge}; samesite=lax; secure`;
+          document.cookie = `admin_email=${data.user.email}; path=/; max-age=${maxAge}; samesite=lax; secure`;
+        }
+        console.log('🍪 [Client] Cookies manually set as fallback');
       } else {
         console.warn('⚠️ [Client] No token in response');
       }
