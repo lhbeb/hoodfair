@@ -1,60 +1,75 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase/server';
-import { isAdmin } from '@/lib/supabase/auth';
+import { verify, sign } from 'jsonwebtoken';
+import { getAdminRole } from '@/lib/supabase/admin-auth';
+
+// JWT secret for signing tokens
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 export async function POST(request: NextRequest) {
     try {
-        const refreshToken = request.cookies.get('admin_refresh_token')?.value;
+        // Get the current token from cookie
+        const token = request.cookies.get('admin_token')?.value;
 
-        if (!refreshToken) {
+        if (!token) {
             return NextResponse.json(
-                { error: 'No refresh token found' },
+                { error: 'No token found' },
                 { status: 401 }
             );
         }
 
-        // Refresh the session using the refresh token
-        const { data, error } = await supabaseAdmin.auth.refreshSession({
-            refresh_token: refreshToken,
-        });
-
-        if (error || !data.session) {
-            // Clear cookies if refresh fails
+        // Verify and decode the current token
+        let decoded: any;
+        try {
+            decoded = verify(token, JWT_SECRET);
+        } catch (err) {
+            // Token is invalid or expired
             const response = NextResponse.json(
                 { error: 'Session expired. Please login again.' },
                 { status: 401 }
             );
             response.cookies.delete('admin_token');
-            response.cookies.delete('admin_refresh_token');
-            response.cookies.delete('admin_token_expires');
+            response.cookies.delete('admin_role');
+            response.cookies.delete('admin_email');
             return response;
         }
 
-        // Verify user is still an admin
-        const adminStatus = await isAdmin(data.user?.email || '');
-        if (!adminStatus) {
+        // Verify user is still an admin in the database
+        const adminRole = await getAdminRole(decoded.email);
+        if (!adminRole) {
             const response = NextResponse.json(
                 { error: 'Access denied. Admin access required.' },
                 { status: 403 }
             );
             response.cookies.delete('admin_token');
-            response.cookies.delete('admin_refresh_token');
-            response.cookies.delete('admin_token_expires');
+            response.cookies.delete('admin_role');
+            response.cookies.delete('admin_email');
             return response;
         }
 
-        // Create response with new tokens
+        // Create a new token with extended expiry
+        const newToken = sign(
+            {
+                id: decoded.id,
+                email: decoded.email,
+                role: adminRole,
+                isActive: true,
+            },
+            JWT_SECRET,
+            { expiresIn: '30d' } // Token expires in 30 days
+        );
+
+        // Create response with new token
         const response = NextResponse.json({
-            token: data.session.access_token,
-            expiresAt: data.session.expires_at,
+            token: newToken,
             user: {
-                email: data.user?.email,
-                id: data.user?.id,
+                id: decoded.id,
+                email: decoded.email,
+                role: adminRole,
             },
         });
 
         // Update access token cookie
-        response.cookies.set('admin_token', data.session.access_token, {
+        response.cookies.set('admin_token', newToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
@@ -62,21 +77,21 @@ export async function POST(request: NextRequest) {
             path: '/',
         });
 
-        // Update refresh token cookie (Supabase may rotate it)
-        response.cookies.set('admin_refresh_token', data.session.refresh_token || '', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 60 * 60 * 24 * 60, // 60 days
-            path: '/',
-        });
-
-        // Update token expiry time
-        response.cookies.set('admin_token_expires', String(data.session.expires_at || ''), {
+        // Update role cookie
+        response.cookies.set('admin_role', adminRole, {
             httpOnly: false,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
-            maxAge: 60 * 60 * 24 * 60, // 60 days
+            maxAge: 60 * 60 * 24 * 30, // 30 days
+            path: '/',
+        });
+
+        // Update email cookie
+        response.cookies.set('admin_email', decoded.email, {
+            httpOnly: false,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 24 * 30, // 30 days
             path: '/',
         });
 

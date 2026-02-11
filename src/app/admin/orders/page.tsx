@@ -48,10 +48,17 @@ export default function AdminOrdersPage() {
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [showExportDialog, setShowExportDialog] = useState(false);
+  const [adminRole, setAdminRole] = useState<string | null>(null);
   const itemsPerPage = 20;
 
   useEffect(() => {
     fetchOrders();
+    // Get admin role from cookie
+    const role = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('admin_role='))
+      ?.split('=')[1];
+    setAdminRole(role || null);
   }, []);
 
   const fetchOrders = async () => {
@@ -604,8 +611,8 @@ export default function AdminOrdersPage() {
             <div
               key={order.id}
               className={`rounded-2xl shadow-sm border transition-all ${order.is_converted
-                  ? 'border-green-300 bg-green-50'
-                  : 'bg-white border-gray-100 hover:border-gray-200'
+                ? 'border-green-300 bg-green-50'
+                : 'bg-white border-gray-100 hover:border-gray-200'
                 }`}
             >
               {/* Order Header - Always Visible */}
@@ -827,7 +834,8 @@ export default function AdminOrdersPage() {
                       </button>
                     )}
 
-                    {!order.is_converted && (
+                    {/* Only SUPER_ADMIN can mark orders as converted */}
+                    {!order.is_converted && adminRole === 'SUPER_ADMIN' && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -835,6 +843,7 @@ export default function AdminOrdersPage() {
                         }}
                         disabled={markingConverted === order.id}
                         className="inline-flex items-center gap-2 px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200 disabled:opacity-50 transition-all"
+                        title="Mark this order as converted (Super Admin only)"
                       >
                         {markingConverted === order.id ? (
                           <RefreshCw className="h-4 w-4 animate-spin" />
@@ -897,8 +906,8 @@ export default function AdminOrdersPage() {
                   key={pageNum}
                   onClick={() => setCurrentPage(pageNum)}
                   className={`min-w-[40px] h-10 rounded-lg font-medium transition-all ${currentPage === pageNum
-                      ? 'bg-[#2658A6] text-white'
-                      : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                    ? 'bg-[#2658A6] text-white'
+                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
                     }`}
                 >
                   {pageNum}

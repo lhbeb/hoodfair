@@ -47,25 +47,25 @@ async function getAdminAuth(request: NextRequest) {
 
   // Check for admin_token cookie first
   const token = request.cookies.get('admin_token')?.value;
-  
+
   if (token) {
     // Verify the token with Supabase
     const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
-    
+
     if (error || !user) {
       return null;
     }
-    
+
     // Check if user is admin
     const { isAdmin } = await import('@/lib/supabase/auth');
     const adminStatus = await isAdmin(user.email || '');
     if (!adminStatus) {
       return null;
     }
-    
+
     return token;
   }
-  
+
   // Fallback to Authorization header (for backward compatibility)
   const authHeader = request.headers.get('authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -187,7 +187,7 @@ export async function PATCH(
 
     console.log('📝 Updating product with slug:', slug);
     console.log('📝 Updates:', JSON.stringify(cleanedUpdates, null, 2));
-    
+
     const product = await updateProduct(slug, cleanedUpdates);
 
     if (!product) {
@@ -195,7 +195,7 @@ export async function PATCH(
       console.error('❌ Update product returned null for slug:', slug);
       console.error('❌ Updates attempted:', JSON.stringify(updates, null, 2));
       console.error('❌ Cleaned updates:', JSON.stringify(cleanedUpdates, null, 2));
-      
+
       // Check if product exists with this slug
       const { getProductBySlug } = await import('@/lib/supabase/products');
       const existingProduct = await getProductBySlug(slug, true);
@@ -204,9 +204,9 @@ export async function PATCH(
       } else {
         console.error('❌ Product NOT found in database with slug:', slug);
       }
-      
+
       return NextResponse.json(
-        { 
+        {
           error: `Product update failed for slug: ${slug}. The product may not exist or there may be a database issue.`,
           slug: slug
         },
@@ -221,7 +221,7 @@ export async function PATCH(
     console.error('Error updating product:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to update product',
         details: errorMessage
       },
@@ -241,6 +241,23 @@ export async function DELETE(
     if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // Check if user is SUPER_ADMIN
+    const adminRole = request.cookies.get('admin_role')?.value;
+
+    if (adminRole !== 'SUPER_ADMIN') {
+      console.error('❌ [DELETE-PRODUCT] Access denied - user is not SUPER_ADMIN:', adminRole);
+      return NextResponse.json(
+        {
+          error: 'Access denied. Only Super Admins can delete products.',
+          requiredRole: 'SUPER_ADMIN',
+          currentRole: adminRole || 'none'
+        },
+        { status: 403 }
+      );
+    }
+
+    console.log('✅ [DELETE-PRODUCT] Role verified: SUPER_ADMIN');
 
     const { slug } = await params;
     const success = await deleteProduct(slug);

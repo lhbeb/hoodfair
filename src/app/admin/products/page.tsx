@@ -24,6 +24,7 @@ interface Product {
   inStock?: boolean;
   created_at: string;
   checkoutLink?: string;
+  checkoutFlow?: 'buymeacoffee' | 'kofi' | 'stripe';
   isFeatured?: boolean;
   is_featured?: boolean;
   published?: boolean;
@@ -43,6 +44,7 @@ export default function AdminProductsPage() {
   const [featuredFilter, setFeaturedFilter] = useState<'all' | 'featured' | 'not_featured'>('all');
   const [stockFilter, setStockFilter] = useState<'all' | 'in_stock' | 'sold_out'>('all');
   const [listedByFilter, setListedByFilter] = useState<string>('all');
+  const [checkoutFilter, setCheckoutFilter] = useState<'all' | 'stripe' | 'kofi' | 'buymeacoffee'>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [currentPage, setCurrentPage] = useState(1);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -52,6 +54,7 @@ export default function AdminProductsPage() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [exporting, setExporting] = useState(false);
+  const [adminRole, setAdminRole] = useState<string | null>(null);
   const FEATURE_LIMIT = 6;
   const itemsPerPage = 12;
 
@@ -82,6 +85,12 @@ export default function AdminProductsPage() {
 
   useEffect(() => {
     fetchProducts();
+    // Get admin role from cookie
+    const role = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('admin_role='))
+      ?.split('=')[1];
+    setAdminRole(role || null);
   }, [fetchProducts]);
 
   // Close dropdown when clicking outside
@@ -144,9 +153,14 @@ export default function AdminProductsPage() {
       }
     }
 
+    // Apply checkout flow filter
+    if (checkoutFilter !== 'all') {
+      filtered = filtered.filter(p => p.checkoutFlow === checkoutFilter);
+    }
+
     setFilteredProducts(filtered);
     setCurrentPage(1);
-  }, [searchQuery, statusFilter, featuredFilter, stockFilter, listedByFilter, products]);
+  }, [searchQuery, statusFilter, featuredFilter, stockFilter, listedByFilter, checkoutFilter, products]);
 
   const handleDelete = async (slug: string) => {
     if (!confirm('Are you sure you want to delete this product?')) return;
@@ -494,6 +508,21 @@ export default function AdminProductsPage() {
             </select>
           </div>
 
+          {/* Checkout Flow Filter */}
+          <div className="flex items-center gap-2">
+            <Filter className="h-5 w-5 text-gray-400" />
+            <select
+              value={checkoutFilter}
+              onChange={(e) => setCheckoutFilter(e.target.value as 'all' | 'stripe' | 'kofi' | 'buymeacoffee')}
+              className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-transparent text-sm font-medium"
+            >
+              <option value="all">All Checkout Methods</option>
+              <option value="stripe">💳 Stripe</option>
+              <option value="kofi">☕ Ko-fi</option>
+              <option value="buymeacoffee">☕ Buy Me a Coffee</option>
+            </select>
+          </div>
+
           {/* View Toggle & Actions */}
           <div className="flex items-center gap-3">
             <div className="flex items-center bg-gray-100 rounded-lg p-1">
@@ -576,7 +605,7 @@ export default function AdminProductsPage() {
       )}
 
       {/* Filter Status */}
-      {(searchQuery || statusFilter !== 'all' || featuredFilter !== 'all' || stockFilter !== 'all' || listedByFilter !== 'all') && (
+      {(searchQuery || statusFilter !== 'all' || featuredFilter !== 'all' || stockFilter !== 'all' || listedByFilter !== 'all' || checkoutFilter !== 'all') && (
         <div className="mb-4 px-4 py-2 bg-[#2658A6]/5 border border-[#2658A6]/20 rounded-xl">
           <div className="text-sm text-[#1a3d70]">
             Showing <strong>{filteredProducts.length}</strong> of <strong>{products.length}</strong> product{products.length !== 1 ? 's' : ''}
@@ -587,6 +616,9 @@ export default function AdminProductsPage() {
             {stockFilter === 'sold_out' && ` (sold out only)`}
             {listedByFilter !== 'all' && listedByFilter !== 'none' && ` (listed by: ${listedByFilter})`}
             {listedByFilter === 'none' && ` (not assigned)`}
+            {checkoutFilter === 'stripe' && ` (Stripe checkout)`}
+            {checkoutFilter === 'kofi' && ` (Ko-fi checkout)`}
+            {checkoutFilter === 'buymeacoffee' && ` (Buy Me a Coffee checkout)`}
           </div>
         </div>
       )}
@@ -727,17 +759,21 @@ export default function AdminProductsPage() {
                   >
                     <Edit className="h-4 w-4 text-gray-700" />
                   </Link>
-                  <button
-                    onClick={() => handleDelete(product.slug)}
-                    disabled={deletingId === product.slug}
-                    className="p-2 bg-white rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
-                  >
-                    {deletingId === product.slug ? (
-                      <RefreshCw className="h-4 w-4 text-red-600 animate-spin" />
-                    ) : (
-                      <Trash2 className="h-4 w-4 text-red-600" />
-                    )}
-                  </button>
+                  {/* Only SUPER_ADMIN can delete products */}
+                  {adminRole === 'SUPER_ADMIN' && (
+                    <button
+                      onClick={() => handleDelete(product.slug)}
+                      disabled={deletingId === product.slug}
+                      className="p-2 bg-white rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+                      title="Delete product (Super Admin only)"
+                    >
+                      {deletingId === product.slug ? (
+                        <RefreshCw className="h-4 w-4 text-red-600 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4 text-red-600" />
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -868,7 +904,16 @@ export default function AdminProductsPage() {
                     <span className="text-sm text-gray-700">{product.listedBy || '—'}</span>
                   </td>
                   <td className="px-4 py-3 hidden xl:table-cell">
-                    {product.checkoutLink ? (
+                    {product.checkoutFlow === 'stripe' ? (
+                      // Stripe: Not clickable, just a badge
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 text-purple-700 text-sm font-semibold rounded-lg">
+                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.594-7.305h.003z" />
+                        </svg>
+                        Stripe
+                      </span>
+                    ) : product.checkoutLink ? (
+                      // Ko-fi or Buy Me a Coffee: Clickable preview link
                       <a
                         href={product.checkoutLink}
                         target="_blank"
@@ -877,7 +922,11 @@ export default function AdminProductsPage() {
                         onClick={(e) => e.stopPropagation()}
                       >
                         <ExternalLink className="h-4 w-4" />
-                        Buymeacoffee link
+                        {product.checkoutFlow === 'kofi' ? (
+                          <span className="font-semibold text-blue-600">Preview Ko-fi</span>
+                        ) : (
+                          <span>Preview Buy Me a Coffee</span>
+                        )}
                       </a>
                     ) : (
                       <span className="text-sm text-gray-400">-</span>
@@ -965,17 +1014,21 @@ export default function AdminProductsPage() {
                         >
                           <Edit className="h-4 w-4 text-gray-500" />
                         </Link>
-                        <button
-                          onClick={() => handleDelete(product.slug)}
-                          disabled={deletingId === product.slug}
-                          className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                        >
-                          {deletingId === product.slug ? (
-                            <RefreshCw className="h-4 w-4 text-red-600 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-4 w-4 text-red-600" />
-                          )}
-                        </button>
+                        {/* Only SUPER_ADMIN can delete products */}
+                        {adminRole === 'SUPER_ADMIN' && (
+                          <button
+                            onClick={() => handleDelete(product.slug)}
+                            disabled={deletingId === product.slug}
+                            className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Delete product (Super Admin only)"
+                          >
+                            {deletingId === product.slug ? (
+                              <RefreshCw className="h-4 w-4 text-red-600 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4 text-red-600" />
+                            )}
+                          </button>
+                        )}
                       </div>
 
                       {/* Mobile/Tablet: Show three-dot menu */}
@@ -1054,21 +1107,25 @@ export default function AdminProductsPage() {
 
                             <div className="border-t border-gray-100 my-1"></div>
 
-                            <button
-                              onClick={() => {
-                                handleDelete(product.slug);
-                                setOpenDropdown(null);
-                              }}
-                              disabled={deletingId === product.slug}
-                              className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {deletingId === product.slug ? (
-                                <RefreshCw className="h-4 w-4 text-red-600 animate-spin" />
-                              ) : (
-                                <Trash2 className="h-4 w-4 text-red-600" />
-                              )}
-                              <span>Delete Product</span>
-                            </button>
+                            {/* Only SUPER_ADMIN can delete products */}
+                            {adminRole === 'SUPER_ADMIN' && (
+                              <button
+                                onClick={() => {
+                                  handleDelete(product.slug);
+                                  setOpenDropdown(null);
+                                }}
+                                disabled={deletingId === product.slug}
+                                className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Delete product (Super Admin only)"
+                              >
+                                {deletingId === product.slug ? (
+                                  <RefreshCw className="h-4 w-4 text-red-600 animate-spin" />
+                                ) : (
+                                  <Trash2 className="h-4 w-4 text-red-600" />
+                                )}
+                                <span>Delete Product</span>
+                              </button>
+                            )}
                           </div>
                         )}
                       </div>

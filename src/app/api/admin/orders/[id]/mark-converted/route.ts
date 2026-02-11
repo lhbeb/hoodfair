@@ -8,10 +8,28 @@ export async function POST(
   const startTime = Date.now();
   try {
     const { id } = await params;
-    
+
     console.log('🔄 [MARK-CONVERTED] Starting conversion for order ID:', id);
     console.log('🔄 [MARK-CONVERTED] Request timestamp:', new Date().toISOString());
-    
+
+    // Step 0: Verify user is SUPER_ADMIN
+    console.log('🔐 [MARK-CONVERTED] Step 0: Verifying admin role...');
+    const adminRole = request.cookies.get('admin_role')?.value;
+
+    if (adminRole !== 'SUPER_ADMIN') {
+      console.error('❌ [MARK-CONVERTED] Access denied - user is not SUPER_ADMIN:', adminRole);
+      return NextResponse.json(
+        {
+          error: 'Access denied. Only Super Admins can mark orders as converted.',
+          requiredRole: 'SUPER_ADMIN',
+          currentRole: adminRole || 'none'
+        },
+        { status: 403 }
+      );
+    }
+
+    console.log('✅ [MARK-CONVERTED] Role verified: SUPER_ADMIN');
+
     if (!id) {
       console.error('❌ [MARK-CONVERTED] Order ID is missing');
       return NextResponse.json(
@@ -35,9 +53,9 @@ export async function POST(
         hint: checkError.hint
       });
       return NextResponse.json(
-        { 
+        {
           error: 'Failed to check order existence',
-          details: checkError.message 
+          details: checkError.message
         },
         { status: 500 }
       );
@@ -45,16 +63,16 @@ export async function POST(
 
     if (!existingOrder || existingOrder.length === 0) {
       console.error('❌ [MARK-CONVERTED] Order not found with ID:', id);
-      
+
       // Try to find similar IDs to help debug
       const { data: sampleOrders } = await supabaseAdmin
         .from('orders')
         .select('id')
         .limit(5);
       console.log('📋 [MARK-CONVERTED] Sample order IDs in database:', sampleOrders?.map(o => o.id));
-      
+
       return NextResponse.json(
-        { 
+        {
           error: `Order not found with ID: ${id}`,
           orderId: id
         },
@@ -75,7 +93,7 @@ export async function POST(
       .select('is_converted')
       .eq('id', id)
       .limit(1);
-    
+
     if (columnCheck && columnCheck.length > 0) {
       console.log('✅ [MARK-CONVERTED] is_converted column exists, current value:', columnCheck[0].is_converted);
     } else {
@@ -104,16 +122,16 @@ export async function POST(
         hint: error.hint,
         orderId: id
       });
-      
+
       // Check if it's an RLS policy issue
       if (error.code === 'PGRST116' || error.message.includes('0 rows')) {
         console.error('❌ [MARK-CONVERTED] RLS POLICY ISSUE DETECTED!');
         console.error('❌ [MARK-CONVERTED] The orders table likely has RLS enabled but no UPDATE policy.');
         console.error('❌ [MARK-CONVERTED] Run the SQL migration: supabase-add-orders-update-policy.sql');
       }
-      
+
       return NextResponse.json(
-        { 
+        {
           error: 'Failed to mark order as converted',
           details: error.message,
           code: error.code,
@@ -130,23 +148,23 @@ export async function POST(
       console.error('   1. RLS policy may be blocking UPDATE (check with: SELECT * FROM pg_policies WHERE tablename = \'orders\';)');
       console.error('   2. The order ID does not match any rows');
       console.error('   3. The is_converted column may not exist (check with: SELECT column_name FROM information_schema.columns WHERE table_name = \'orders\' AND column_name = \'is_converted\';)');
-      
+
       // Try to read the order again to see if it still exists
       const { data: verifyOrder, error: verifyError } = await supabaseAdmin
         .from('orders')
         .select('id, is_converted')
         .eq('id', id);
-      
+
       console.log('🔍 [MARK-CONVERTED] Verification query result:', verifyOrder);
       if (verifyError) {
         console.error('❌ [MARK-CONVERTED] Verification query error:', verifyError);
       }
-      
+
       // Check if order exists but update failed
       if (verifyOrder && verifyOrder.length > 0) {
         console.error('❌ [MARK-CONVERTED] Order EXISTS but update failed - this is definitely an RLS policy issue!');
         return NextResponse.json(
-          { 
+          {
             error: 'Update blocked - RLS policy issue confirmed. Order exists but cannot be updated.',
             orderId: id,
             currentStatus: verifyOrder[0].is_converted,
@@ -155,9 +173,9 @@ export async function POST(
           { status: 500 }
         );
       }
-      
+
       return NextResponse.json(
-        { 
+        {
           error: 'Update returned 0 rows - order may not exist or RLS policy is blocking',
           orderId: id,
           suggestion: 'Verify order exists and RLS policies are configured correctly'
@@ -168,7 +186,7 @@ export async function POST(
 
     const updatedOrder = data[0];
     const duration = Date.now() - startTime;
-    
+
     console.log('✅ [MARK-CONVERTED] Order successfully marked as converted:', {
       orderId: updatedOrder.id,
       isConverted: updatedOrder.is_converted,
@@ -188,9 +206,9 @@ export async function POST(
       orderId: (await params).id,
       duration: `${duration}ms`
     });
-    
+
     return NextResponse.json(
-      { 
+      {
         error: 'Internal server error',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
