@@ -73,15 +73,29 @@ function LoginForm() {
         localStorage.setItem('admin_token', data.token);
         console.log('✅ [Client] Token stored in localStorage');
 
-        // FALLBACK: Manually set cookie on client side
-        // This is crucial for fixing login loops where Set-Cookie is blocked
-        const maxAge = 60 * 60 * 24 * 30; // 30 days
-        document.cookie = `admin_token=${data.token}; path=/; max-age=${maxAge}; samesite=lax; secure`;
-        if (data.user) {
-          document.cookie = `admin_role=${data.user.role}; path=/; max-age=${maxAge}; samesite=lax; secure`;
-          document.cookie = `admin_email=${data.user.email}; path=/; max-age=${maxAge}; samesite=lax; secure`;
+        // Wait a bit for server cookies to be set
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Check if server cookies were set successfully
+        const hasServerCookie = document.cookie.includes('admin_token=');
+
+        // FALLBACK: Only manually set cookies if server didn't set them
+        if (!hasServerCookie) {
+          console.warn('🍪 [Client] Server cookies not detected, setting client-side fallback...');
+
+          const maxAge = 60 * 60 * 24 * 30; // 30 days
+          const isProduction = window.location.protocol === 'https:';
+          const secureFlag = isProduction ? '; secure' : '';
+
+          document.cookie = `admin_token=${data.token}; path=/; max-age=${maxAge}; samesite=lax${secureFlag}`;
+          if (data.user) {
+            document.cookie = `admin_role=${data.user.role}; path=/; max-age=${maxAge}; samesite=lax${secureFlag}`;
+            document.cookie = `admin_email=${data.user.email}; path=/; max-age=${maxAge}; samesite=lax${secureFlag}`;
+          }
+          console.log('🍪 [Client] Client-side cookies set as fallback');
+        } else {
+          console.log('✅ [Client] Server cookies detected, no fallback needed');
         }
-        console.log('🍪 [Client] Cookies manually set as fallback');
       } else {
         console.warn('⚠️ [Client] No token in response');
       }

@@ -17,11 +17,18 @@ export async function middleware(request: NextRequest) {
   // Protect admin routes (except login)
   if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login')) {
     // Bypass authentication in development if enabled
-    if (bypassAuth) {
+    // CRITICAL: Only allow bypass in development, never in production
+    if (bypassAuth && process.env.NODE_ENV === 'development') {
+      console.warn('⚠️⚠️⚠️ [MIDDLEWARE] AUTH BYPASS ENABLED - DEVELOPMENT ONLY ⚠️⚠️⚠️');
       console.log('🔓 [MIDDLEWARE] Bypassing authentication for:', pathname);
       const response = NextResponse.next();
       response.headers.set('x-pathname', pathname);
       return response;
+    }
+
+    // If bypass is attempted in production, log critical warning and continue with auth
+    if (bypassAuth && process.env.NODE_ENV === 'production') {
+      console.error('🚨 [MIDDLEWARE] AUTH BYPASS BLOCKED IN PRODUCTION! Proceeding with normal auth...');
     }
 
     const token = request.cookies.get('admin_token')?.value;

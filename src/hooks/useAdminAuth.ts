@@ -12,7 +12,6 @@ import { useRouter } from 'next/navigation';
  */
 export function useAdminAuth() {
     const router = useRouter();
-    const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const isRefreshingRef = useRef(false);
     const hasAttemptedRefreshRef = useRef(false);
     const [isReady, setIsReady] = useState(false);
@@ -67,10 +66,35 @@ export function useAdminAuth() {
             return;
         }
 
-        // If we have localStorage token but no expiry cookie, try refreshing
-        // This handles the case where access token expired but refresh token exists
+        // If we have localStorage token but no expiry cookie, validate the token first
         if (!expiryCookie && localToken && !hasAttemptedRefreshRef.current) {
-            console.log('[Auth] No expiry cookie but has localStorage token, attempting refresh...');
+            console.log('[Auth] No expiry cookie but has localStorage token, validating...');
+
+            try {
+                // Decode JWT to check expiry (client-side decode, no verification needed)
+                const tokenParts = localToken.split('.');
+                if (tokenParts.length === 3) {
+                    const payload = JSON.parse(atob(tokenParts[1]));
+                    const expiresAt = payload.exp;
+                    const now = Math.floor(Date.now() / 1000);
+
+                    if (expiresAt && expiresAt < now) {
+                        // Token is already expired, don't bother refreshing
+                        console.log('[Auth] Token is expired, redirecting to login');
+                        localStorage.removeItem('admin_token');
+                        router.push('/admin/login');
+                        setIsReady(true);
+                        return;
+                    }
+
+                    // Token is valid, try refreshing to get updated cookies
+                    console.log('[Auth] Token is valid, attempting refresh...');
+                }
+            } catch (err) {
+                console.error('[Auth] Error decoding token:', err);
+                // If we can't decode, try refresh anyway
+            }
+
             hasAttemptedRefreshRef.current = true;
             const success = await refreshToken();
             if (!success) {
@@ -101,7 +125,7 @@ export function useAdminAuth() {
         } else {
             setIsReady(true);
         }
-    }, [refreshToken]);
+    }, [refreshToken, router]);
 
     useEffect(() => {
         // Check token immediately on mount
@@ -112,9 +136,6 @@ export function useAdminAuth() {
 
         return () => {
             clearInterval(interval);
-            if (refreshTimeoutRef.current) {
-                clearTimeout(refreshTimeoutRef.current);
-            }
         };
     }, [checkAndRefreshToken]);
 
