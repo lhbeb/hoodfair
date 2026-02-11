@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         // Get the base URL for success/cancel redirects
         const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
-        // Create Stripe Checkout Session
+        // Create Stripe Checkout Session with expiration
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: [
@@ -46,6 +46,8 @@ export async function POST(request: NextRequest) {
             shipping_address_collection: {
                 allowed_countries: ['US', 'CA', 'GB', 'AU', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'AT', 'CH', 'SE', 'NO', 'DK', 'FI', 'IE', 'PT', 'GR', 'PL', 'CZ', 'HU', 'RO', 'BG', 'HR', 'SK', 'SI', 'LT', 'LV', 'EE', 'CY', 'MT', 'LU'],
             },
+            // CRITICAL: Set session expiration to 30 minutes to prevent incomplete transactions
+            expires_at: Math.floor(Date.now() / 1000) + (30 * 60), // 30 minutes from now
             metadata: {
                 product_slug: product.slug,
                 product_id: product.id,
