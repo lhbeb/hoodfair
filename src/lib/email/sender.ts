@@ -55,7 +55,7 @@ const parseFullOrderData = (rawData: unknown): Record<string, any> | undefined =
  */
 export async function sendOrderEmail(order: any): Promise<{ success: boolean; error?: string }> {
   try {
-    const { product_title, product_price, product_slug, customer_name, customer_email, customer_phone, shipping_address, shipping_city, shipping_state, shipping_zip, full_order_data } = order;
+    const { product_title, product_price, product_slug, customer_name, customer_email, customer_phone, shipping_address, shipping_city, shipping_state, shipping_zip, full_order_data, product_listed_by } = order;
 
     const parsedFullOrderData = parseFullOrderData(full_order_data);
     const baseUrl = resolveBaseUrl([
@@ -77,6 +77,7 @@ export async function sendOrderEmail(order: any): Promise<{ success: boolean; er
       <ul>
         <li><strong>Product:</strong> ${product_title}</li>
         <li><strong>Price:</strong> $${product_price}</li>
+        <li><strong>Listed By:</strong> ${product_listed_by || 'Not specified'}</li>
         <li><strong>Product URL:</strong> ${productUrl}</li>
       </ul>
 
@@ -135,7 +136,7 @@ export async function sendOrderEmailAsync(orderId: string): Promise<void> {
     try {
       console.log(`📧 [Async] Starting email send for order ${orderId}...`);
       const order = await getOrderById(orderId);
-      
+
       if (!order) {
         console.error(`❌ [Async] Order ${orderId} not found in database`);
         return;
@@ -143,7 +144,7 @@ export async function sendOrderEmailAsync(orderId: string): Promise<void> {
 
       console.log(`📧 [Async] Order found, sending email...`);
       const result = await sendOrderEmail(order);
-      
+
       if (result.success) {
         console.log(`✅ [Async] Email sent successfully for order ${orderId}`);
       } else {
