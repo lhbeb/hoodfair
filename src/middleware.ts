@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { verify } from 'jsonwebtoken';
+import { jwtVerify } from 'jose';
 
 // JWT secret - must match the one in login route
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const getSecretKey = () => new TextEncoder().encode(JWT_SECRET);
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -43,10 +44,12 @@ export async function middleware(request: NextRequest) {
     }
 
     try {
-      // Verify the JWT token
+      // Verify the JWT token using jose (Edge-compatible)
       console.log('🔒 [MIDDLEWARE] Verifying JWT token...');
 
-      const decoded = verify(token, JWT_SECRET) as {
+      const { payload } = await jwtVerify(token, getSecretKey());
+
+      const decoded = payload as {
         id: string;
         email: string;
         role: string;
