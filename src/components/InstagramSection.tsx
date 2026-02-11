@@ -15,7 +15,7 @@ const InstagramSection: React.FC = () => {
                 <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 rounded-full p-0.5 flex-shrink-0">
                   <div className="w-full h-full bg-white rounded-full overflow-hidden">
                     <Image
-                      src="https://i.ibb.co/RGcM1gLY/pdp1.png"
+                      src="https://i.ibb.co/5xRFqhWv/hoodfaiaar.png"
                       alt="HoodFair Profile"
                       width={80}
                       height={80}
@@ -23,12 +23,12 @@ const InstagramSection: React.FC = () => {
                     />
                   </div>
                 </div>
-                
+
                 {/* Profile Details */}
                 <div className="flex-grow">
                   <h3 className="font-bold text-[#262626] text-lg sm:text-xl mb-1">@hoodfaircom</h3>
                   <p className="text-gray-600 text-sm sm:text-base mb-2">HoodFair</p>
-                  
+
                   {/* Statistics */}
                   <div className="flex items-center space-x-4 sm:space-x-6 text-sm">
                     <div className="text-center">

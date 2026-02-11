@@ -12,19 +12,19 @@ const InstagramWidget: React.FC = () => {
           <div className="w-20 h-20 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 rounded-full p-0.5 flex-shrink-0">
             <div className="w-full h-full bg-white rounded-full overflow-hidden">
               <Image
-                src="https://i.ibb.co/RGcM1gLY/pdp1.png"
+                src="https://i.ibb.co/5xRFqhWv/hoodfaiaar.png"
                 alt="HoodFair Profile"
                 width={80}
                 height={80}
               />
             </div>
           </div>
-          
+
           {/* Profile Info */}
           <div className="flex-grow">
             <h3 className="font-bold text-[#262626] text-xl mb-1">@hoodfaircom</h3>
-                <p className="text-gray-600 text-sm mb-3">HoodFair</p>
-            
+            <p className="text-gray-600 text-sm mb-3">HoodFair</p>
+
             {/* Statistics */}
             <div className="flex items-center space-x-6 text-sm">
               <div className="text-center">
