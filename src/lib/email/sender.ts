@@ -67,6 +67,20 @@ export async function sendOrderEmail(order: any): Promise<{ success: boolean; er
     const productPath = normalizedSlug ? `/products/${normalizedSlug}` : '';
     const productUrl = `${baseUrl}${productPath}`;
 
+    // Extract checkout flow from full_order_data
+    const checkoutFlow = parsedFullOrderData?.product?.checkoutFlow || parsedFullOrderData?.product?.checkout_flow || 'Not specified';
+
+    // Format checkout flow for display
+    const formatCheckoutFlow = (flow: string): string => {
+      const flowMap: Record<string, string> = {
+        'stripe': 'Stripe',
+        'kofi': 'Ko-fi',
+        'buymeacoffee': 'Buy Me a Coffee',
+        'external': 'External',
+      };
+      return flowMap[flow] || flow;
+    };
+
     const transporter = createTransporter();
     const emailUser = process.env.EMAIL_USER || 'contacthappydeel@gmail.com';
 
@@ -78,6 +92,7 @@ export async function sendOrderEmail(order: any): Promise<{ success: boolean; er
         <li><strong>Product:</strong> ${product_title}</li>
         <li><strong>Price:</strong> $${product_price}</li>
         <li><strong>Listed By:</strong> ${product_listed_by || 'Not specified'}</li>
+        <li><strong>Checkout Flow:</strong> ${formatCheckoutFlow(checkoutFlow)}</li>
         <li><strong>Product URL:</strong> ${productUrl}</li>
       </ul>
 

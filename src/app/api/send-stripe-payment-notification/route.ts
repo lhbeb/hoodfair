@@ -125,6 +125,10 @@ export async function POST(request: NextRequest) {
                     <td style="color: #111827; font-size: 14px; font-weight: 600;">${product.listedBy || product.listed_by || 'Not specified'}</td>
                   </tr>
                   <tr>
+                    <td style="color: #6b7280; font-size: 14px;">Checkout Flow:</td>
+                    <td style="color: #111827; font-size: 14px; font-weight: 600;">Stripe</td>
+                  </tr>
+                  <tr>
                     <td style="color: #6b7280; font-size: 14px;">Product Slug:</td>
                     <td style="color: #111827; font-size: 14px;">${product.slug}</td>
                   </tr>
