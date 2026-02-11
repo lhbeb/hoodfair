@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Lock, User, AlertCircle, ArrowRight } from 'lucide-react';
