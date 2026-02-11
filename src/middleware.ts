@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase/server';
-import { isAdmin } from '@/lib/supabase/auth';
+import { verify } from 'jsonwebtoken';
+
+// JWT secret - must match the one in login route
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  console.log('🔒 [MIDDLEWARE] Request to:', pathname);
 
   // Import shouldBypassAuth dynamically to avoid issues
   const { shouldBypassAuth } = await import('@/lib/supabase/auth');
@@ -21,80 +25,52 @@ export async function middleware(request: NextRequest) {
     }
 
     const token = request.cookies.get('admin_token')?.value;
-    const refreshToken = request.cookies.get('admin_refresh_token')?.value;
+
+    console.log('🔒 [MIDDLEWARE] Checking token:', token ? 'exists' : 'missing');
 
     if (!token) {
-      // Check if we have a refresh token - if so, let the page handle the refresh
-      // This prevents race condition issues during login
-      if (refreshToken) {
-        console.log('🔄 [MIDDLEWARE] No access token but refresh token exists, allowing through for client-side refresh');
-        const response = NextResponse.next();
-        response.headers.set('x-pathname', pathname);
-        response.headers.set('x-needs-refresh', 'true');
-        return response;
-      }
-
-      // No tokens at all, redirect to login
-      console.log('🚫 [MIDDLEWARE] No tokens found, redirecting to login');
+      // No token, redirect to login
+      console.log('🚫 [MIDDLEWARE] No token found, redirecting to login');
       return NextResponse.redirect(new URL('/admin/login', request.url));
     }
 
     try {
-      // Verify the token
-      const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+      // Verify the JWT token
+      console.log('🔒 [MIDDLEWARE] Verifying JWT token...');
 
-      if (error || !user) {
-        // Token might be expired, check if we have refresh token
-        if (refreshToken) {
-          console.log('🔄 [MIDDLEWARE] Access token invalid but refresh token exists, allowing through for client-side refresh');
-          const response = NextResponse.next();
-          response.headers.set('x-pathname', pathname);
-          response.headers.set('x-needs-refresh', 'true');
-          return response;
-        }
+      const decoded = verify(token, JWT_SECRET) as {
+        id: string;
+        email: string;
+        role: string;
+        isActive: boolean;
+      };
 
-        // Invalid token and no refresh token, redirect to login
-        console.log('🚫 [MIDDLEWARE] Invalid token and no refresh token, redirecting to login');
+      console.log('✅ [MIDDLEWARE] Token verified for:', decoded.email);
+
+      // Check if admin is active
+      if (!decoded.isActive) {
+        console.log('🚫 [MIDDLEWARE] Admin account is deactivated');
         const response = NextResponse.redirect(new URL('/admin/login', request.url));
         response.cookies.delete('admin_token');
-        response.cookies.delete('admin_refresh_token');
-        response.cookies.delete('admin_token_expires');
-        return response;
-      }
-
-      // Check if user is admin
-      const adminStatus = await isAdmin(user.email || '');
-      if (!adminStatus) {
-        // Not an admin, redirect to login
-        console.log('🚫 [MIDDLEWARE] User is not admin, redirecting to login');
-        const response = NextResponse.redirect(new URL('/admin/login', request.url));
-        response.cookies.delete('admin_token');
-        response.cookies.delete('admin_refresh_token');
-        response.cookies.delete('admin_token_expires');
+        response.cookies.delete('admin_role');
+        response.cookies.delete('admin_email');
         return response;
       }
 
       // Authenticated admin, allow access
       const response = NextResponse.next();
       response.headers.set('x-pathname', pathname);
+      response.headers.set('x-admin-email', decoded.email);
+      response.headers.set('x-admin-role', decoded.role);
       return response;
     } catch (error) {
       console.error('❌ [MIDDLEWARE] Error verifying token:', error);
 
-      // On error, check if we have refresh token before redirecting
-      if (refreshToken) {
-        console.log('🔄 [MIDDLEWARE] Error but refresh token exists, allowing through');
-        const response = NextResponse.next();
-        response.headers.set('x-pathname', pathname);
-        response.headers.set('x-needs-refresh', 'true');
-        return response;
-      }
-
-      // Error verifying token and no refresh, redirect to login
+      // Invalid or expired token, redirect to login
       const response = NextResponse.redirect(new URL('/admin/login', request.url));
       response.cookies.delete('admin_token');
-      response.cookies.delete('admin_refresh_token');
-      response.cookies.delete('admin_token_expires');
+      response.cookies.delete('admin_role');
+      response.cookies.delete('admin_email');
       return response;
     }
   }
@@ -117,4 +93,3 @@ export const config = {
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 };
-

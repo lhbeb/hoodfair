@@ -17,7 +17,12 @@ export default function AdminLoginPage() {
     setError('');
     setLoading(true);
 
+    console.log('🔐 [Client] Login form submitted');
+    console.log('🔐 [Client] Username:', username);
+
     try {
+      console.log('🔐 [Client] Sending login request...');
+
       const response = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -25,14 +30,40 @@ export default function AdminLoginPage() {
         credentials: 'include', // Ensure cookies are included
       });
 
-      const data = await response.json();
+      console.log('🔐 [Client] Response received:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries())
+      });
+
+      let data;
+      try {
+        data = await response.json();
+        console.log('🔐 [Client] Response data:', data);
+      } catch (jsonError) {
+        console.error('❌ [Client] Failed to parse JSON response:', jsonError);
+        const text = await response.text();
+        console.error('❌ [Client] Response text:', text);
+        throw new Error('Invalid response from server. Please try again.');
+      }
 
       if (!response.ok) {
+        console.error('❌ [Client] Login failed:', data.error);
         throw new Error(data.error || 'Login failed');
       }
 
+      console.log('✅ [Client] Login successful, storing token...');
+
       // Store token in localStorage as backup
-      localStorage.setItem('admin_token', data.token);
+      if (data.token) {
+        localStorage.setItem('admin_token', data.token);
+        console.log('✅ [Client] Token stored in localStorage');
+      } else {
+        console.warn('⚠️ [Client] No token in response');
+      }
+
+      console.log('🔄 [Client] Redirecting to /admin/products...');
 
       // IMPORTANT: Use window.location instead of router.push
       // This forces a full page navigation which ensures:
@@ -41,7 +72,17 @@ export default function AdminLoginPage() {
       // 3. Middleware will see the cookie on the next request
       window.location.href = '/admin/products';
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      console.error('❌ [Client] Login error:', err);
+
+      if (err instanceof Error) {
+        console.error('❌ [Client] Error message:', err.message);
+        console.error('❌ [Client] Error stack:', err.stack);
+        setError(err.message);
+      } else {
+        console.error('❌ [Client] Unknown error:', err);
+        setError('An unexpected error occurred. Please try again.');
+      }
+
       setLoading(false);
     }
     // Don't set loading to false on success - we're navigating away
