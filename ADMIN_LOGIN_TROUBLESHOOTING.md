@@ -77,18 +77,16 @@ console.error('❌ [Admin Login] Unexpected error:', error);
 
 ---
 
-### **3. Better Error Messages**
+### **3. Better Error Messages & Visibility**
 
 **Before:**
-```json
-{ "error": "Invalid credentials" }
-```
+- Silent redirect loops without messages
+- Console logs hidden from non-technical users
 
 **After:**
-```json
-{ "error": "Invalid credentials. Please check your email and password." }
-{ "error": "An error occurred during login. Please try again or contact support." }
-```
+- ✅ **Browser Alert:** `alert("Login Failed: error message")` shows immediately
+- ✅ **URL Parameters:** Redirects to `/admin/login?error=Session%20expired`
+- ✅ **Visual Feedback:** Login page displays error from URL
 
 ---
 

@@ -1,16 +1,27 @@
 "use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Lock, User, AlertCircle, ArrowRight } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Check for error in URL query params (from middleware redirect)
+    const errorMsg = searchParams.get('error');
+    if (errorMsg) {
+      setError(decodeURIComponent(errorMsg));
+      // Optional: Clear the error param from URL without refreshing
+      window.history.replaceState({}, '', '/admin/login');
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,14 +85,21 @@ export default function AdminLoginPage() {
     } catch (err) {
       console.error('❌ [Client] Login error:', err);
 
+      let errorMessage = 'An unexpected error occurred';
+
       if (err instanceof Error) {
         console.error('❌ [Client] Error message:', err.message);
         console.error('❌ [Client] Error stack:', err.stack);
+        errorMessage = err.message;
         setError(err.message);
       } else {
         console.error('❌ [Client] Unknown error:', err);
         setError('An unexpected error occurred. Please try again.');
+        errorMessage = 'An unexpected error occurred. Please try again.';
       }
+
+      // SHOW ALERT so the error is visible immediately
+      alert(`Login Failed: ${errorMessage}`);
 
       setLoading(false);
     }

@@ -50,7 +50,9 @@ export async function middleware(request: NextRequest) {
       // Check if admin is active
       if (!decoded.isActive) {
         console.log('🚫 [MIDDLEWARE] Admin account is deactivated');
-        const response = NextResponse.redirect(new URL('/admin/login', request.url));
+        const url = new URL('/admin/login', request.url);
+        url.searchParams.set('error', 'Account deactivated');
+        const response = NextResponse.redirect(url);
         response.cookies.delete('admin_token');
         response.cookies.delete('admin_role');
         response.cookies.delete('admin_email');
@@ -67,7 +69,9 @@ export async function middleware(request: NextRequest) {
       console.error('❌ [MIDDLEWARE] Error verifying token:', error);
 
       // Invalid or expired token, redirect to login
-      const response = NextResponse.redirect(new URL('/admin/login', request.url));
+      const url = new URL('/admin/login', request.url);
+      url.searchParams.set('error', 'Session expired or invalid');
+      const response = NextResponse.redirect(url);
       response.cookies.delete('admin_token');
       response.cookies.delete('admin_role');
       response.cookies.delete('admin_email');
