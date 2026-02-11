@@ -256,7 +256,19 @@ const CheckoutPage: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setShippingData(prev => ({ ...prev, [name]: value }));
+
+    // Validate zip code - only allow alphanumeric characters (for international support)
+    if (name === 'zipCode') {
+      // Remove any non-alphanumeric characters except spaces and hyphens
+      const cleanedValue = value.replace(/[^a-zA-Z0-9\s-]/g, '');
+      setShippingData(prev => ({ ...prev, [name]: cleanedValue }));
+    } else if (name === 'email') {
+      // Clear email error when user types
+      setEmailError('');
+      setShippingData(prev => ({ ...prev, [name]: value }));
+    } else {
+      setShippingData(prev => ({ ...prev, [name]: value }));
+    }
 
     // Filter state suggestions based on input and selected country
     if (name === 'state') {
@@ -401,10 +413,25 @@ const CheckoutPage: React.FC = () => {
       return;
     }
 
-    // Validate email
+    // Validate email format
     if (!shippingData.email) {
       console.error('❌ [Checkout] Email is required');
       setEmailError('Email address is required');
+      return;
+    }
+
+    // Email validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(shippingData.email)) {
+      console.error('❌ [Checkout] Invalid email format');
+      setEmailError('Please enter a valid email address (e.g., example@email.com)');
+      return;
+    }
+
+    // Validate zip code (must have at least 3 characters)
+    if (!shippingData.zipCode || shippingData.zipCode.trim().length < 3) {
+      console.error('❌ [Checkout] Invalid zip code');
+      alert('Please enter a valid zip/postal code (at least 3 characters)');
       return;
     }
 
@@ -797,6 +824,10 @@ const CheckoutPage: React.FC = () => {
                                 value={shippingData.zipCode}
                                 onChange={handleInputChange}
                                 required
+                                minLength={3}
+                                maxLength={10}
+                                pattern="[a-zA-Z0-9\s-]+"
+                                title="Zip/postal code must be 3-10 characters (letters, numbers, spaces, and hyphens only)"
                                 className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] transition-all duration-300"
                                 placeholder="Enter your zip code"
                                 autoComplete="postal-code"
@@ -817,7 +848,9 @@ const CheckoutPage: React.FC = () => {
                               value={shippingData.email}
                               onChange={handleInputChange}
                               required
-                              className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] transition-all duration-300"
+                              pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
+                              title="Please enter a valid email address (e.g., example@email.com)"
+                              className={`w-full px-4 py-4 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 ${emailError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-[#2658A6] focus:border-[#2658A6]'}`}
                               placeholder="Enter your email address"
                               autoComplete="email"
                             />
