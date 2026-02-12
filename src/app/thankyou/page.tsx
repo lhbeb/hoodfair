@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { CheckCircle, Mail, Clock, Package, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
-export default function ThankYouPage() {
+function ThankYouContent() {
   const searchParams = useSearchParams();
   const [verifying, setVerifying] = useState(true);
   const [paymentVerified, setPaymentVerified] = useState(false);
@@ -259,4 +259,29 @@ export default function ThankYouPage() {
       </div>
     </div>
   );
-} 
+}
+
+// Main export with Suspense boundary
+export default function ThankYouPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
+        <div className="max-w-2xl w-full">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 md:p-12 text-center">
+            <div className="mx-auto w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+              <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-[#262626] mb-4">
+              Loading...
+            </h1>
+            <p className="text-lg text-gray-600">
+              Please wait a moment.
+            </p>
+          </div>
+        </div>
+      </div>
+    }>
+      <ThankYouContent />
+    </Suspense>
+  );
+}
