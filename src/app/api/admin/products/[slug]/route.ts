@@ -42,38 +42,74 @@ async function getAdminAuth(request: NextRequest) {
   const { shouldBypassAuth } = await import('@/lib/supabase/auth');
   if (shouldBypassAuth()) {
     console.log('🔓 [AUTH] Bypassing authentication for API request');
-    return 'dev-bypass-token'; // Return a mock token for dev mode
+    return { authenticated: true, role: 'SUPER_ADMIN', email: 'dev@localhost' };
   }
 
-  // Check for admin_token cookie first
+  // Check for admin_token cookie (JWT token from our login route)
   const token = request.cookies.get('admin_token')?.value;
 
   if (token) {
-    // Verify the token with Supabase
-    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+    try {
+      // Verify JWT token using jose (same as middleware)
+      const { jwtVerify } = await import('jose');
+      const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+      const getSecretKey = () => new TextEncoder().encode(JWT_SECRET);
 
-    if (error || !user) {
+      const { payload } = await jwtVerify(token, getSecretKey());
+
+      const decoded = payload as {
+        id: string;
+        email: string;
+        role: string;
+        isActive: boolean;
+      };
+
+      // Check if admin is active
+      if (!decoded.isActive) {
+        console.log('🚫 [AUTH] Admin account is deactivated:', decoded.email);
+        return null;
+      }
+
+      console.log('✅ [AUTH] JWT token verified for:', decoded.email, 'Role:', decoded.role);
+      return { authenticated: true, role: decoded.role, email: decoded.email };
+    } catch (error) {
+      console.error('❌ [AUTH] JWT verification failed:', error);
       return null;
     }
-
-    // Check if user is admin
-    const { isAdmin } = await import('@/lib/supabase/auth');
-    const adminStatus = await isAdmin(user.email || '');
-    if (!adminStatus) {
-      return null;
-    }
-
-    return token;
   }
 
   // Fallback to Authorization header (for backward compatibility)
   const authHeader = request.headers.get('authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const headerToken = authHeader.split('Bearer ')[1];
+
+    try {
+      const { jwtVerify } = await import('jose');
+      const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+      const getSecretKey = () => new TextEncoder().encode(JWT_SECRET);
+
+      const { payload } = await jwtVerify(headerToken, getSecretKey());
+
+      const decoded = payload as {
+        id: string;
+        email: string;
+        role: string;
+        isActive: boolean;
+      };
+
+      if (!decoded.isActive) {
+        return null;
+      }
+
+      console.log('✅ [AUTH] JWT token verified from header for:', decoded.email, 'Role:', decoded.role);
+      return { authenticated: true, role: decoded.role, email: decoded.email };
+    } catch (error) {
+      console.error('❌ [AUTH] Header JWT verification failed:', error);
+      return null;
+    }
   }
 
-  const headerToken = authHeader.split('Bearer ')[1];
-  return headerToken;
+  return null;
 }
 
 // GET - Get single product
@@ -242,22 +278,20 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if user is SUPER_ADMIN
-    const adminRole = request.cookies.get('admin_role')?.value;
-
-    if (adminRole !== 'SUPER_ADMIN') {
-      console.error('❌ [DELETE-PRODUCT] Access denied - user is not SUPER_ADMIN:', adminRole);
+    // Check if user is SUPER_ADMIN (using auth object instead of cookies)
+    if (auth.role !== 'SUPER_ADMIN') {
+      console.error('❌ [DELETE-PRODUCT] Access denied - user is not SUPER_ADMIN:', auth.role);
       return NextResponse.json(
         {
           error: 'Access denied. Only Super Admins can delete products.',
           requiredRole: 'SUPER_ADMIN',
-          currentRole: adminRole || 'none'
+          currentRole: auth.role
         },
         { status: 403 }
       );
     }
 
-    console.log('✅ [DELETE-PRODUCT] Role verified: SUPER_ADMIN');
+    console.log('✅ [DELETE-PRODUCT] Role verified: SUPER_ADMIN for:', auth.email);
 
     const { slug } = await params;
     const success = await deleteProduct(slug);
