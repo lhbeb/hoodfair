@@ -542,6 +542,7 @@ export default function NewProductPage() {
                 <option value="othmane">othmane</option>
                 <option value="janah">janah</option>
                 <option value="youssef">youssef</option>
+                <option value="yassine">yassine</option>
               </select>
             </Field>
 

@@ -504,6 +504,7 @@ export default function AdminProductsPage() {
               <option value="othmane">othmane</option>
               <option value="janah">janah</option>
               <option value="youssef">youssef</option>
+              <option value="yassine">yassine</option>
               <option value="none">Not Assigned</option>
             </select>
           </div>

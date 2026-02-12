@@ -50,25 +50,25 @@ async function getAdminAuth(request: NextRequest) {
 
   // Check for admin_token cookie first
   const token = request.cookies.get('admin_token')?.value;
-  
+
   if (token) {
     // Verify the token with Supabase
     const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
-    
+
     if (error || !user) {
       return null;
     }
-    
+
     // Check if user is admin
     const { isAdmin } = await import('@/lib/supabase/auth');
     const adminStatus = await isAdmin(user.email || '');
     if (!adminStatus) {
       return null;
     }
-    
+
     return token;
   }
-  
+
   // Fallback to Authorization header (for backward compatibility)
   const authHeader = request.headers.get('authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
       'listed_by',
       'collections',
     ];
-    
+
     // Validate collections is an array and not empty
     if (!productData.collections || !Array.isArray(productData.collections) || productData.collections.length === 0) {
       return NextResponse.json(
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate listed_by value
-    const validListedByValues = ['walid', 'abdo', 'jebbar', 'amine', 'mehdi', 'othmane', 'janah', 'youssef'];
+    const validListedByValues = ['walid', 'abdo', 'jebbar', 'amine', 'mehdi', 'othmane', 'janah', 'youssef', 'yassine'];
     if (productData.listed_by && !validListedByValues.includes(productData.listed_by)) {
       return NextResponse.json(
         { error: `Invalid listed_by value. Must be one of: ${validListedByValues.join(', ')}` },
