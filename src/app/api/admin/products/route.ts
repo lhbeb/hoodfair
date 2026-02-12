@@ -45,38 +45,45 @@ async function getAdminAuth(request: NextRequest) {
   const { shouldBypassAuth } = await import('@/lib/supabase/auth');
   if (shouldBypassAuth()) {
     console.log('🔓 [AUTH] Bypassing authentication for API request');
-    return 'dev-bypass-token'; // Return a mock token for dev mode
+    return { authenticated: true, role: 'SUPER_ADMIN', email: 'dev@localhost' };
   }
 
-  // Check for admin_token cookie first
+  // Check for admin_token cookie (JWT token from our login route)
   const token = request.cookies.get('admin_token')?.value;
 
   if (token) {
-    // Verify the token with Supabase
-    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+    try {
+      // Verify JWT token using jose (same as middleware)
+      const { jwtVerify } = await import('jose');
+      const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+      const getSecretKey = () => new TextEncoder().encode(JWT_SECRET);
 
-    if (error || !user) {
+      const { payload } = await jwtVerify(token, getSecretKey());
+
+      const decoded = payload as {
+        id: string;
+        email: string;
+        role: string;
+        isActive: boolean;
+      };
+
+      // Check if admin is active
+      if (!decoded.isActive) {
+        console.log('🚫 [AUTH] Admin account is deactivated:', decoded.email);
+        return null;
+      }
+
+      console.log('✅ [AUTH] JWT token verified for:', decoded.email, 'Role:', decoded.role);
+      return { authenticated: true, role: decoded.role, email: decoded.email };
+    } catch (error) {
+      console.error('❌ [AUTH] JWT verification failed:', error);
       return null;
     }
-
-    // Check if user is admin
-    const { isAdmin } = await import('@/lib/supabase/auth');
-    const adminStatus = await isAdmin(user.email || '');
-    if (!adminStatus) {
-      return null;
-    }
-
-    return token;
   }
 
-  // Fallback to Authorization header (for backward compatibility)
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-
-  const headerToken = authHeader.split('Bearer ')[1];
-  return headerToken;
+  // No valid authentication found
+  console.log('🚫 [AUTH] No valid admin_token cookie found');
+  return null;
 }
 
 // GET - List all products (admin view - includes drafts)
