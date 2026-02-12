@@ -11,12 +11,11 @@ function ThankYouContent() {
   const [orderDetails, setOrderDetails] = useState<any>(null);
 
   useEffect(() => {
-    // Security: If no payment_intent, redirect to home (prevent direct access)
     const paymentIntentId = searchParams.get('payment_intent');
 
+    // Only verify payment if we have a payment_intent (from Stripe redirect)
     if (!paymentIntentId) {
-      console.warn('⚠️ No payment_intent found, redirecting to home');
-      router.push('/');
+      console.log('ℹ️ No payment_intent found - showing generic thank you message');
       return;
     }
 
@@ -56,7 +55,7 @@ function ThankYouContent() {
     };
 
     verifyInBackground();
-  }, [searchParams, router]);
+  }, [searchParams]);
 
   // Always show success (Stripe only redirects here if payment succeeded)
   return (

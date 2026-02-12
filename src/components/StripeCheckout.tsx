@@ -95,11 +95,11 @@ function PaymentForm({ product, shippingData, onClose }: StripeCheckoutProps) {
                     console.error('⚠️ Error sending admin notification (non-critical):', error);
                 });
 
-                // Clear cart and redirect after a short delay
+                // Clear cart and redirect after showing success message (3 seconds is UX best practice)
                 setTimeout(() => {
                     if (onClose) onClose();
-                    window.location.href = '/thankyou';
-                }, 2000);
+                    window.location.href = `/thankyou?payment_intent=${paymentIntent.id}`;
+                }, 3000);
             }
         } catch (err) {
             console.error('Payment error:', err);
