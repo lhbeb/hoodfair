@@ -5,6 +5,46 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
     apiVersion: '2026-01-28.clover',
 });
 
+// Helper function to sanitize Stripe errors for user-facing responses
+function getSafeStripeError(error: any): string {
+    // Log the actual error for debugging (server-side only)
+    console.error('🚨 [Stripe Error Details]:', {
+        type: error.type,
+        code: error.code,
+        message: error.message,
+        raw: error.raw,
+    });
+
+    // Check for sensitive errors that should NOT be exposed to users
+    const sensitiveErrors = [
+        'api_key',
+        'authentication',
+        'invalid_request_error',
+        'expired',
+        'sk_live',
+        'sk_test',
+        'secret',
+        'token',
+    ];
+
+    const errorMessage = error.message?.toLowerCase() || '';
+    const isSensitive = sensitiveErrors.some(sensitive => errorMessage.includes(sensitive));
+
+    if (isSensitive) {
+        // Return generic error for sensitive issues
+        return 'Payment processing is temporarily unavailable. Please contact support at support@hoodfair.com';
+    }
+
+    // For non-sensitive errors, we can show a slightly more specific message
+    // but still avoid technical jargon
+    if (error.type === 'card_error') {
+        return 'There was an issue with your payment method. Please try a different card or contact support@hoodfair.com';
+    }
+
+    // Generic fallback for any other errors
+    return 'An error occurred during payment processing. Please contact support@hoodfair.com';
+}
+
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
@@ -56,9 +96,11 @@ export async function POST(request: NextRequest) {
             paymentIntentId: paymentIntent.id,
         });
     } catch (error: any) {
-        console.error('❌ Error creating payment intent:', error);
+        // Get sanitized error message (hides sensitive API details)
+        const safeErrorMessage = getSafeStripeError(error);
+
         return NextResponse.json(
-            { error: error.message || 'Failed to create payment intent' },
+            { error: safeErrorMessage },
             { status: 500 }
         );
     }
