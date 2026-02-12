@@ -55,7 +55,7 @@ const parseFullOrderData = (rawData: unknown): Record<string, any> | undefined =
  */
 export async function sendOrderEmail(order: any): Promise<{ success: boolean; error?: string }> {
   try {
-    const { product_title, product_price, product_slug, customer_name, customer_email, customer_phone, shipping_address, shipping_city, shipping_state, shipping_zip, full_order_data, product_listed_by, checkout_flow } = order;
+    const { product_title, product_price, product_slug, customer_name, customer_email, customer_phone, shipping_address, shipping_city, shipping_state, shipping_zip, full_order_data, product_listed_by } = order;
 
     const parsedFullOrderData = parseFullOrderData(full_order_data);
     const baseUrl = resolveBaseUrl([
@@ -67,8 +67,8 @@ export async function sendOrderEmail(order: any): Promise<{ success: boolean; er
     const productPath = normalizedSlug ? `/products/${normalizedSlug}` : '';
     const productUrl = `${baseUrl}${productPath}`;
 
-    // Use checkout_flow from order object directly (saved from product)
-    const checkoutFlowValue = checkout_flow || parsedFullOrderData?.product?.checkoutFlow || parsedFullOrderData?.product?.checkout_flow || 'Not specified';
+    // Extract checkout flow from full_order_data
+    const checkoutFlow = parsedFullOrderData?.product?.checkoutFlow || parsedFullOrderData?.product?.checkout_flow || 'Not specified';
 
     // Format checkout flow for display
     const formatCheckoutFlow = (flow: string): string => {
@@ -92,7 +92,7 @@ export async function sendOrderEmail(order: any): Promise<{ success: boolean; er
         <li><strong>Product:</strong> ${product_title}</li>
         <li><strong>Price:</strong> $${product_price}</li>
         <li><strong>Listed By:</strong> ${product_listed_by || 'Not specified'}</li>
-        <li><strong>Checkout Flow:</strong> ${formatCheckoutFlow(checkoutFlowValue)}</li>
+        <li><strong>Checkout Flow:</strong> ${formatCheckoutFlow(checkoutFlow)}</li>
         <li><strong>Product URL:</strong> ${productUrl}</li>
       </ul>
 

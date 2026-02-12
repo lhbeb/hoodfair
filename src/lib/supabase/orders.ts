@@ -40,25 +40,10 @@ export async function saveOrder(orderData: OrderData): Promise<{ id: string; suc
       return { id: '', success: false, error: `Missing required fields: ${missing.join(', ')}` };
     }
 
-    // Fetch product details to get checkout_flow and listed_by
-    console.log('📦 [saveOrder] Fetching product details for slug:', orderData.productSlug);
-    const { data: product, error: productError } = await supabaseAdmin
-      .from('products')
-      .select('checkout_flow, listed_by')
-      .eq('slug', orderData.productSlug)
-      .single();
-
-    if (productError) {
-      console.warn('⚠️ [saveOrder] Could not fetch product details:', productError.message);
-      // Continue anyway, but with null values
-    }
-
     const insertData = {
       product_slug: orderData.productSlug,
       product_title: orderData.productTitle,
       product_price: Number(orderData.productPrice), // Ensure it's a number
-      product_listed_by: product?.listed_by || null, // Add listed_by from product
-      checkout_flow: product?.checkout_flow || null, // Add checkout_flow from product
       customer_name: orderData.customerName,
       customer_email: orderData.customerEmail,
       customer_phone: orderData.customerPhone || null,
@@ -71,11 +56,7 @@ export async function saveOrder(orderData: OrderData): Promise<{ id: string; suc
       email_error: null,
     };
 
-    console.log('📦 [saveOrder] Inserting data with product details:', {
-      ...insertData,
-      product_listed_by: insertData.product_listed_by,
-      checkout_flow: insertData.checkout_flow,
-    });
+    console.log('📦 [saveOrder] Inserting data:', JSON.stringify(insertData, null, 2));
 
     const { data, error } = await supabaseAdmin
       .from('orders')
@@ -159,7 +140,7 @@ export async function updateOrderEmailStatus(
 export async function getOrdersNeedingRetry(maxRetries: number = 5): Promise<any[]> {
   try {
     const now = new Date().toISOString();
-
+    
     // Get orders where email hasn't been sent, retry count is below max, and either no retry scheduled or retry time has passed
     const { data, error } = await supabaseAdmin
       .from('orders')
@@ -178,7 +159,7 @@ export async function getOrdersNeedingRetry(maxRetries: number = 5): Promise<any
     const filtered = (data || []).filter(order => {
       const retryCount = order.email_retry_count || 0;
       const nextRetry = order.next_retry_at;
-
+      
       // Include if retry count is below max AND (no retry scheduled OR retry time has passed)
       return retryCount < maxRetries && (!nextRetry || new Date(nextRetry) <= new Date(now));
     });
@@ -250,7 +231,7 @@ export async function getAllOrders() {
 
     // Get unique product slugs from orders
     const productSlugs = [...new Set(orders.map((o: any) => o.product_slug).filter(Boolean))];
-
+    
     // Fetch products to get listed_by values
     const { data: products, error: productsError } = await supabaseAdmin
       .from('products')
