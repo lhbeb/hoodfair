@@ -46,8 +46,10 @@ export async function POST(request: NextRequest) {
             shipping_address_collection: {
                 allowed_countries: ['US', 'CA', 'GB', 'AU', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'AT', 'CH', 'SE', 'NO', 'DK', 'FI', 'IE', 'PT', 'GR', 'PL', 'CZ', 'HU', 'RO', 'BG', 'HR', 'SK', 'SI', 'LT', 'LV', 'EE', 'CY', 'MT', 'LU'],
             },
-            // CRITICAL: Set session expiration to 30 minutes to prevent incomplete transactions
-            expires_at: Math.floor(Date.now() / 1000) + (30 * 60), // 30 minutes from now
+            // CRITICAL: Set session expiration to 15 minutes (industry standard)
+            // Aligns with Shopify, Amazon, and other major e-commerce platforms
+            // Reduces incomplete transactions faster while giving users adequate time
+            expires_at: Math.floor(Date.now() / 1000) + (15 * 60), // 15 minutes from now
             metadata: {
                 product_slug: product.slug,
                 product_id: product.id,
