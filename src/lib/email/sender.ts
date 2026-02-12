@@ -1,6 +1,7 @@
 import 'server-only';
 import nodemailer from 'nodemailer';
 import { updateOrderEmailStatus, getOrderById } from '@/lib/supabase/orders';
+import { supabaseAdmin } from '@/lib/supabase/server';
 import { resolveBaseUrl } from '@/lib/url';
 
 // Create transporter (in serverless, each invocation is isolated)
@@ -55,7 +56,7 @@ const parseFullOrderData = (rawData: unknown): Record<string, any> | undefined =
  */
 export async function sendOrderEmail(order: any): Promise<{ success: boolean; error?: string }> {
   try {
-    const { product_title, product_price, product_slug, customer_name, customer_email, customer_phone, shipping_address, shipping_city, shipping_state, shipping_zip, full_order_data, product_listed_by } = order;
+    const { product_title, product_price, product_slug, customer_name, customer_email, customer_phone, shipping_address, shipping_city, shipping_state, shipping_zip, full_order_data } = order;
 
     const parsedFullOrderData = parseFullOrderData(full_order_data);
     const baseUrl = resolveBaseUrl([
@@ -67,8 +68,28 @@ export async function sendOrderEmail(order: any): Promise<{ success: boolean; er
     const productPath = normalizedSlug ? `/products/${normalizedSlug}` : '';
     const productUrl = `${baseUrl}${productPath}`;
 
-    // Extract checkout flow from full_order_data
-    const checkoutFlow = parsedFullOrderData?.product?.checkoutFlow || parsedFullOrderData?.product?.checkout_flow || 'Not specified';
+    // Fetch product details from database to get listed_by and checkout_flow
+    let listedBy: string | null = null;
+    let checkoutFlow = 'Not specified';
+
+    if (normalizedSlug) {
+      try {
+        const { data: product, error: productError } = await supabaseAdmin
+          .from('products')
+          .select('listed_by, checkout_flow')
+          .eq('slug', normalizedSlug)
+          .single();
+
+        if (productError) {
+          console.warn(`⚠️ Could not fetch product details for slug "${normalizedSlug}":`, productError.message);
+        } else if (product) {
+          listedBy = product.listed_by;
+          checkoutFlow = product.checkout_flow || 'Not specified';
+        }
+      } catch (productFetchError) {
+        console.warn('⚠️ Error fetching product details:', productFetchError);
+      }
+    }
 
     // Format checkout flow for display
     const formatCheckoutFlow = (flow: string): string => {
@@ -91,7 +112,7 @@ export async function sendOrderEmail(order: any): Promise<{ success: boolean; er
       <ul>
         <li><strong>Product:</strong> ${product_title}</li>
         <li><strong>Price:</strong> $${product_price}</li>
-        <li><strong>Listed By:</strong> ${product_listed_by || 'Not specified'}</li>
+        <li><strong>Listed By:</strong> ${listedBy || 'Not specified'}</li>
         <li><strong>Checkout Flow:</strong> ${formatCheckoutFlow(checkoutFlow)}</li>
         <li><strong>Product URL:</strong> ${productUrl}</li>
       </ul>

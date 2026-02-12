@@ -1,0 +1,4 @@
+id,email,role,password_hash,created_at,updated_at,last_login,is_active,created_by,metadata
+32cee07d-5fab-4d3f-893f-34d55e2b3a56,elmahboubimehdi@gmail.com,REGULAR_ADMIN,$2b$10$placeholder_hash_for_regular_admin,2026-02-11 00:20:55.81375+00,2026-02-12 03:50:37.720866+00,2026-02-12 03:50:37.638+00,true,,"{""department"":""Operations"",""display_name"":""Regular Admin""}"
+5a3cbe96-d2f4-4dde-8eef-f5b256c905e4,matrix01mehdi@gmail.com,SUPER_ADMIN,$2b$10$SzBT2lMMHza2hqEKU1rcPOROI/Em/Fxvpb1YLK3vt242iR1eIDnUm,2026-02-11 01:38:10.170054+00,2026-02-12 00:19:53.218367+00,2026-02-12 00:19:53.134+00,true,,"{""department"":""System Administration"",""display_name"":""Super Admin""}"
+ca749a04-0c48-4f6c-9c9c-6c381723c275,Matrix01mehdi@gmail.com,SUPER_ADMIN,$2b$10$placeholder_hash_for_super_admin,2026-02-11 00:20:55.81375+00,2026-02-11 00:20:55.81375+00,,true,,"{""department"":""System Administration"",""display_name"":""Super Admin""}"
