@@ -30,26 +30,112 @@ export async function POST(req: NextRequest) {
     const data = await req.json();
     const { device, deviceType, fingerprint, url, productTitle, productSlug, productPrice, action } = data;
 
-    // Get IP address from headers (no req.ip)
-    let ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '';
-    if (!ip || ip === '::1' || ip === '127.0.0.1') ip = '';
+    // Enhanced IP detection - check multiple headers
+    let ip = '';
+    const forwardedFor = req.headers.get('x-forwarded-for');
+    const realIp = req.headers.get('x-real-ip');
+    const cfConnectingIp = req.headers.get('cf-connecting-ip'); // Cloudflare
+    const xClientIp = req.headers.get('x-client-ip');
 
-    // Fetch geo info server-side using ipwho.is
+    // Priority: Cloudflare > X-Real-IP > X-Forwarded-For > X-Client-IP
+    if (cfConnectingIp) {
+      ip = cfConnectingIp.trim();
+    } else if (realIp) {
+      ip = realIp.trim();
+    } else if (forwardedFor) {
+      // X-Forwarded-For can be a comma-separated list, take the first one
+      ip = forwardedFor.split(',')[0].trim();
+    } else if (xClientIp) {
+      ip = xClientIp.trim();
+    }
+
+    // Filter out localhost/private IPs
+    const isLocalhost = !ip ||
+      ip === '::1' ||
+      ip === '127.0.0.1' ||
+      ip.startsWith('192.168.') ||
+      ip.startsWith('10.') ||
+      ip.startsWith('172.16.') ||
+      ip === 'localhost';
+
+    if (isLocalhost) {
+      ip = '';
+      console.log('🏠 [Telegram] Localhost detected, skipping geo lookup');
+    }
+
+    // Fetch geo info with multiple fallback services
     let country = 'Unknown';
     let countryFlag = '';
-    try {
-      if (ip) {
-        const geoRes = await fetch(`https://ipwho.is/${ip}`);
+    let geoSource = 'none';
+
+    if (ip) {
+      console.log(`🌍 [Telegram] Looking up geo for IP: ${ip}`);
+
+      // Try ipwho.is first (most reliable, includes country_code)
+      try {
+        const geoRes = await fetch(`https://ipwho.is/${ip}`, {
+          signal: AbortSignal.timeout(5000) // 5 second timeout
+        });
         if (geoRes.ok) {
           const geo = await geoRes.json();
-          if (geo.success) {
-            country = geo.country || 'Unknown';
+          if (geo.success && geo.country) {
+            country = geo.country;
             countryFlag = geo.country_code ? countryCodeToFlagEmoji(geo.country_code) : '';
+            geoSource = 'ipwho.is';
+            console.log(`✅ [Telegram] Geo found via ipwho.is: ${country} (${geo.country_code})`);
           }
         }
+      } catch (e) {
+        console.warn('⚠️ [Telegram] ipwho.is failed:', e instanceof Error ? e.message : String(e));
       }
-    } catch (e) {
-      // Ignore geo errors, fallback to unknown
+
+      // Fallback 1: ip-api.com (free, no key required)
+      if (country === 'Unknown') {
+        try {
+          const geoRes = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,countryCode`, {
+            signal: AbortSignal.timeout(5000)
+          });
+          if (geoRes.ok) {
+            const geo = await geoRes.json();
+            if (geo.status === 'success' && geo.country) {
+              country = geo.country;
+              countryFlag = geo.countryCode ? countryCodeToFlagEmoji(geo.countryCode) : '';
+              geoSource = 'ip-api.com';
+              console.log(`✅ [Telegram] Geo found via ip-api.com: ${country} (${geo.countryCode})`);
+            }
+          }
+        } catch (e) {
+          console.warn('⚠️ [Telegram] ip-api.com failed:', e instanceof Error ? e.message : String(e));
+        }
+      }
+
+      // Fallback 2: ipapi.co (free tier: 1000 requests/day)
+      if (country === 'Unknown') {
+        try {
+          const geoRes = await fetch(`https://ipapi.co/${ip}/json/`, {
+            signal: AbortSignal.timeout(5000)
+          });
+          if (geoRes.ok) {
+            const geo = await geoRes.json();
+            if (geo.country_name && !geo.error) {
+              country = geo.country_name;
+              countryFlag = geo.country_code ? countryCodeToFlagEmoji(geo.country_code) : '';
+              geoSource = 'ipapi.co';
+              console.log(`✅ [Telegram] Geo found via ipapi.co: ${country} (${geo.country_code})`);
+            }
+          }
+        } catch (e) {
+          console.warn('⚠️ [Telegram] ipapi.co failed:', e instanceof Error ? e.message : String(e));
+        }
+      }
+
+      if (country === 'Unknown') {
+        console.error(`❌ [Telegram] All geo services failed for IP: ${ip}`);
+      }
+    } else {
+      console.log('🔍 [Telegram] No valid IP found, using "Development/VPN"');
+      country = 'Development/VPN';
+      countryFlag = '🔒'; // Lock emoji for development/VPN
     }
 
     // Date and time (server-side)
