@@ -11,34 +11,74 @@ async function getAdminAuth(request: NextRequest) {
   const { shouldBypassAuth } = await import('@/lib/supabase/auth');
   if (shouldBypassAuth()) {
     console.log('🔓 [AUTH] Bypassing authentication for API request');
-    return 'dev-bypass-token'; // Return a mock token for dev mode
+    return { authenticated: true, role: 'SUPER_ADMIN', email: 'dev@localhost' };
   }
 
+  // Check for admin_token cookie (JWT token from our login route)
   const token = request.cookies.get('admin_token')?.value;
-  
+
   if (token) {
-    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
-    
-    if (error || !user) {
+    try {
+      // Verify JWT token using jose (same as middleware)
+      const { jwtVerify } = await import('jose');
+      const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+      const getSecretKey = () => new TextEncoder().encode(JWT_SECRET);
+
+      const { payload } = await jwtVerify(token, getSecretKey());
+
+      const decoded = payload as {
+        id: string;
+        email: string;
+        role: string;
+        isActive: boolean;
+      };
+
+      // Check if admin is active
+      if (!decoded.isActive) {
+        console.log('🚫 [AUTH] Admin account is deactivated:', decoded.email);
+        return null;
+      }
+
+      console.log('✅ [AUTH] JWT token verified for:', decoded.email, 'Role:', decoded.role);
+      return { authenticated: true, role: decoded.role, email: decoded.email };
+    } catch (error) {
+      console.error('❌ [AUTH] JWT verification failed:', error);
       return null;
     }
-    
-    const { isAdmin } = await import('@/lib/supabase/auth');
-    const adminStatus = await isAdmin(user.email || '');
-    if (!adminStatus) {
-      return null;
-    }
-    
-    return token;
-  }
-  
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
   }
 
-  const headerToken = authHeader.split('Bearer ')[1];
-  return headerToken;
+  // Fallback to Authorization header (for backward compatibility)
+  const authHeader = request.headers.get('authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const headerToken = authHeader.split('Bearer ')[1];
+
+    try {
+      const { jwtVerify } = await import('jose');
+      const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+      const getSecretKey = () => new TextEncoder().encode(JWT_SECRET);
+
+      const { payload } = await jwtVerify(headerToken, getSecretKey());
+
+      const decoded = payload as {
+        id: string;
+        email: string;
+        role: string;
+        isActive: boolean;
+      };
+
+      if (!decoded.isActive) {
+        return null;
+      }
+
+      console.log('✅ [AUTH] JWT token verified from header for:', decoded.email, 'Role:', decoded.role);
+      return { authenticated: true, role: decoded.role, email: decoded.email };
+    } catch (error) {
+      console.error('❌ [AUTH] Header JWT verification failed:', error);
+      return null;
+    }
+  }
+
+  return null;
 }
 
 async function assertFeaturedLimit(canFeature: boolean) {
