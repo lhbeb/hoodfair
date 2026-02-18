@@ -184,13 +184,11 @@ export default function RootLayout({
           </AdminRouteOnly>
         </ErrorBoundaryWrapper>
 
-        {/* Tidio Live Chat Widget */}
-        <PublicRouteOnly>
-          <Script
-            src="//code.tidio.co/9ximyjwjwmobhbw5vz7ps0vn84xhxtsr.js"
-            async
-          />
-        </PublicRouteOnly>
+        {/* Tidio Live Chat Widget - loads on all pages, CSS controls visibility */}
+        <Script
+          src="//code.tidio.co/9ximyjwjwmobhbw5vz7ps0vn84xhxtsr.js"
+          async
+        />
         <AdminRouteCheck>
           <Script
             src="https://www.googletagmanager.com/gtag/js?id=G-6ELCP7YFYP"
