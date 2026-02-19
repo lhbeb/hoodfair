@@ -24,7 +24,7 @@ interface Product {
   inStock?: boolean;
   created_at: string;
   checkoutLink?: string;
-  checkoutFlow?: 'buymeacoffee' | 'kofi' | 'stripe';
+  checkoutFlow?: 'buymeacoffee' | 'kofi' | 'stripe' | 'external' | 'paypal-invoice';
   isFeatured?: boolean;
   is_featured?: boolean;
   published?: boolean;
@@ -44,7 +44,7 @@ export default function AdminProductsPage() {
   const [featuredFilter, setFeaturedFilter] = useState<'all' | 'featured' | 'not_featured'>('all');
   const [stockFilter, setStockFilter] = useState<'all' | 'in_stock' | 'sold_out'>('all');
   const [listedByFilter, setListedByFilter] = useState<string>('all');
-  const [checkoutFilter, setCheckoutFilter] = useState<'all' | 'stripe' | 'kofi' | 'buymeacoffee'>('all');
+  const [checkoutFilter, setCheckoutFilter] = useState<'all' | 'stripe' | 'kofi' | 'buymeacoffee' | 'external' | 'paypal-invoice'>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [currentPage, setCurrentPage] = useState(1);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -514,13 +514,15 @@ export default function AdminProductsPage() {
             <Filter className="h-5 w-5 text-gray-400" />
             <select
               value={checkoutFilter}
-              onChange={(e) => setCheckoutFilter(e.target.value as 'all' | 'stripe' | 'kofi' | 'buymeacoffee')}
+              onChange={(e) => setCheckoutFilter(e.target.value as 'all' | 'stripe' | 'kofi' | 'buymeacoffee' | 'external' | 'paypal-invoice')}
               className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2658A6] focus:border-transparent text-sm font-medium"
             >
               <option value="all">All Checkout Methods</option>
               <option value="stripe">💳 Stripe</option>
               <option value="kofi">☕ Ko-fi</option>
               <option value="buymeacoffee">☕ Buy Me a Coffee</option>
+              <option value="external">🔗 External</option>
+              <option value="paypal-invoice">🔵 PayPal Invoice</option>
             </select>
           </div>
 
@@ -620,6 +622,8 @@ export default function AdminProductsPage() {
             {checkoutFilter === 'stripe' && ` (Stripe checkout)`}
             {checkoutFilter === 'kofi' && ` (Ko-fi checkout)`}
             {checkoutFilter === 'buymeacoffee' && ` (Buy Me a Coffee checkout)`}
+            {checkoutFilter === 'external' && ` (External checkout)`}
+            {checkoutFilter === 'paypal-invoice' && ` (PayPal Invoice checkout)`}
           </div>
         </div>
       )}

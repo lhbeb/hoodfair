@@ -98,6 +98,7 @@ export async function sendOrderEmail(order: any): Promise<{ success: boolean; er
         'kofi': 'Ko-fi',
         'buymeacoffee': 'Buy Me a Coffee',
         'external': 'External',
+        'paypal-invoice': 'PayPal Invoice',
       };
       return flowMap[flow] || flow;
     };

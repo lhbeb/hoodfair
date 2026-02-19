@@ -13,6 +13,7 @@ import { debugLog, debugError } from '@/utils/debug';
 import CheckoutNotifier from '@/components/CheckoutNotifier';
 import KofiCheckout from '@/components/KofiCheckout';
 import StripeCheckout from '@/components/StripeCheckout';
+import PaypalInvoiceConfirmation from '@/components/PaypalInvoiceConfirmation';
 
 // Google Ads conversion tracking helper
 const trackGoogleAdsConversion = (value?: number, currency: string = 'USD') => {
@@ -61,6 +62,7 @@ const CheckoutPage: React.FC = () => {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [showKofiCheckout, setShowKofiCheckout] = useState(false); // New state for Ko-fi iframe
   const [showStripeCheckout, setShowStripeCheckout] = useState(false); // New state for Stripe checkout
+  const [showPaypalConfirmation, setShowPaypalConfirmation] = useState(false); // New state for PayPal Invoice confirmation
   const [emailError, setEmailError] = useState('');
   const [isSendingEmail, setIsSendingEmail] = useState(false);
 
@@ -493,6 +495,10 @@ const CheckoutPage: React.FC = () => {
         // Stripe: Show Stripe checkout component
         console.log('💳 [Checkout] Stripe flow: Showing Stripe checkout');
         setShowStripeCheckout(true);
+      } else if (checkoutFlow === 'paypal-invoice') {
+        // PayPal Invoice: Show on-site confirmation, customer will receive a PayPal invoice by email
+        console.log('📧 [Checkout] PayPal Invoice flow: Showing confirmation screen');
+        setShowPaypalConfirmation(true);
       } else {
         // BuyMeACoffee or External: Redirect to external link
         console.log('🔄 [Checkout] External flow: Redirecting to', product.checkoutLink);
@@ -549,6 +555,27 @@ const CheckoutPage: React.FC = () => {
         shippingData={shippingData}
         onClose={() => {
           setShowKofiCheckout(false);
+          clearCart();
+          router.push('/');
+        }}
+      />
+    );
+  }
+
+  // PayPal Invoice flow - show on-site confirmation
+  if (showPaypalConfirmation) {
+    const { product } = cartItem;
+    return (
+      <PaypalInvoiceConfirmation
+        product={{
+          title: product.title,
+          price: product.price,
+          currency: product.currency,
+          images: product.images,
+        }}
+        shippingData={shippingData}
+        onClose={() => {
+          setShowPaypalConfirmation(false);
           clearCart();
           router.push('/');
         }}

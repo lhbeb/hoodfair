@@ -140,7 +140,7 @@ export async function updateOrderEmailStatus(
 export async function getOrdersNeedingRetry(maxRetries: number = 5): Promise<any[]> {
   try {
     const now = new Date().toISOString();
-    
+
     // Get orders where email hasn't been sent, retry count is below max, and either no retry scheduled or retry time has passed
     const { data, error } = await supabaseAdmin
       .from('orders')
@@ -159,7 +159,7 @@ export async function getOrdersNeedingRetry(maxRetries: number = 5): Promise<any
     const filtered = (data || []).filter(order => {
       const retryCount = order.email_retry_count || 0;
       const nextRetry = order.next_retry_at;
-      
+
       // Include if retry count is below max AND (no retry scheduled OR retry time has passed)
       return retryCount < maxRetries && (!nextRetry || new Date(nextRetry) <= new Date(now));
     });
@@ -231,11 +231,11 @@ export async function getAllOrders() {
 
     // Get unique product slugs from orders
     const productSlugs = [...new Set(orders.map((o: any) => o.product_slug).filter(Boolean))];
-    
-    // Fetch products to get listed_by values
+
+    // Fetch products to get listed_by and checkout_flow values
     const { data: products, error: productsError } = await supabaseAdmin
       .from('products')
-      .select('slug, listed_by')
+      .select('slug, listed_by, checkout_flow')
       .in('slug', productSlugs);
 
     if (productsError) {
@@ -244,18 +244,22 @@ export async function getAllOrders() {
       return orders || [];
     }
 
-    // Create a map of slug -> listed_by
+    // Create maps of slug -> listed_by and slug -> checkout_flow
     const productListedByMap = new Map<string, string | null>();
+    const productCheckoutFlowMap = new Map<string, string | null>();
     (products || []).forEach((p: any) => {
       productListedByMap.set(p.slug, p.listed_by || null);
+      productCheckoutFlowMap.set(p.slug, p.checkout_flow || null);
     });
 
-    // Enrich orders with product's listed_by
+    // Enrich orders with product's listed_by and checkout_flow
     const enrichedOrders = (orders || []).map((order: any) => {
       const listedBy = productListedByMap.get(order.product_slug) || null;
+      const checkoutFlow = productCheckoutFlowMap.get(order.product_slug) || null;
       return {
         ...order,
-        product_listed_by: listedBy, // Add the listed_by value from the product
+        product_listed_by: listedBy,
+        product_checkout_flow: checkoutFlow,
       };
     });
 
