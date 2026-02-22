@@ -40,7 +40,7 @@ const Footer = () => {
               </div>
               <div className="pt-2">
                 <a
-                  href="https://go.hoodfair.com/p146"
+                  href="https://go.hoodfair.com/p170"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center text-white hover:text-[#F4C446] transition-colors duration-300"

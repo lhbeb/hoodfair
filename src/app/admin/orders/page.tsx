@@ -666,28 +666,29 @@ export default function AdminOrdersPage() {
                         <Eye className="h-4 w-4 text-gray-500" />
                       </Link>
                     </div>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
                       <span className="text-xs text-gray-400">Uploader:</span>
                       <span className="text-xs font-medium text-gray-600">{order.product_listed_by || '—'}</span>
+                      {(() => {
+                        const flow = order.product_checkout_flow;
+                        if (!flow) return null;
+                        const flowLabels: Record<string, { label: string; color: string }> = {
+                          'stripe': { label: '💳 Stripe', color: 'bg-violet-100 text-violet-700' },
+                          'kofi': { label: '☕ Ko-fi', color: 'bg-yellow-100 text-yellow-700' },
+                          'buymeacoffee': { label: '☕ Buy Me a Coffee', color: 'bg-amber-100 text-amber-700' },
+                          'external': { label: '🔗 External', color: 'bg-gray-100 text-gray-600' },
+                          'paypal-invoice': { label: '🔵 PayPal Invoice', color: 'bg-blue-100 text-blue-700' },
+                        };
+                        const { label, color } = flowLabels[flow] || { label: flow, color: 'bg-gray-100 text-gray-600' };
+                        return (
+                          <>
+                            <span className="text-xs text-gray-300">·</span>
+                            <span className="text-xs text-gray-400">Checkout:</span>
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${color}`}>{label}</span>
+                          </>
+                        );
+                      })()}
                     </div>
-                    {(() => {
-                      const flow = order.product_checkout_flow;
-                      if (!flow) return null;
-                      const flowLabels: Record<string, { label: string; color: string }> = {
-                        'stripe': { label: '💳 Stripe', color: 'bg-violet-100 text-violet-700' },
-                        'kofi': { label: '☕ Ko-fi', color: 'bg-yellow-100 text-yellow-700' },
-                        'buymeacoffee': { label: '☕ Buy Me a Coffee', color: 'bg-amber-100 text-amber-700' },
-                        'external': { label: '🔗 External', color: 'bg-gray-100 text-gray-600' },
-                        'paypal-invoice': { label: '🔵 PayPal Invoice', color: 'bg-blue-100 text-blue-700' },
-                      };
-                      const { label, color } = flowLabels[flow] || { label: flow, color: 'bg-gray-100 text-gray-600' };
-                      return (
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-gray-400">Checkout:</span>
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${color}`}>{label}</span>
-                        </div>
-                      );
-                    })()}
                   </div>
 
                   {/* Price & Date */}
@@ -825,7 +826,7 @@ export default function AdminOrdersPage() {
                             'external': { label: '🔗 External', color: 'bg-gray-100 text-gray-600' },
                             'paypal-invoice': { label: '🔵 PayPal Invoice', color: 'bg-blue-100 text-blue-700' },
                           };
-                          const { label, color } = flowLabels[flow] || { label: flow || 'Not specified', color: 'bg-gray-100 text-gray-500' };
+                          const { label, color } = (flow ? flowLabels[flow] : undefined) || { label: flow || 'Not specified', color: 'bg-gray-100 text-gray-500' };
                           return (
                             <div className="flex items-center gap-2">
                               <ExternalLink className="h-4 w-4 text-gray-400" />
