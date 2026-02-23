@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { MapPin, Mail, ChevronRight, Lock } from 'lucide-react';
 
 interface PaypalInvoiceConfirmationProps {
     shippingData: {
@@ -23,12 +23,10 @@ interface PaypalInvoiceConfirmationProps {
 export default function PaypalInvoiceConfirmation({ shippingData, product, onClose }: PaypalInvoiceConfirmationProps) {
     const [visible, setVisible] = useState(false);
     const [dotStep, setDotStep] = useState(0);
-
     const currencySymbol = product.currency === 'EUR' ? '€' : product.currency === 'GBP' ? '£' : '$';
 
     useEffect(() => {
         const t = setTimeout(() => setVisible(true), 60);
-        // Animate the "preparing invoice" dot
         const interval = setInterval(() => setDotStep(s => (s + 1) % 4), 500);
         return () => { clearTimeout(t); clearInterval(interval); };
     }, []);
@@ -36,76 +34,127 @@ export default function PaypalInvoiceConfirmation({ shippingData, product, onClo
     const dots = ['', '.', '..', '...'];
 
     return (
-        <div
-            className={`flex flex-col items-center justify-center min-h-screen bg-[#0d1523] px-6 py-12 transition-all duration-700 ${visible ? 'opacity-100' : 'opacity-0'}`}
-        >
-            {/* ── PAYPAL EMBLEM ── */}
-            <div className="mb-8 relative">
-                {/* Outer glow ring */}
-                <div className="absolute inset-0 rounded-full bg-[#003087]/30 blur-xl scale-150" />
-                <div className="relative w-20 h-20 rounded-full bg-[#003087] flex items-center justify-center shadow-2xl">
-                    <span className="text-white font-black text-3xl select-none tracking-tight">P</span>
-                </div>
-            </div>
-
-            {/* ── HEADLINE ── */}
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white text-center tracking-tight leading-tight mb-3">
-                Your order is reserved.
-            </h1>
-
-            {/* ── SUBTITLE ── */}
-            <p className="text-[#8ba3c4] text-center text-base max-w-xs leading-relaxed mb-10">
-                We&apos;re preparing your PayPal invoice{dots[dotStep]}<br />
-                It&apos;s heading to{' '}
-                <span className="text-white font-semibold">{shippingData.email}</span>
-            </p>
-
-            {/* ── DIVIDER ── */}
-            <div className="w-full max-w-xs mb-8">
-                <div className="h-px bg-white/10" />
-            </div>
-
-            {/* ── WHAT'S NEXT — minimal, two lines ── */}
-            <div className="w-full max-w-xs flex flex-col gap-5 mb-10">
-                <div className="flex items-start gap-4">
-                    <span className="text-xl flex-shrink-0 mt-0.5">📩</span>
-                    <div>
-                        <p className="text-white text-sm font-semibold leading-snug">Check your inbox</p>
-                        <p className="text-[#8ba3c4] text-xs mt-0.5 leading-relaxed">
-                            Open the PayPal invoice — tap <strong className="text-white">Pay Now</strong>. That&apos;s it.
-                        </p>
-                    </div>
-                </div>
-                <div className="flex items-start gap-4">
-                    <span className="text-xl flex-shrink-0 mt-0.5">📦</span>
-                    <div>
-                        <p className="text-white text-sm font-semibold leading-snug">We ship instantly</p>
-                        <p className="text-[#8ba3c4] text-xs mt-0.5 leading-relaxed">
-                            Once payment lands, <span className="text-white">{product.title}</span> ships to your door.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            {/* ── ORDER AMOUNT LINE ── */}
-            <div className="w-full max-w-xs flex items-center justify-between mb-8 px-4 py-3 bg-white/5 rounded-2xl border border-white/10">
-                <span className="text-[#8ba3c4] text-xs">Invoice amount</span>
-                <span className="text-white font-bold text-base">{currencySymbol}{product.price.toFixed(2)}</span>
-            </div>
-
-            {/* ── CTA ── */}
-            <button
-                onClick={onClose}
-                className="w-full max-w-xs py-4 px-6 bg-white hover:bg-gray-100 active:scale-[0.98] text-[#0d1523] font-bold rounded-2xl transition-all duration-200 text-sm flex items-center justify-center gap-1.5 shadow-xl"
+        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 py-12">
+            <div
+                className={`w-full max-w-md transition-all duration-500 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
             >
-                Continue Shopping
-                <ChevronRight className="h-4 w-4" />
-            </button>
+                {/* ── MAIN CARD ── */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
 
-            {/* ── FOOTER NOTE ── */}
-            <p className="mt-6 text-[10px] text-[#8ba3c4]/60 text-center max-w-xs">
-                Questions? <a href="mailto:support@hoodfair.com" className="underline text-[#8ba3c4] hover:text-white transition-colors">support@hoodfair.com</a>
-            </p>
+                    {/* Top accent bar — brand blue */}
+                    <div className="h-1 w-full bg-[#2658A6]" />
+
+                    <div className="p-6 sm:p-8">
+
+                        {/* ── LOGO + HEADLINE ── */}
+                        <div className="flex flex-col items-center mb-7">
+                            <div className="w-16 h-16 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center mb-4 overflow-hidden">
+                                <img
+                                    src="/paypal-incoice.webp"
+                                    alt="PayPal Invoice"
+                                    className="w-12 h-12 object-contain"
+                                />
+                            </div>
+                            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#262626] tracking-tight text-center leading-tight">
+                                Order Reserved
+                            </h1>
+                            <p className="mt-2 text-sm text-gray-500 text-center">
+                                Preparing your PayPal invoice{dots[dotStep]}
+                            </p>
+                        </div>
+
+                        {/* ── PAYPAL INVOICE NOTICE ── */}
+                        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-5">
+                            <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-full bg-white border border-blue-100 shadow-sm flex items-center justify-center flex-shrink-0 overflow-hidden mt-0.5">
+                                    <img
+                                        src="/paypal-incoice.webp"
+                                        alt="PayPal"
+                                        className="w-5 h-5 object-contain"
+                                    />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-semibold text-[#2658A6] mb-0.5">PayPal Invoice on its way</p>
+                                    <p className="text-sm text-gray-600">
+                                        A PayPal invoice is being sent to{' '}
+                                        <span className="font-semibold text-[#2658A6] break-all">{shippingData.email}</span>.
+                                        Open it and tap <strong>Pay Now</strong> to confirm your order.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ── SHIPPING ADDRESS ── */}
+                        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-5">
+                            <div className="flex items-center gap-2 mb-2">
+                                <MapPin className="h-4 w-4 text-[#2658A6]" />
+                                <span className="text-sm font-semibold text-[#2658A6]">Confirmed Delivery Address</span>
+                            </div>
+                            <div className="text-sm text-gray-800 leading-relaxed space-y-0.5 pl-6">
+                                {shippingData.streetAddress && <div>{shippingData.streetAddress}</div>}
+                                {shippingData.city && (
+                                    <div>
+                                        {shippingData.city}
+                                        {shippingData.state ? `, ${shippingData.state}` : ''}
+                                        {shippingData.zipCode ? ` ${shippingData.zipCode}` : ''}
+                                    </div>
+                                )}
+                            </div>
+                            {shippingData.email && (
+                                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-blue-100 pl-6">
+                                    <Mail className="h-3.5 w-3.5 text-[#2658A6] flex-shrink-0" />
+                                    <span className="text-sm text-[#2658A6] break-all">{shippingData.email}</span>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* ── WHAT'S NEXT ── */}
+                        <div className="mb-6 grid grid-cols-1 gap-3">
+                            {[
+                                { step: '1', text: <span>Check your inbox for a PayPal invoice at <strong>{shippingData.email}</strong></span> },
+                                { step: '2', text: <span>Tap <strong>Pay Now</strong> to complete your payment via PayPal</span> },
+                                { step: '3', text: <span>Once confirmed, <strong>{product.title}</strong> ships straight to your door</span> },
+                            ].map(({ step, text }) => (
+                                <div key={step} className="flex items-start gap-3">
+                                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#2658A6] text-white text-xs font-bold flex items-center justify-center mt-0.5">
+                                        {step}
+                                    </span>
+                                    <span className="text-sm text-gray-600">{text}</span>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* ── AMOUNT ROW ── */}
+                        <div className="flex items-center justify-between py-3 border-t border-gray-100 mb-6">
+                            <span className="text-sm text-gray-500">Invoice amount</span>
+                            <span className="text-base font-bold text-[#2658A6]">{currencySymbol}{product.price.toFixed(2)}</span>
+                        </div>
+
+                        {/* ── CTA ── */}
+                        <button
+                            onClick={onClose}
+                            className="w-full py-3.5 px-6 bg-[#2658A6] hover:bg-[#1a3d70] active:scale-[0.98] text-white font-bold rounded-xl transition-all duration-200 text-sm flex items-center justify-center gap-1.5"
+                        >
+                            Continue Shopping
+                            <ChevronRight className="h-4 w-4" />
+                        </button>
+
+                        {/* ── SSL NOTICE ── */}
+                        <div className="flex items-center justify-center gap-2 mt-4 text-xs text-gray-400">
+                            <Lock className="h-3.5 w-3.5 text-[#2658A6]" />
+                            <span>Your information is secured with SSL.</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Support line below card */}
+                <p className="mt-4 text-center text-xs text-gray-400">
+                    Questions?{' '}
+                    <a href="mailto:support@hoodfair.com" className="text-[#2658A6] hover:underline">
+                        support@hoodfair.com
+                    </a>
+                </p>
+            </div>
         </div>
     );
 }
