@@ -453,7 +453,123 @@ export default function NewProductPage() {
       <form onSubmit={handleSubmit} className="space-y-4 max-w-3xl">
 
         {/* ═══════════════════════════════════════════════════════════════
-            SECTION 1: BASIC INFO
+            SECTION 1: PRICING
+        ═══════════════════════════════════════════════════════════════ */}
+        <Section id="pricing" icon={DollarSign} title="Pricing" description="Set product price and payment details">
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <Field label="Price" required>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.price}
+                    onChange={(e) => updateField('price', e.target.value)}
+                    placeholder="0.00"
+                    required
+                    className="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all"
+                  />
+                </div>
+              </Field>
+
+              <Field label="Original Price" hint="For discount display">
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.original_price}
+                    onChange={(e) => updateField('original_price', e.target.value)}
+                    placeholder="0.00"
+                    className="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all"
+                  />
+                </div>
+              </Field>
+
+              <Field label="Currency">
+                <select
+                  value={formData.currency}
+                  onChange={(e) => updateField('currency', e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all bg-white"
+                >
+                  <option value="USD">USD ($)</option>
+                  <option value="EUR">EUR (€)</option>
+                  <option value="GBP">GBP (£)</option>
+                </select>
+              </Field>
+            </div>
+
+            {/* Discount Badge */}
+            {discount && (
+              <div className="inline-flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                <Tag className="h-4 w-4" />
+                <span className="font-medium">{discount}% OFF</span>
+                <span className="text-green-600">
+                  (Save ${(parseFloat(formData.original_price) - parseFloat(formData.price)).toFixed(2)})
+                </span>
+              </div>
+            )}
+
+            <div className="pt-4 border-t border-gray-100">
+              <Field label="Checkout Link" required>
+                <input
+                  type="url"
+                  value={formData.checkout_link}
+                  onChange={(e) => updateField('checkout_link', e.target.value)}
+                  placeholder="https://..."
+                  required
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all"
+                />
+              </Field>
+
+              <Field label="Checkout Flow" required hint="Select how customers will complete their purchase">
+                <select
+                  value={formData.checkout_flow}
+                  onChange={(e) => updateField('checkout_flow', e.target.value as 'buymeacoffee' | 'kofi' | 'external' | 'stripe' | 'paypal-invoice')}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all bg-white"
+                  required
+                >
+                  <option value="buymeacoffee">BuyMeACoffee (External - Redirects to payment link)</option>
+                  <option value="kofi">Ko-fi (Iframe - Embedded on your site)</option>
+                  <option value="stripe">Stripe (Stripe Checkout - Professional payment processing)</option>
+                  <option value="external">External (Custom payment provider)</option>
+                  <option value="paypal-invoice">PayPal Invoice (On-site confirmation — invoice sent by email)</option>
+                </select>
+                <div className="mt-2 p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                  <p className="text-xs text-blue-800">
+                    {formData.checkout_flow === 'kofi' ? (
+                      <>
+                        <strong>Ko-fi (Iframe):</strong> Customer stays on your site. Payment form loads in an embedded iframe after address confirmation.
+                      </>
+                    ) : formData.checkout_flow === 'stripe' ? (
+                      <>
+                        <strong>Stripe:</strong> Customer is redirected to Stripe&apos;s secure checkout page. Requires Stripe API keys in environment variables.
+                      </>
+                    ) : formData.checkout_flow === 'external' ? (
+                      <>
+                        <strong>External:</strong> Customer is redirected to your custom payment provider after address confirmation.
+                      </>
+                    ) : formData.checkout_flow === 'paypal-invoice' ? (
+                      <>
+                        <strong>PayPal Invoice:</strong> Customer sees an on-site &ldquo;Order Confirmed — Pending Payment&rdquo; screen. A PayPal invoice is sent to their email. No redirect or iframe needed — checkout link is not required.
+                      </>
+                    ) : (
+                      <>
+                        <strong>BuyMeACoffee (External):</strong> Customer is redirected to external checkout link after address confirmation.
+                      </>
+                    )}
+                  </p>
+                </div>
+              </Field>
+            </div>
+          </div>
+        </Section>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            SECTION 2: BASIC INFO
         ═══════════════════════════════════════════════════════════════ */}
         <Section id="basic" icon={Package} title="Basic Information" description="Title, description, and product details">
           <div className="space-y-4">
@@ -597,122 +713,6 @@ export default function NewProductPage() {
                 <span className="text-sm text-gray-700">Featured</span>
                 <span className="text-xs text-gray-400">({featuredCount}/{FEATURE_LIMIT})</span>
               </label>
-            </div>
-          </div>
-        </Section>
-
-        {/* ═══════════════════════════════════════════════════════════════
-            SECTION 2: PRICING
-        ═══════════════════════════════════════════════════════════════ */}
-        <Section id="pricing" icon={DollarSign} title="Pricing" description="Set product price and payment details">
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <Field label="Price" required>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.price}
-                    onChange={(e) => updateField('price', e.target.value)}
-                    placeholder="0.00"
-                    required
-                    className="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all"
-                  />
-                </div>
-              </Field>
-
-              <Field label="Original Price" hint="For discount display">
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.original_price}
-                    onChange={(e) => updateField('original_price', e.target.value)}
-                    placeholder="0.00"
-                    className="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all"
-                  />
-                </div>
-              </Field>
-
-              <Field label="Currency">
-                <select
-                  value={formData.currency}
-                  onChange={(e) => updateField('currency', e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all bg-white"
-                >
-                  <option value="USD">USD ($)</option>
-                  <option value="EUR">EUR (€)</option>
-                  <option value="GBP">GBP (£)</option>
-                </select>
-              </Field>
-            </div>
-
-            {/* Discount Badge */}
-            {discount && (
-              <div className="inline-flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
-                <Tag className="h-4 w-4" />
-                <span className="font-medium">{discount}% OFF</span>
-                <span className="text-green-600">
-                  (Save ${(parseFloat(formData.original_price) - parseFloat(formData.price)).toFixed(2)})
-                </span>
-              </div>
-            )}
-
-            <div className="pt-4 border-t border-gray-100">
-              <Field label="Checkout Link" required>
-                <input
-                  type="url"
-                  value={formData.checkout_link}
-                  onChange={(e) => updateField('checkout_link', e.target.value)}
-                  placeholder="https://..."
-                  required
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all"
-                />
-              </Field>
-
-              <Field label="Checkout Flow" required hint="Select how customers will complete their purchase">
-                <select
-                  value={formData.checkout_flow}
-                  onChange={(e) => updateField('checkout_flow', e.target.value as 'buymeacoffee' | 'kofi' | 'external' | 'stripe' | 'paypal-invoice')}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2658A6] focus:border-[#2658A6] outline-none transition-all bg-white"
-                  required
-                >
-                  <option value="buymeacoffee">BuyMeACoffee (External - Redirects to payment link)</option>
-                  <option value="kofi">Ko-fi (Iframe - Embedded on your site)</option>
-                  <option value="stripe">Stripe (Stripe Checkout - Professional payment processing)</option>
-                  <option value="external">External (Custom payment provider)</option>
-                  <option value="paypal-invoice">PayPal Invoice (On-site confirmation — invoice sent by email)</option>
-                </select>
-                <div className="mt-2 p-3 bg-blue-50 border border-blue-100 rounded-lg">
-                  <p className="text-xs text-blue-800">
-                    {formData.checkout_flow === 'kofi' ? (
-                      <>
-                        <strong>Ko-fi (Iframe):</strong> Customer stays on your site. Payment form loads in an embedded iframe after address confirmation.
-                      </>
-                    ) : formData.checkout_flow === 'stripe' ? (
-                      <>
-                        <strong>Stripe:</strong> Customer is redirected to Stripe&apos;s secure checkout page. Requires Stripe API keys in environment variables.
-                      </>
-                    ) : formData.checkout_flow === 'external' ? (
-                      <>
-                        <strong>External:</strong> Customer is redirected to your custom payment provider after address confirmation.
-                      </>
-                    ) : formData.checkout_flow === 'paypal-invoice' ? (
-                      <>
-                        <strong>PayPal Invoice:</strong> Customer sees an on-site &ldquo;Order Confirmed — Pending Payment&rdquo; screen. A PayPal invoice is sent to their email. No redirect or iframe needed — checkout link is not required.
-                      </>
-                    ) : (
-                      <>
-                        <strong>BuyMeACoffee (External):</strong> Customer is redirected to external checkout link after address confirmation.
-                      </>
-                    )}
-                  </p>
-                </div>
-              </Field>
             </div>
           </div>
         </Section>
