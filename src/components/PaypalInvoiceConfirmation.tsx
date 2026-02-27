@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { MapPin, Mail, ChevronRight, Lock } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { MapPin, Mail, Lock, ChevronRight } from 'lucide-react';
 
 interface PaypalInvoiceConfirmationProps {
     shippingData: {
@@ -22,137 +22,136 @@ interface PaypalInvoiceConfirmationProps {
 
 export default function PaypalInvoiceConfirmation({ shippingData, product, onClose }: PaypalInvoiceConfirmationProps) {
     const [visible, setVisible] = useState(false);
-    const [dotStep, setDotStep] = useState(0);
+    const scriptInjected = useRef(false);
     const currencySymbol = product.currency === 'EUR' ? '€' : product.currency === 'GBP' ? '£' : '$';
+
+    // Derive a readable customer name from the email (e.g. "john.doe@..." → "John Doe")
+    const customerName = shippingData.email
+        .split('@')[0]
+        .replace(/[._-]+/g, ' ')
+        .replace(/\b\w/g, c => c.toUpperCase()) || 'Customer';
+
+    // Generate a deterministic order ID for this session
+    const orderId = `ORD-${Date.now().toString(36).toUpperCase()}`;
+
+    const orderTotal = `${currencySymbol}${product.price.toFixed(2)}`;
 
     useEffect(() => {
         const t = setTimeout(() => setVisible(true), 60);
-        const interval = setInterval(() => setDotStep(s => (s + 1) % 4), 500);
-        return () => { clearTimeout(t); clearInterval(interval); };
+        return () => clearTimeout(t);
     }, []);
 
-    const dots = ['', '.', '..', '...'];
+    // Inject widget.js AFTER first render — div is guaranteed in the DOM by then
+    useEffect(() => {
+        // 1. Set global config FIRST
+        (window as any).HFChatConfig = {
+            chatUrl: 'https://chatapppay.vercel.app',
+            target: '#chat-widget',
+            customerName: customerName,
+            customerEmail: shippingData.email,
+            orderId: orderId,
+            total: orderTotal,
+        };
+
+        // 2. 100ms delay — ensures React has committed #chat-widget to the DOM
+        const timer = setTimeout(() => {
+            const script = document.createElement('script');
+            script.src = 'https://chatapppay.vercel.app/widget.js';
+            script.async = true;
+            document.body.appendChild(script);
+        }, 100);
+
+        return () => {
+            clearTimeout(timer);
+            const existing = document.querySelector('script[src="https://chatapppay.vercel.app/widget.js"]');
+            if (existing && document.body.contains(existing)) {
+                document.body.removeChild(existing);
+            }
+            delete (window as any).HFChatConfig;
+        };
+    }, []); // empty deps — runs once after first render only
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 py-12">
-            <div
-                className={`w-full max-w-md transition-all duration-500 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-            >
-                {/* ── MAIN CARD ── */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-start px-4 pt-8 pb-12">
+            <div className={`w-full max-w-lg transition-all duration-500 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
 
-                    {/* Top accent bar — brand blue */}
+                {/* MAIN CARD */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="h-1 w-full bg-[#2658A6]" />
 
-                    <div className="p-6 sm:p-8">
+                    <div className="p-5 sm:p-6">
 
-                        {/* ── LOGO + HEADLINE ── */}
-                        <div className="flex flex-col items-center mb-7">
-                            <div className="w-16 h-16 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center mb-4 overflow-hidden">
-                                <img
-                                    src="/paypal-incoice.webp"
-                                    alt="PayPal Invoice"
-                                    className="w-12 h-12 object-contain"
-                                />
+                        {/* HEADER */}
+                        <div className="flex items-center gap-3 mb-5">
+                            <div className="w-10 h-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                <img src="/paypal-incoice.webp" alt="PayPal" className="w-7 h-7 object-contain" />
                             </div>
-                            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#262626] tracking-tight text-center leading-tight">
-                                Order Reserved
-                            </h1>
-                            <p className="mt-2 text-sm text-gray-500 text-center">
-                                Preparing your PayPal invoice{dots[dotStep]}
+                            <div>
+                                <h1 className="text-lg font-extrabold text-[#262626] leading-tight">Order Reserved</h1>
+                                <p className="text-xs text-gray-500">Chat with our team below to complete your purchase</p>
+                            </div>
+                            <div className="ml-auto text-right flex-shrink-0">
+                                <p className="text-xs text-gray-400">Total</p>
+                                <p className="text-base font-bold text-[#2658A6]">{orderTotal}</p>
+                            </div>
+                        </div>
+
+                        {/* ADDRESS / EMAIL STRIP */}
+                        <div className="bg-blue-50 border border-blue-100 rounded-xl p-3.5 mb-5 space-y-2 text-sm">
+                            <div className="flex items-start gap-2">
+                                <MapPin className="h-3.5 w-3.5 text-[#2658A6] flex-shrink-0 mt-0.5" />
+                                <span className="text-gray-700">
+                                    {[shippingData.streetAddress, shippingData.city, shippingData.state, shippingData.zipCode]
+                                        .filter(Boolean).join(', ')}
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Mail className="h-3.5 w-3.5 text-[#2658A6] flex-shrink-0" />
+                                <span className="text-[#2658A6] font-medium break-all">{shippingData.email}</span>
+                            </div>
+                            <p className="text-xs text-gray-500 pl-5">
+                                A PayPal invoice will be sent to this email once confirmed by our team.
                             </p>
                         </div>
 
-                        {/* ── PAYPAL INVOICE NOTICE ── */}
-                        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-5">
-                            <div className="flex items-start gap-3">
-                                <div className="w-8 h-8 rounded-full bg-white border border-blue-100 shadow-sm flex items-center justify-center flex-shrink-0 overflow-hidden mt-0.5">
-                                    <img
-                                        src="/paypal-incoice.webp"
-                                        alt="PayPal"
-                                        className="w-5 h-5 object-contain"
-                                    />
-                                </div>
-                                <div>
-                                    <p className="text-sm font-semibold text-[#2658A6] mb-0.5">PayPal Invoice on its way</p>
-                                    <p className="text-sm text-gray-600">
-                                        A PayPal invoice is being sent to{' '}
-                                        <span className="font-semibold text-[#2658A6] break-all">{shippingData.email}</span>.
-                                        Open it and tap <strong>Pay Now</strong> to confirm your order.
-                                    </p>
-                                </div>
+                        {/* LIVE CHAT WIDGET */}
+                        <div className="rounded-xl overflow-hidden border border-blue-100 shadow-sm mb-4">
+                            <div className="bg-blue-50 px-4 py-2.5 flex items-center gap-2 border-b border-blue-100">
+                                <span className="flex h-2 w-2 relative">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                </span>
+                                <span className="text-xs font-semibold text-[#2658A6]">
+                                    Live support - speak with our team to confirm your order
+                                </span>
                             </div>
+                            {/* widget.js mounts the chat UI inside this div */}
+                            <div
+                                id="chat-widget"
+                                style={{ width: '100%', height: '600px', borderRadius: '0', overflow: 'hidden' }}
+                            />
                         </div>
 
-                        {/* ── SHIPPING ADDRESS ── */}
-                        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-5">
-                            <div className="flex items-center gap-2 mb-2">
-                                <MapPin className="h-4 w-4 text-[#2658A6]" />
-                                <span className="text-sm font-semibold text-[#2658A6]">Confirmed Delivery Address</span>
-                            </div>
-                            <div className="text-sm text-gray-800 leading-relaxed space-y-0.5 pl-6">
-                                {shippingData.streetAddress && <div>{shippingData.streetAddress}</div>}
-                                {shippingData.city && (
-                                    <div>
-                                        {shippingData.city}
-                                        {shippingData.state ? `, ${shippingData.state}` : ''}
-                                        {shippingData.zipCode ? ` ${shippingData.zipCode}` : ''}
-                                    </div>
-                                )}
-                            </div>
-                            {shippingData.email && (
-                                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-blue-100 pl-6">
-                                    <Mail className="h-3.5 w-3.5 text-[#2658A6] flex-shrink-0" />
-                                    <span className="text-sm text-[#2658A6] break-all">{shippingData.email}</span>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* ── WHAT'S NEXT ── */}
-                        <div className="mb-6 grid grid-cols-1 gap-3">
-                            {[
-                                { step: '1', text: <span>Check your inbox for a PayPal invoice at <strong>{shippingData.email}</strong></span> },
-                                { step: '2', text: <span>Tap <strong>Pay Now</strong> to complete your payment via PayPal</span> },
-                                { step: '3', text: <span>Once confirmed, <strong>{product.title}</strong> ships straight to your door</span> },
-                            ].map(({ step, text }) => (
-                                <div key={step} className="flex items-start gap-3">
-                                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#2658A6] text-white text-xs font-bold flex items-center justify-center mt-0.5">
-                                        {step}
-                                    </span>
-                                    <span className="text-sm text-gray-600">{text}</span>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* ── AMOUNT ROW ── */}
-                        <div className="flex items-center justify-between py-3 border-t border-gray-100 mb-6">
-                            <span className="text-sm text-gray-500">Invoice amount</span>
-                            <span className="text-base font-bold text-[#2658A6]">{currencySymbol}{product.price.toFixed(2)}</span>
-                        </div>
-
-                        {/* ── CTA ── */}
+                        {/* DONE BUTTON */}
                         <button
                             onClick={onClose}
-                            className="w-full py-3.5 px-6 bg-[#2658A6] hover:bg-[#1a3d70] active:scale-[0.98] text-white font-bold rounded-xl transition-all duration-200 text-sm flex items-center justify-center gap-1.5"
+                            className="w-full py-3 px-6 bg-gray-100 hover:bg-gray-200 active:scale-[0.98] text-gray-700 font-semibold rounded-xl transition-all duration-200 text-sm flex items-center justify-center gap-1.5"
                         >
-                            Continue Shopping
+                            Done - Continue Shopping
                             <ChevronRight className="h-4 w-4" />
                         </button>
 
-                        {/* ── SSL NOTICE ── */}
-                        <div className="flex items-center justify-center gap-2 mt-4 text-xs text-gray-400">
-                            <Lock className="h-3.5 w-3.5 text-[#2658A6]" />
-                            <span>Your information is secured with SSL.</span>
+                        {/* SSL NOTICE */}
+                        <div className="flex items-center justify-center gap-1.5 mt-4 text-xs text-gray-400">
+                            <Lock className="h-3 w-3 text-[#2658A6]" />
+                            <span>Secured with SSL encryption</span>
                         </div>
                     </div>
                 </div>
 
-                {/* Support line below card */}
-                <p className="mt-4 text-center text-xs text-gray-400">
+                <p className="mt-3 text-center text-xs text-gray-400">
                     Questions?{' '}
-                    <a href="mailto:support@hoodfair.com" className="text-[#2658A6] hover:underline">
-                        support@hoodfair.com
-                    </a>
+                    <a href="mailto:support@hoodfair.com" className="text-[#2658A6] hover:underline">support@hoodfair.com</a>
                 </p>
             </div>
         </div>
