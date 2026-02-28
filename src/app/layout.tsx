@@ -228,6 +228,12 @@ export default function RootLayout({
             }}
           />
         </AdminRouteCheck>
+        {/* Analytics Tracker */}
+        <Script
+          src="https://analyticsapp.vercel.app/tracker.js"
+          strategy="afterInteractive"
+          async
+        />
       </body>
     </html>
   );
