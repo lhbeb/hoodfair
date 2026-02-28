@@ -14,7 +14,8 @@ import {
   X,
   Zap,
   LayoutDashboard,
-  Terminal
+  Terminal,
+  BarChart2
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { lockScroll, unlockScroll } from '@/utils/scrollUtils';
@@ -33,6 +34,7 @@ const getMainNavItems = (ordersCount: number): NavItem[] => [
   { name: 'Products', path: '/admin/products', icon: Package, description: 'Manage inventory' },
   { name: 'Orders', path: '/admin/orders', icon: ShoppingCart, description: 'View all orders', badge: ordersCount > 0 ? ordersCount : undefined },
   { name: 'Scripts', path: '/admin/scripts', icon: Terminal, description: 'Run DB scripts' },
+  { name: 'Analytics', path: '/admin/analytics', icon: BarChart2, description: 'Traffic & visitors' },
 ];
 
 const quickActions: NavItem[] = [
